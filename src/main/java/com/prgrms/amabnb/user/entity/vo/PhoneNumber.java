@@ -7,18 +7,20 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Embeddable
+@EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PhoneNumber {
 
-    private static final String PHONE_NUMBER_REGEX = "\\d{3}-\\d{3,4}-\\d{4}";
+    private static final String PHONE_NUMBER_REGEX = "01\\d{1}-\\d{3,4}-\\d{4}";
     private static final Pattern PHONE_NUMBER_PATTERN = Pattern.compile(PHONE_NUMBER_REGEX);
 
-    @Column(name = "phone_number", nullable = false, unique = true, length = 20)
+    @Column(name = "phone_number", unique = true, length = 20)
     private String number;
 
     public PhoneNumber(String number) {
@@ -31,14 +33,14 @@ public class PhoneNumber {
         validateFormat(number);
     }
 
-    private void validateFormat(String number) {
-        if (!PHONE_NUMBER_PATTERN.matcher(number).matches()) {
+    private void validateBlank(String number) {
+        if (Objects.isNull(number) || number.isBlank()) {
             throw new IllegalArgumentException();
         }
     }
 
-    private void validateBlank(String number) {
-        if (Objects.isNull(number) || number.isBlank()) {
+    private void validateFormat(String number) {
+        if (!PHONE_NUMBER_PATTERN.matcher(number).matches()) {
             throw new IllegalArgumentException();
         }
     }
