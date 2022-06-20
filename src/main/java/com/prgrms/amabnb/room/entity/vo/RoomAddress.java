@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+import java.util.Objects;
 
 @Getter
 @Embeddable
@@ -14,34 +15,36 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RoomAddress {
 
+    private final String ZIPCODE_REGEX = "^\\d{5}$";
+
     @Column(nullable = false)
-    private int zipcode;
+    private String zipcode;
 
     @Column(nullable = false)
     private String address;
 
     private String detailAddress;
 
-    public RoomAddress(int zipcode, String address, String detailAddress) {
+    public RoomAddress(String zipcode, String address, String detailAddress) {
         validateRoomAddress(zipcode, address);
         this.zipcode = zipcode;
         this.address = address;
         this.detailAddress = detailAddress;
     }
 
-    private void validateRoomAddress(int zipcode, String address) {
+    private void validateRoomAddress(String zipcode, String address) {
         validateZipcode(zipcode);
         validateAddress(address);
     }
 
-    private void validateZipcode(int zipcode) {
-        if (zipcode < 0) {
+    private void validateZipcode(String zipcode) {
+        if (Objects.isNull(zipcode) || zipcode.isBlank() || !zipcode.matches(ZIPCODE_REGEX)) {
             throw new IllegalArgumentException("우편번호 입력값이 잘못됐습니다");
         }
     }
 
     private void validateAddress(String address) {
-        if (address.isBlank()) {
+        if (Objects.isNull(address) || address.isBlank()) {
             throw new IllegalArgumentException("주소 입력값이 잘못됐습니다");
         }
     }

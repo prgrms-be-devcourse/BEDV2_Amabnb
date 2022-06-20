@@ -2,19 +2,9 @@ package com.prgrms.amabnb.room.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
 import com.prgrms.amabnb.common.model.Money;
@@ -38,6 +28,7 @@ public class Room extends BaseEntity {
     private Long id;
 
     @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "price"))
     private Money price;
 
     @Lob
@@ -72,7 +63,7 @@ public class Room extends BaseEntity {
     @Builder
     public Room(Long id, Money price, String description, int maxGuestNum, RoomAddress address, RoomOption roomOption,
                 RoomType roomType, RoomScope roomScope) {
-        validateRoom(maxGuestNum, description);
+        validateRoom(price, maxGuestNum, description, address, roomType, roomScope);
         this.id = id;
         this.price = price;
         this.description = description;
@@ -83,20 +74,48 @@ public class Room extends BaseEntity {
         this.roomScope = roomScope;
     }
 
-    private void validateRoom(int maxGuestNum, String description) {
+    private void validateRoom(Money price, int maxGuestNum, String description, RoomAddress roomAddress, RoomType roomType, RoomScope roomScope) {
         validateMaxGuestNum(maxGuestNum);
         validateDescription(description);
+        isPresentPrice(price);
+        isPresentRoomAddress(roomAddress);
+        isPresentRoomType(roomType);
+        isPresentRoomScope(roomScope);
     }
 
     private void validateMaxGuestNum(int maxGuestNum) {
         if (maxGuestNum < 1) {
-            throw new IllegalArgumentException("최대 인원 수 입력값이 잘못됐습니다.");
+            throw new IllegalArgumentException("최대 인원 수 입력값이 잘못됐습니다");
         }
     }
 
     private void validateDescription(String description) {
-        if (description.isBlank()) {
-            throw new IllegalArgumentException();
+        if (Objects.isNull(description) || description.isBlank()) {
+            throw new IllegalArgumentException("숙소 정보 입력값이 잘못됐습니다");
+        }
+    }
+
+    private void isPresentRoomAddress(RoomAddress roomAddress) {
+        if (Objects.isNull(roomAddress)) {
+            throw new IllegalArgumentException("숙소 주소를 입력하지 않았습니다");
+        }
+    }
+
+    private void isPresentPrice(Money price) {
+        if (Objects.isNull(price)) {
+            throw new IllegalArgumentException("가격을 입력하지 않았습니다");
+        }
+    }
+
+    private void isPresentRoomType(RoomType roomType) {
+        if (Objects.isNull(roomType)) {
+            throw new IllegalArgumentException("숙소 유형이 정해지지 않았습니다");
+        }
+    }
+
+    private void isPresentRoomScope(RoomScope roomScope) {
+        if (Objects.isNull(roomScope)) {
+            throw new IllegalArgumentException("숙소 이용 범위가 정해지지 않았습니다");
         }
     }
 }
