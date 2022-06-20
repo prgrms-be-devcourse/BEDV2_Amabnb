@@ -17,11 +17,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Email {
 
+    private static final int EMAIL_MAX_LENGTH = 100;
     private static final String EMAIL_REGEX = "[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@"
         + "(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?";
     private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
 
-    @Column(name = "email", length = 100, nullable = false, unique = true)
+    @Column(name = "email", length = EMAIL_MAX_LENGTH, nullable = false, unique = true)
     private String value;
 
     public Email(String value) {
@@ -32,6 +33,7 @@ public class Email {
     private void validateEmail(String value) {
         validateBlank(value);
         validateFormat(value);
+        validateLength(value);
     }
 
     private void validateBlank(String value) {
@@ -42,6 +44,12 @@ public class Email {
 
     private void validateFormat(String value) {
         if (!EMAIL_PATTERN.matcher(value).matches()) {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private void validateLength(String value) {
+        if (value.length() > EMAIL_MAX_LENGTH) {
             throw new IllegalArgumentException();
         }
     }
