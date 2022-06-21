@@ -13,6 +13,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import com.prgrms.amabnb.user.entity.vo.Email;
 import com.prgrms.amabnb.user.entity.vo.PhoneNumber;
+import com.prgrms.amabnb.user.exception.UserInvalidValueException;
 
 class UserTest {
 
@@ -61,7 +62,8 @@ class UserTest {
             assertThatThrownBy(() -> createUserBuilder()
                 .oauthId(source)
                 .build()
-            ).isInstanceOf(IllegalArgumentException.class);
+            ).isInstanceOf(UserInvalidValueException.class)
+                .hasMessage("인증 아이디는 비어있을 수 없습니다.");
         }
 
         @DisplayName("provider는 null이거나 비어있으면 안된다.")
@@ -71,7 +73,8 @@ class UserTest {
             assertThatThrownBy(() -> createUserBuilder()
                 .provider(source)
                 .build()
-            ).isInstanceOf(IllegalArgumentException.class);
+            ).isInstanceOf(UserInvalidValueException.class)
+                .hasMessage("제공자는 비어있을 수 없습니다.");
         }
 
         @DisplayName("name는 null이거나 비어있으면 안된다.")
@@ -81,7 +84,8 @@ class UserTest {
             assertThatThrownBy(() -> createUserBuilder()
                 .name(source)
                 .build()
-            ).isInstanceOf(IllegalArgumentException.class);
+            ).isInstanceOf(UserInvalidValueException.class)
+                .hasMessage("이름은 비어있을 수 없습니다.");
         }
 
         @DisplayName("name는 20자 초과이면 안된다.")
@@ -90,7 +94,8 @@ class UserTest {
             assertThatThrownBy(() -> createUserBuilder()
                 .name("a".repeat(21))
                 .build()
-            ).isInstanceOf(IllegalArgumentException.class);
+            ).isInstanceOf(UserInvalidValueException.class)
+                .hasMessage("이름은 20자 이하여야 합니다. 현재 이름 길이: 21");
         }
 
         @DisplayName("birth는 현재보다 미래면 안된다.")
@@ -99,7 +104,8 @@ class UserTest {
             assertThatThrownBy(() -> createUserBuilder()
                 .birth(LocalDate.MAX)
                 .build()
-            ).isInstanceOf(IllegalArgumentException.class);
+            ).isInstanceOf(UserInvalidValueException.class)
+                .hasMessage("생일은 현재보다 미래일 수 없습니다.");
         }
 
         @DisplayName("imageUrl은 null이거나 비어있으면 안된다.")
@@ -109,7 +115,8 @@ class UserTest {
             assertThatThrownBy(() -> createUserBuilder()
                 .imageUrl(source)
                 .build()
-            ).isInstanceOf(IllegalArgumentException.class);
+            ).isInstanceOf(UserInvalidValueException.class)
+                .hasMessage("이미지 URL은 비어있을 수 없습니다.");
         }
     }
 }

@@ -16,6 +16,7 @@ import javax.persistence.Table;
 import com.prgrms.amabnb.common.model.BaseEntity;
 import com.prgrms.amabnb.user.entity.vo.Email;
 import com.prgrms.amabnb.user.entity.vo.PhoneNumber;
+import com.prgrms.amabnb.user.exception.UserInvalidValueException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -74,32 +75,34 @@ public class User extends BaseEntity {
 
     private void setImageUrl(String imageUrl) {
         if (Objects.isNull(imageUrl) || imageUrl.isBlank()) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException("이미지 URL은 비어있을 수 없습니다.");
         }
         this.imageUrl = imageUrl;
     }
 
     private void setProvider(String provider) {
         if (Objects.isNull(provider) || provider.isBlank()) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException("제공자는 비어있을 수 없습니다.");
         }
         this.provider = provider;
     }
 
     private void setName(String name) {
         if (Objects.isNull(name) || name.isBlank()) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException("이름은 비어있을 수 없습니다.");
         }
 
         if (name.length() > NAME_MAX_LENGTH) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException(
+                "이름은 %d자 이하여야 합니다. 현재 이름 길이: %d".formatted(NAME_MAX_LENGTH, name.length())
+            );
         }
         this.name = name;
     }
 
     private void setOauthId(String oauthId) {
         if (Objects.isNull(oauthId) || oauthId.isBlank()) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException("인증 아이디는 비어있을 수 없습니다.");
         }
         this.oauthId = oauthId;
     }
@@ -117,7 +120,7 @@ public class User extends BaseEntity {
 
     private void validateBirth(LocalDate birth) {
         if (birth.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException("생일은 현재보다 미래일 수 없습니다.");
         }
     }
 
