@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+import com.prgrms.amabnb.user.exception.UserInvalidValueException;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,19 +40,21 @@ public class Email {
 
     private void validateBlank(String value) {
         if (Objects.isNull(value) || value.isBlank()) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException("이메일은 비어있을 수 없습니다.");
         }
     }
 
     private void validateFormat(String value) {
         if (!EMAIL_PATTERN.matcher(value).matches()) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException("이메일 포맷을 만족해야합니다. 현재 이메일 : %s".formatted(value));
         }
     }
 
     private void validateLength(String value) {
         if (value.length() > EMAIL_MAX_LENGTH) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException(
+                "이메일은 %d자 이하여야 합니다. 현재 이메일 길이 :%d".formatted(EMAIL_MAX_LENGTH, value.length())
+            );
         }
     }
 
