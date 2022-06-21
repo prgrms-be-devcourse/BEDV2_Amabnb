@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
+import com.prgrms.amabnb.user.exception.UserInvalidValueException;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,13 +37,13 @@ public class PhoneNumber {
 
     private void validateBlank(String number) {
         if (Objects.isNull(number) || number.isBlank()) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException("휴대폰 번호는 비어있을 수 없습니다.");
         }
     }
 
     private void validateFormat(String number) {
         if (!PHONE_NUMBER_PATTERN.matcher(number).matches()) {
-            throw new IllegalArgumentException();
+            throw new UserInvalidValueException("휴대폰 번호 포맷을 만족해야 합니다. 현재 휴대폰 번호 : %s".formatted(number));
         }
     }
 
