@@ -8,6 +8,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.prgrms.amabnb.user.exception.UserInvalidValueException;
+
 class PhoneNumberTest {
 
     @ParameterizedTest
@@ -30,7 +32,8 @@ class PhoneNumberTest {
         @NullAndEmptySource
         void emptyPhoneNumber(String number) {
             assertThatThrownBy(() -> new PhoneNumber(number))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(UserInvalidValueException.class)
+                .hasMessage("휴대폰 번호는 비어있을 수 없습니다.");
         }
 
         @ParameterizedTest
@@ -38,7 +41,8 @@ class PhoneNumberTest {
         @ValueSource(strings = {"010--1234-5678", "010/1234-5678", "01012345678"})
         void invalidHyphen(String number) {
             assertThatThrownBy(() -> new PhoneNumber(number))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(UserInvalidValueException.class)
+                .hasMessage("휴대폰 번호 포맷을 만족해야 합니다. 현재 휴대폰 번호 : " + number);
         }
 
         @ParameterizedTest
@@ -46,7 +50,8 @@ class PhoneNumberTest {
         @ValueSource(strings = {"0100-1234-5678", "010-12345-6789", "010-1234-56789", "01-1234-5678"})
         void invalidLength(String number) {
             assertThatThrownBy(() -> new PhoneNumber(number))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(UserInvalidValueException.class)
+                .hasMessage("휴대폰 번호 포맷을 만족해야 합니다. 현재 휴대폰 번호 : " + number);
         }
 
     }
