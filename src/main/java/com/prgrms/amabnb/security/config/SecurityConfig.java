@@ -5,8 +5,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.prgrms.amabnb.oauth.handler.ExceptionHandlerFilter;
 import com.prgrms.amabnb.oauth.handler.OAuthAuthenticationSuccessHandler;
@@ -32,11 +32,15 @@ public class SecurityConfig {
             .httpBasic().disable()
             .rememberMe().disable()
             .csrf().disable()
+            .logout().disable()
+            .requestCache().disable()
+            .formLogin().disable()
+            .headers().disable()
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and();
 
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthenticationFilter, OAuth2AuthorizationRequestRedirectFilter.class);
         http.addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
         return http.build();
     }
