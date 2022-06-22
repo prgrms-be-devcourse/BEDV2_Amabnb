@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.room.entity.dto.request;
+package com.prgrms.amabnb.room.dto.request;
 
 import com.prgrms.amabnb.common.model.Money;
 import com.prgrms.amabnb.room.entity.Room;
@@ -68,15 +68,15 @@ public class CreateRoomRequest {
         this.roomScope = roomScope;
     }
 
-    public static Room toRoom(CreateRoomRequest request) {
+    public Room toRoom() {
         return Room.builder()
-                .price(new Money(request.getPrice()))
-                .description(request.getDescription())
-                .maxGuestNum(request.getMaxGuestNum())
-                .address(new RoomAddress(request.getZipcode(), request.getAddress(), request.getDetailAddress()))
-                .roomOption(new RoomOption(request.getBedCnt(), request.getBedRoomCnt(), request.getBathRoomCnt()))
-                .roomType(request.getRoomType())
-                .roomScope(request.getRoomScope())
+                .price(new Money(price))
+                .description(description)
+                .maxGuestNum(maxGuestNum)
+                .address(new RoomAddress(zipcode, address, detailAddress))
+                .roomOption(new RoomOption(bedCnt, bedRoomCnt, bathRoomCnt))
+                .roomType(roomType)
+                .roomScope(roomScope)
                 .build();
     }
 }
