@@ -3,7 +3,6 @@ package com.prgrms.amabnb.common.exception;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -45,12 +44,4 @@ public class GlobalExceptionHandler {
             .status(HttpStatus.FORBIDDEN)
             .body(new ErrorResponse("접근권한이 없습니다."));
     }
-
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException e) {
-        return ResponseEntity
-            .status(HttpStatus.UNAUTHORIZED)
-            .body(new ErrorResponse("로그인을 먼저 진행해주세요."));
-    }
-
 }

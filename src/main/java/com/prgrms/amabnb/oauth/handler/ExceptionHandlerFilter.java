@@ -25,9 +25,9 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (TokenException ex) {
-            log.info("exception handler filter : {}", ex);
-            setErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, response, ex);
+        } catch (TokenException e) {
+            log.info("exception handler token error : {}", e);
+            setErrorResponse(HttpStatus.UNAUTHORIZED, response, e);
         }
     }
 
