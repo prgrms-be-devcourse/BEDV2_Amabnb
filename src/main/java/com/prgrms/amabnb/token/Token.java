@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.auth.entity;
+package com.prgrms.amabnb.token;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
