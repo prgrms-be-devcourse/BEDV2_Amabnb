@@ -3,6 +3,7 @@ package com.prgrms.amabnb.room.entity.dto.request;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
+import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -183,6 +184,6 @@ class CreateRoomRequestTest {
     @DisplayName("toRoom 테스트")
     void toRoomTest() {
         //then
-        assertThat(CreateRoomRequest.toRoom(createRoomRequest)).isInstanceOf(Room.class);
+        assertThat(createRoomRequest.toRoom()).isInstanceOf(Room.class);
     }
 }
