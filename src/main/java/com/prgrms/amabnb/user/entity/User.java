@@ -53,18 +53,18 @@ public class User extends BaseEntity {
     private PhoneNumber phoneNumber;
 
     @Column(nullable = false)
-    private String imageUrl;
+    private String profileImgUrl;
 
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    private UserRole userRole; // 게스트 < 호스트
 
     @Builder
     public User(Long id, String oauthId, String provider, String name, LocalDate birth,
-        Email email, PhoneNumber phoneNumber, String imageUrl, UserRole userRole) {
+        Email email, PhoneNumber phoneNumber, String profileImgUrl, UserRole userRole) {
         setOauthId(oauthId);
         setName(name);
         setProvider(provider);
-        setImageUrl(imageUrl);
+        setProfileImgUrl(profileImgUrl);
         setBirth(birth);
         this.id = id;
         this.birth = birth;
@@ -73,11 +73,11 @@ public class User extends BaseEntity {
         this.userRole = userRole;
     }
 
-    private void setImageUrl(String imageUrl) {
+    private void setProfileImgUrl(String imageUrl) {
         if (Objects.isNull(imageUrl) || imageUrl.isBlank()) {
             throw new UserInvalidValueException("이미지 URL은 비어있을 수 없습니다.");
         }
-        this.imageUrl = imageUrl;
+        this.profileImgUrl = imageUrl;
     }
 
     private void setProvider(String provider) {

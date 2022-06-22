@@ -9,6 +9,6 @@ public enum UserRole {
     GUEST("ROLE_GUEST"),
     HOST("ROLE_HOST");
 
-    private final String role;
+    private final String grantedAuthority;
 
 }

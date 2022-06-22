@@ -26,7 +26,7 @@ class UserTest {
             .birth(LocalDate.of(2000, 1, 12))
             .email(new Email("asdsadsad@gmail.com"))
             .phoneNumber(new PhoneNumber("010-2312-1231"))
-            .imageUrl("urlurlrurlrurlurlurl");
+            .profileImgUrl("urlurlrurlrurlurlurl");
     }
 
     @Test
@@ -43,11 +43,11 @@ class UserTest {
             () -> assertThat(user.getProvider()).isEqualTo("testProvider"),
             () -> assertThat(user.getName()).isEqualTo("testUser"),
             () -> assertThat(user.getUserRole()).isEqualTo(UserRole.GUEST),
-            () -> assertThat(user.getUserRole().getRole()).isEqualTo(UserRole.GUEST.getRole()),
+            () -> assertThat(user.getUserRole().getGrantedAuthority()).isEqualTo(UserRole.GUEST.getGrantedAuthority()),
             () -> assertThat(user.getBirth().get()).isEqualTo(LocalDate.of(2000, 1, 12)),
             () -> assertThat(user.getEmail()).isEqualTo(new Email("asdsadsad@gmail.com")),
             () -> assertThat(user.getPhoneNumber().get()).isEqualTo(new PhoneNumber("010-2312-1231")),
-            () -> assertThat(user.getImageUrl()).isEqualTo("urlurlrurlrurlurlurl")
+            () -> assertThat(user.getProfileImgUrl()).isEqualTo("urlurlrurlrurlurlurl")
         );
     }
 
@@ -113,7 +113,7 @@ class UserTest {
         @NullAndEmptySource
         void imageUrl(String source) {
             assertThatThrownBy(() -> createUserBuilder()
-                .imageUrl(source)
+                .profileImgUrl(source)
                 .build()
             ).isInstanceOf(UserInvalidValueException.class)
                 .hasMessage("이미지 URL은 비어있을 수 없습니다.");
