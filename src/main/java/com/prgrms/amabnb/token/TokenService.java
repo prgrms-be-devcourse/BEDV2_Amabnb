@@ -1,10 +1,7 @@
-package com.prgrms.amabnb.auth.service;
+package com.prgrms.amabnb.token;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.prgrms.amabnb.auth.entity.Token;
-import com.prgrms.amabnb.auth.entity.TokenRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,5 +20,5 @@ public class TokenService {
     public boolean validRefreshToken(String refreshToken) {
         return tokenRepository.existsByRefreshToken(refreshToken);
     }
-    
+
 }

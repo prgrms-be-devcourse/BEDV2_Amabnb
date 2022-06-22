@@ -1,12 +1,12 @@
-package com.prgrms.amabnb.auth.jwt;
+package com.prgrms.amabnb.security.jwt;
 
 import java.util.Objects;
 
-public record JwtAuthentication(String token, String userId) {
+public record JwtAuthentication(String token, long id) {
 
     public JwtAuthentication {
         validateToken(token);
-        validateUserId(userId);
+        validateUserId(id);
     }
 
     private void validateToken(String token) {
@@ -15,8 +15,8 @@ public record JwtAuthentication(String token, String userId) {
         }
     }
 
-    private void validateUserId(String userId) {
-        if (Objects.isNull(userId) || userId.isBlank()) {
+    private void validateUserId(long id) {
+        if (id < 1L) {
             throw new IllegalArgumentException();
         }
     }

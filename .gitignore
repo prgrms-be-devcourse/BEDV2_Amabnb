@@ -15,3 +15,6 @@ out/
 
 ### MAC OS ###
 .DS_Store
+
+### project file ##
+/src/main/resources/application-security.yaml

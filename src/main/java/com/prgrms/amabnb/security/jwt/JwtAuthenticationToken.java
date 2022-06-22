@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.auth.jwt;
+package com.prgrms.amabnb.security.jwt;
 
 import java.util.Collection;
 
@@ -49,4 +49,5 @@ public class JwtAuthenticationToken extends AbstractAuthenticationToken {
         super.eraseCredentials();
         this.credentials = null;
     }
+
 }
