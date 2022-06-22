@@ -3,7 +3,7 @@ package com.prgrms.amabnb.room.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
-import com.prgrms.amabnb.room.entity.dto.request.CreateRoomRequest;
+import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.service.CreateRoomService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,10 +32,10 @@ class RoomApiControllerTest {
     @Autowired
     CreateRoomService createRoomService;
 
-    ObjectMapper objectMapper= new ObjectMapper();
+    ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
-    void createRoom() throws Exception{
+    void createRoom() throws Exception {
         CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
                 .price(1)
                 .description("방설명")
@@ -69,7 +68,6 @@ class RoomApiControllerTest {
                                 fieldWithPath("bathRoomCnt").type(JsonFieldType.NUMBER).description("bathRoomCnt"),
                                 fieldWithPath("roomType").type(JsonFieldType.STRING).description("roomType"),
                                 fieldWithPath("roomScope").type(JsonFieldType.STRING).description("roomScope")
-                        ))
-                );
+                        )));
     }
 }
