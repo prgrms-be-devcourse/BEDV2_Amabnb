@@ -18,7 +18,7 @@ class RoomAddressTest {
         String address = "창원";
         String detailAddress = "의창구";
         //then
-        new RoomAddress(zipcode, address, detailAddress);
+        RoomAddress roomAddress = new RoomAddress(zipcode, address, detailAddress);
     }
 
     @DisplayName("zipcode는 5자리이고 숫자외에는 입력할 수 없다")
