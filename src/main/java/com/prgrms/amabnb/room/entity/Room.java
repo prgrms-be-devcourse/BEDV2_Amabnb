@@ -23,6 +23,7 @@ import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.user.entity.User;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,6 +31,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends BaseEntity {
+
+    @Builder
+    public Room(Long id) {
+        this.id = id;
+    }
 
     @Id
     @GeneratedValue
