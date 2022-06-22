@@ -29,13 +29,13 @@ public class JwtTokenProvider {
     private long refreshTokenValidityInMilliseconds;
 
     public String createAccessToken(long payload, String role) {
-        Map<String, Object> Claims = Map.of("userId", payload, "role", role);
+        Map<String, Object> claims = Map.of("userId", payload, "role", role);
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + accessTokenValidityInMilliseconds);
 
         return Jwts.builder()
             .setIssuer(issuer)
-            .setClaims(Claims)
+            .setClaims(claims)
             .setIssuedAt(now)
             .setExpiration(expiredDate)
             .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
