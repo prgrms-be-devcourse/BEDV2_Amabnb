@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.token.exception;
+package com.prgrms.amabnb.common.security.jwt.exception;
 
 public class TokenException extends RuntimeException {
 

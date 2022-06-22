@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.security.jwt;
+package com.prgrms.amabnb.common.security.jwt;
 
 import static org.springframework.http.HttpHeaders.*;
 
@@ -16,7 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.prgrms.amabnb.security.jwt.util.AuthorizationExtractor;
+import com.prgrms.amabnb.common.security.jwt.util.AuthorizationExtractor;
 
 import lombok.RequiredArgsConstructor;
 

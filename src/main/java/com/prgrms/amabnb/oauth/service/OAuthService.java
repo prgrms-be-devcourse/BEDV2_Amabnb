@@ -6,10 +6,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.prgrms.amabnb.security.jwt.JwtTokenProvider;
-import com.prgrms.amabnb.token.Token;
-import com.prgrms.amabnb.token.TokenRepository;
-import com.prgrms.amabnb.token.TokenResponse;
+import com.prgrms.amabnb.common.security.jwt.JwtTokenProvider;
+import com.prgrms.amabnb.oauth.entity.Token;
+import com.prgrms.amabnb.oauth.entity.TokenRepository;
+import com.prgrms.amabnb.oauth.dto.TokenResponse;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.repository.UserRepository;
 

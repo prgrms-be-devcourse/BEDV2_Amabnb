@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.security.jwt.util;
+package com.prgrms.amabnb.common.security.jwt.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

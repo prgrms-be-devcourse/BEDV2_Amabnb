@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.security.config;
+package com.prgrms.amabnb.common.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -8,9 +8,9 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.prgrms.amabnb.oauth.handler.ExceptionHandlerFilter;
-import com.prgrms.amabnb.oauth.handler.OAuthAuthenticationSuccessHandler;
-import com.prgrms.amabnb.security.jwt.JwtAuthenticationFilter;
+import com.prgrms.amabnb.common.security.jwt.JwtAuthenticationFilter;
+import com.prgrms.amabnb.common.security.handler.ExceptionHandlerFilter;
+import com.prgrms.amabnb.common.security.handler.OAuthAuthenticationSuccessHandler;
 
 import lombok.RequiredArgsConstructor;
 

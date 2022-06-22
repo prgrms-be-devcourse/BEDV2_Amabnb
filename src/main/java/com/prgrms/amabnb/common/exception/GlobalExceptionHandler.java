@@ -6,7 +6,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.prgrms.amabnb.token.exception.TokenException;
+import com.prgrms.amabnb.common.security.jwt.exception.TokenException;
 
 import lombok.extern.slf4j.Slf4j;
 

@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.token;
+package com.prgrms.amabnb.oauth.dto;
 
 public class TokenResponse {
     private final String accessToken;

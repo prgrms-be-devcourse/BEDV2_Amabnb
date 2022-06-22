@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.oauth.handler;
+package com.prgrms.amabnb.common.security.handler;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.amabnb.oauth.service.OAuthService;
-import com.prgrms.amabnb.token.TokenResponse;
+import com.prgrms.amabnb.oauth.dto.TokenResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.oauth.handler;
+package com.prgrms.amabnb.common.security.handler;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.amabnb.common.exception.ErrorResponse;
-import com.prgrms.amabnb.token.exception.TokenException;
+import com.prgrms.amabnb.common.security.jwt.exception.TokenException;
 
 import lombok.extern.slf4j.Slf4j;
 

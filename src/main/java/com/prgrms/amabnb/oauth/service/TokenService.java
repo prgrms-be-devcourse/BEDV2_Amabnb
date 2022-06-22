@@ -1,7 +1,10 @@
-package com.prgrms.amabnb.token;
+package com.prgrms.amabnb.oauth.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.prgrms.amabnb.oauth.entity.Token;
+import com.prgrms.amabnb.oauth.entity.TokenRepository;
 
 import lombok.RequiredArgsConstructor;
 
