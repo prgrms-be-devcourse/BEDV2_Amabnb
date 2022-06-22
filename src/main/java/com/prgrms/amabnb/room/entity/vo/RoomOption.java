@@ -15,7 +15,7 @@ import javax.persistence.Embeddable;
 public class RoomOption {
 
     @Column(nullable = false)
-    private int bedCount;
+    private int bedCnt;
 
     @Column(nullable = false)
     private int bedRoomCnt;
@@ -23,9 +23,9 @@ public class RoomOption {
     @Column(nullable = false)
     private int bathRoomCnt;
 
-    public RoomOption(int bedCount, int bedRoomCnt, int bathRoomCnt) {
-        validateRoomOption(bedCount,bedRoomCnt,bathRoomCnt);
-        this.bedCount = bedCount;
+    public RoomOption(int bedCnt, int bedRoomCnt, int bathRoomCnt) {
+        validateRoomOption(bedCnt,bedRoomCnt,bathRoomCnt);
+        this.bedCnt = bedCnt;
         this.bedRoomCnt = bedRoomCnt;
         this.bathRoomCnt = bathRoomCnt;
     }

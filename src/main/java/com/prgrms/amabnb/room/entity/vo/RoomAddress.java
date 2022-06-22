@@ -15,8 +15,6 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RoomAddress {
 
-    private final String ZIPCODE_REGEX = "^\\d{5}$";
-
     @Column(nullable = false)
     private String zipcode;
 
@@ -38,6 +36,8 @@ public class RoomAddress {
     }
 
     private void validateZipcode(String zipcode) {
+        final String ZIPCODE_REGEX = "^\\d{5}$";
+
         if (Objects.isNull(zipcode) || zipcode.isBlank() || !zipcode.matches(ZIPCODE_REGEX)) {
             throw new IllegalArgumentException("우편번호 입력값이 잘못됐습니다");
         }

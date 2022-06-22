@@ -63,7 +63,7 @@ public class Room extends BaseEntity {
     @Builder
     public Room(Long id, Money price, String description, int maxGuestNum, RoomAddress address, RoomOption roomOption,
                 RoomType roomType, RoomScope roomScope) {
-        validateRoom(price, maxGuestNum, description, address, roomType, roomScope);
+        validateRoom(price, maxGuestNum, description, address, roomOption,roomType, roomScope);
         this.id = id;
         this.price = price;
         this.description = description;
@@ -74,11 +74,12 @@ public class Room extends BaseEntity {
         this.roomScope = roomScope;
     }
 
-    private void validateRoom(Money price, int maxGuestNum, String description, RoomAddress roomAddress, RoomType roomType, RoomScope roomScope) {
+    private void validateRoom(Money price, int maxGuestNum, String description, RoomAddress roomAddress, RoomOption roomOption, RoomType roomType, RoomScope roomScope) {
         validateMaxGuestNum(maxGuestNum);
         validateDescription(description);
         isPresentPrice(price);
         isPresentRoomAddress(roomAddress);
+        isPresentRoomOption(roomOption);
         isPresentRoomType(roomType);
         isPresentRoomScope(roomScope);
     }
@@ -92,6 +93,12 @@ public class Room extends BaseEntity {
     private void validateDescription(String description) {
         if (Objects.isNull(description) || description.isBlank()) {
             throw new IllegalArgumentException("숙소 정보 입력값이 잘못됐습니다");
+        }
+    }
+
+    private void isPresentRoomOption(RoomOption roomOption) {
+        if (Objects.isNull(roomOption)) {
+            throw new IllegalArgumentException("숙소 옵션을 입력하지 않았습니다.");
         }
     }
 
