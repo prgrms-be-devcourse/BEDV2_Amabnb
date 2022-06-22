@@ -56,7 +56,7 @@ public class User extends BaseEntity {
     private String profileImgUrl;
 
     @Enumerated(EnumType.STRING)
-    private UserRole userRole; // 게스트 < 호스트
+    private UserRole userRole;
 
     @Builder
     public User(Long id, String oauthId, String provider, String name, LocalDate birth,
