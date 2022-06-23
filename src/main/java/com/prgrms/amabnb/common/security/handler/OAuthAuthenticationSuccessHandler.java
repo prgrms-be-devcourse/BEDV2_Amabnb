@@ -12,8 +12,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prgrms.amabnb.oauth.service.OAuthService;
 import com.prgrms.amabnb.oauth.dto.TokenResponse;
+import com.prgrms.amabnb.oauth.service.OAuthService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final OAuthService oauthService;
+    private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -36,7 +37,7 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
             response.setStatus(HttpStatus.OK.value());
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(new ObjectMapper().writeValueAsString(tokenResponse));
+            response.getWriter().write(objectMapper.writeValueAsString(tokenResponse));
         }
     }
 
