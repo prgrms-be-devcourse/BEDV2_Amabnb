@@ -7,6 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -22,7 +24,7 @@ public class ImageController {
     public Long uploadImage(@RequestHeader(AUTHORIZATION) String userId, @RequestParam("images") MultipartFile[] files, @RequestParam("room-id") Long roomId) throws IOException {
         String dirPath = "/Users/willkim/IdeaProjects/BEDV2_Amabnb/src/main/resources/images";
         int cnt = 1;
-        Image image = new Image();
+        List<Image> imageList = new ArrayList<>();
         try {
             for (MultipartFile file : files) {
                 String randomUUID = UUID.randomUUID().toString();
@@ -31,21 +33,21 @@ public class ImageController {
                 File destination = new File(realPath);
                 file.transferTo(destination);
 
-                image = Image.builder()
-                        .roomId(Room.builder().id(roomId).build())
+                Image image = Image.builder()
                         .imageName(realPath)
                         .build();
 
-                imageService.save(image);
-
+                imageList.add(image);
                 cnt++;
             }
+
+            imageService.saveAll(imageList);
 
         } catch (Exception e) {
             System.out.println("this is exception : " + e);
             return -1L;
         }
-        return roomId;
-    }
 
+        return 1L;
+    }
 }

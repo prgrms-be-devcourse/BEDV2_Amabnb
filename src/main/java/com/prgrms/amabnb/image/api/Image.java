@@ -1,15 +1,7 @@
 package com.prgrms.amabnb.image.api;
 
-import com.prgrms.amabnb.room.entity.Room;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
+import lombok.*;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -21,14 +13,10 @@ public class Image {
 
     private String imageName;
 
-    @ManyToOne
-    private Room roomId;
-
     @Builder
-    public Image(Long id, String imageName, Room roomId) {
+    public Image(Long id, String imageName) {
         this.id = id;
         this.imageName = imageName;
-        this.roomId = roomId;
     }
 
     @Override

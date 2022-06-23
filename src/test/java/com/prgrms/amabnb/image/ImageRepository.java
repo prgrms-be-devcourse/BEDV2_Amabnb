@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.repository;
+package com.prgrms.amabnb.image;
 
 import com.prgrms.amabnb.image.api.Image;
 import com.prgrms.amabnb.image.api.ImageService;
@@ -34,19 +34,4 @@ public class ImageRepository {
 
     }
 
-    @Test
-    void 이미지_서비스_테스트() {
-        Room room = Room.builder()
-                .id(1L)
-                .build();
-
-        Image img = Image.builder()
-                .imageName("thisisImageName.png")
-                .roomId(room)
-                .build();
-
-        Long imageId = imageService.save(img);
-
-        System.out.println(">>>>>!!" + imageId);
-    }
 }

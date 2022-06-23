@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ImageService {
 
     private final ImageRepository imageRepository;
@@ -15,9 +17,14 @@ public class ImageService {
     public Long save(Image image) {
         return imageRepository.save(image).getId();
     }
-//
-//    @Transactional
-//    public Long saveAll(Image image) {
-//        return imageRepository.saveAll().getId();
-//    }
+
+    @Transactional
+    public void saveAll(List<Image> images) {
+        imageRepository.saveAll(images);
+    }
+
+    @Transactional
+    public List<Image> findAll() {
+        return imageRepository.findAll();
+    }
 }
