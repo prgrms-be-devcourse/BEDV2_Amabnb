@@ -74,9 +74,10 @@ public class Room extends BaseEntity {
     @JoinColumn(name = "users_id")
     private User host;
 
-    @OneToMany
-    @JoinColumn(name = "review_id")
-    private List<Review> reviews = new ArrayList<>();
+    @Builder
+    public Room(Long id) {
+        this.id = id;
+    }
 
     @Builder
     public Room(Long id, Money price, String description, int maxGuestNum, RoomAddress address, RoomOption roomOption,

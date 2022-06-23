@@ -23,10 +23,9 @@ spring:
       ddl-auto: create
 
 jwt:
-  issuer:
-  secret-key:
+  issuer: amabnb
+  secret-key: twk4jbz8a6smC4u0Xv6KvQUImMfVZ16/SCR0uKJIv3g=
   access-token:
-    expire-length:
+    expire-length: 7200000
   refresh-token:
-    expire-length:
-
+    expire-length: 1209600000

@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.image.api;
+package com.prgrms.amabnb.image.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
