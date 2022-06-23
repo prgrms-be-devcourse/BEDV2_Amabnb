@@ -25,6 +25,11 @@ public class Token {
     private long userId;
 
     public Token(String refreshToken, Long userId) {
+        this(null, refreshToken, userId);
+    }
+
+    public Token(Long id, String refreshToken, Long userId) {
+        this.id = id;
         this.refreshToken = refreshToken;
         this.userId = userId;
     }
