@@ -41,9 +41,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         var token = AuthorizationExtractor.extract(request);
         if (token != null) {
             jwtTokenProvider.validateToken(token);
-            return token;
         }
-        return null;
+        return token;
     }
 
     private JwtAuthenticationToken createAuthentication(String accessToken) {
