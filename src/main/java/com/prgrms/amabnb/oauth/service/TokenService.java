@@ -7,6 +7,7 @@ import com.prgrms.amabnb.common.security.jwt.JwtTokenProvider;
 import com.prgrms.amabnb.common.security.jwt.exception.InvalidTokenException;
 import com.prgrms.amabnb.oauth.dto.AccessTokenResponse;
 import com.prgrms.amabnb.oauth.dto.RefreshTokenRequest;
+import com.prgrms.amabnb.oauth.dto.TokenResponse;
 import com.prgrms.amabnb.oauth.entity.Token;
 import com.prgrms.amabnb.oauth.entity.TokenRepository;
 
@@ -22,8 +23,11 @@ public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public void saveRefreshToken(String refreshToken, Long userId) {
+    public TokenResponse createToken(Long userId, String role) {
+        var accessToken = jwtTokenProvider.createAccessToken(userId, role);
+        var refreshToken = jwtTokenProvider.createRefreshToken();
         tokenRepository.save(new Token(refreshToken, userId));
+        return new TokenResponse(accessToken, refreshToken);
     }
 
     @Transactional

@@ -4,7 +4,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.prgrms.amabnb.common.security.jwt.JwtTokenProvider;
 import com.prgrms.amabnb.oauth.dto.TokenResponse;
 import com.prgrms.amabnb.oauth.dto.UserProfile;
 import com.prgrms.amabnb.user.entity.User;
@@ -19,7 +18,6 @@ public class OAuthService {
 
     private final TokenService tokenService;
     private final UserRepository userRepository;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public TokenResponse register(String registerId, OAuth2User oauth) {
@@ -34,10 +32,7 @@ public class OAuthService {
 
         var userId = user.getId();
         var role = user.getUserRole().getGrantedAuthority();
-        var accessToken = jwtTokenProvider.createAccessToken(userId, role);
-        var refreshToken = jwtTokenProvider.createRefreshToken();
-        tokenService.saveRefreshToken(refreshToken, userId);
-        return new TokenResponse(accessToken, refreshToken);
+        return tokenService.createToken(userId, role);
     }
 
     private User createUser(String registerId, OAuth2User oauth) {
