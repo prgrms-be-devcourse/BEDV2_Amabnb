@@ -15,13 +15,13 @@ public class AuthorizationExtractor {
     public static String extract(HttpServletRequest request) {
         var authHeaderValue = request.getHeader(AUTHORIZATION);
         if (authHeaderValue != null) {
-            return extract(authHeaderValue);
+            return extractToken(authHeaderValue);
         }
 
         return null;
     }
 
-    private static String extract(String value) {
+    private static String extractToken(String value) {
         if (value.toLowerCase().startsWith(BEARER_TYPE.toLowerCase())) {
             var authHeaderValue = value.substring(BEARER_TYPE.length()).trim();
             var commaIndex = authHeaderValue.indexOf(',');
