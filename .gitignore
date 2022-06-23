@@ -15,3 +15,6 @@ out/
 
 ### MAC OS ###
 .DS_Store
+
+### local images directory ###
+/src/main/resources/images
