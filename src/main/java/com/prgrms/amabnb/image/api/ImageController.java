@@ -19,10 +19,14 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class ImageController {
 
     private final ImageService imageService;
+    String dirPath = "/Users/willkim/IdeaProjects/BEDV2_Amabnb/src/main/resources/images";
 
     @PostMapping("/upload")
-    public Long uploadImage(@RequestHeader(AUTHORIZATION) String userId, @RequestParam("images") MultipartFile[] files, @RequestParam("room-id") Long roomId) throws IOException {
-        String dirPath = "/Users/willkim/IdeaProjects/BEDV2_Amabnb/src/main/resources/images";
+    public Long uploadImage(
+            @RequestHeader(AUTHORIZATION) String userId,
+            @RequestParam("images") MultipartFile[] files
+    ) throws IOException {
+
         int cnt = 1;
         List<Image> imageList = new ArrayList<>();
         try {

@@ -5,6 +5,7 @@ import javax.persistence.*;
 
 @Entity
 @Getter
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Image {
     @Id
@@ -17,13 +18,5 @@ public class Image {
     public Image(Long id, String imageName) {
         this.id = id;
         this.imageName = imageName;
-    }
-
-    @Override
-    public String toString() {
-        return "Image{" +
-                "id=" + id +
-                ", imageName='" + imageName +
-                '}';
     }
 }
