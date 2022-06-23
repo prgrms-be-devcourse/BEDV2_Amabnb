@@ -3,8 +3,6 @@ package com.prgrms.amabnb.user.entity;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDate;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +21,6 @@ class UserTest {
             .provider("testProvider")
             .userRole(UserRole.GUEST)
             .name("testUser")
-            .birth(LocalDate.of(2000, 1, 12))
             .email(new Email("asdsadsad@gmail.com"))
             .phoneNumber(new PhoneNumber("010-2312-1231"))
             .profileImgUrl("urlurlrurlrurlurlurl");
@@ -44,7 +41,6 @@ class UserTest {
             () -> assertThat(user.getName()).isEqualTo("testUser"),
             () -> assertThat(user.getUserRole()).isEqualTo(UserRole.GUEST),
             () -> assertThat(user.getUserRole().getGrantedAuthority()).isEqualTo(UserRole.GUEST.getGrantedAuthority()),
-            () -> assertThat(user.getBirth().get()).isEqualTo(LocalDate.of(2000, 1, 12)),
             () -> assertThat(user.getEmail()).isEqualTo(new Email("asdsadsad@gmail.com")),
             () -> assertThat(user.getPhoneNumber().get()).isEqualTo(new PhoneNumber("010-2312-1231")),
             () -> assertThat(user.getProfileImgUrl()).isEqualTo("urlurlrurlrurlurlurl")
@@ -96,16 +92,6 @@ class UserTest {
                 .build()
             ).isInstanceOf(UserInvalidValueException.class)
                 .hasMessage("이름은 20자 이하여야 합니다. 현재 이름 길이: 21");
-        }
-
-        @DisplayName("birth는 현재보다 미래면 안된다.")
-        @Test
-        void birth_past_than_now() {
-            assertThatThrownBy(() -> createUserBuilder()
-                .birth(LocalDate.MAX)
-                .build()
-            ).isInstanceOf(UserInvalidValueException.class)
-                .hasMessage("생일은 현재보다 미래일 수 없습니다.");
         }
 
         @DisplayName("imageUrl은 null이거나 비어있으면 안된다.")
