@@ -1,14 +1,18 @@
 package com.prgrms.amabnb.image.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import javax.transaction.Transactional;
 import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.prgrms.amabnb.image.entity.Image;
+import com.prgrms.amabnb.image.repository.ImageRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ImageService {
 
     private final ImageRepository imageRepository;

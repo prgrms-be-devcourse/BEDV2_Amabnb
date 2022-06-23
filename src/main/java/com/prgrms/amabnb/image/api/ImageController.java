@@ -43,8 +43,8 @@ public class ImageController {
                 file.transferTo(destination);
 
                 Image image = Image.builder()
-                        .imageName(realPath)
-                        .build();
+                    .imageName(realPath)
+                    .build();
 
                 imageList.add(image);
                 cnt++;
