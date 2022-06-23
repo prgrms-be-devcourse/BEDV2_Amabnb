@@ -23,9 +23,9 @@ public enum OAuthProvider {
             return UserProfile.builder()
                 .oauthId(String.valueOf(response.get("id")))
                 .provider(KAKAO.registrationId)
-                .name((String)properties.get("nickname"))
-                .email((String)account.get("email"))
-                .profileImgUrl((String)properties.get("profile_image"))
+                .name(String.valueOf(properties.get("nickname")))
+                .email(String.valueOf(account.get("email")))
+                .profileImgUrl(String.valueOf(properties.get("profile_image")))
                 .build();
         }
     };
