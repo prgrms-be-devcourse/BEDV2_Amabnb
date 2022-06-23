@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.room.entity.vo;
 
+import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -39,13 +40,13 @@ public class RoomAddress {
         final String ZIPCODE_REGEX = "^\\d{5}$";
 
         if (Objects.isNull(zipcode) || zipcode.isBlank() || !zipcode.matches(ZIPCODE_REGEX)) {
-            throw new IllegalArgumentException("우편번호 입력값이 잘못됐습니다");
+            throw new RoomInvalidValueException("우편번호 입력값이 잘못됐습니다");
         }
     }
 
     private void validateAddress(String address) {
         if (Objects.isNull(address) || address.isBlank()) {
-            throw new IllegalArgumentException("주소 입력값이 잘못됐습니다");
+            throw new RoomInvalidValueException("주소 입력값이 잘못됐습니다");
         }
     }
 }

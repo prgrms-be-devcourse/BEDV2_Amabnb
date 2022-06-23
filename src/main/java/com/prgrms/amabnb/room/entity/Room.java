@@ -11,6 +11,7 @@ import com.prgrms.amabnb.common.model.Money;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
+import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
 import com.prgrms.amabnb.user.entity.User;
 
 import lombok.AccessLevel;
@@ -86,43 +87,43 @@ public class Room extends BaseEntity {
 
     private void validateMaxGuestNum(int maxGuestNum) {
         if (maxGuestNum < 1) {
-            throw new IllegalArgumentException("최대 인원 수 입력값이 잘못됐습니다");
+            throw new RoomInvalidValueException("최대 인원 수 입력값이 잘못됐습니다");
         }
     }
 
     private void validateDescription(String description) {
         if (Objects.isNull(description) || description.isBlank()) {
-            throw new IllegalArgumentException("숙소 정보 입력값이 잘못됐습니다");
+            throw new RoomInvalidValueException("숙소 정보 입력값이 잘못됐습니다");
         }
     }
 
     private void isPresentRoomOption(RoomOption roomOption) {
         if (Objects.isNull(roomOption)) {
-            throw new IllegalArgumentException("숙소 옵션을 입력하지 않았습니다.");
+            throw new RoomInvalidValueException("숙소 옵션을 입력하지 않았습니다.");
         }
     }
 
     private void isPresentRoomAddress(RoomAddress roomAddress) {
         if (Objects.isNull(roomAddress)) {
-            throw new IllegalArgumentException("숙소 주소를 입력하지 않았습니다");
+            throw new RoomInvalidValueException("숙소 주소를 입력하지 않았습니다");
         }
     }
 
     private void isPresentPrice(Money price) {
         if (Objects.isNull(price)) {
-            throw new IllegalArgumentException("가격을 입력하지 않았습니다");
+            throw new RoomInvalidValueException("가격을 입력하지 않았습니다");
         }
     }
 
     private void isPresentRoomType(RoomType roomType) {
         if (Objects.isNull(roomType)) {
-            throw new IllegalArgumentException("숙소 유형이 정해지지 않았습니다");
+            throw new RoomInvalidValueException("숙소 유형이 정해지지 않았습니다");
         }
     }
 
     private void isPresentRoomScope(RoomScope roomScope) {
         if (Objects.isNull(roomScope)) {
-            throw new IllegalArgumentException("숙소 이용 범위가 정해지지 않았습니다");
+            throw new RoomInvalidValueException("숙소 이용 범위가 정해지지 않았습니다");
         }
     }
 }

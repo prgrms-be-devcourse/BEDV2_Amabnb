@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.room.entity.vo;
 
+import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -38,17 +39,17 @@ public class RoomOption {
 
     private void validateBedCnt(int bedCount) {
         if (bedCount < 0) {
-            throw new IllegalArgumentException("침대 수 입렵값이 잘못됐습니다");
+            throw new RoomInvalidValueException("침대 수 입렵값이 잘못됐습니다");
         }
     }
     private void validateBedRoomCnt(int bedRoomCnt) {
         if (bedRoomCnt < 0) {
-            throw new IllegalArgumentException("침실 수 입렵값이 잘못됐습니다");
+            throw new RoomInvalidValueException("침실 수 입렵값이 잘못됐습니다");
         }
     }
     private void validateBathRoomCnt(int bathRoomCnt) {
         if (bathRoomCnt < 0) {
-            throw new IllegalArgumentException("욕실 수 입렵값이 잘못됐습니다");
+            throw new RoomInvalidValueException("욕실 수 입렵값이 잘못됐습니다");
         }
     }
 }
