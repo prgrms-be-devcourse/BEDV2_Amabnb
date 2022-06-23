@@ -1,10 +1,12 @@
 package com.prgrms.amabnb.room.service;
 
-import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
-import com.prgrms.amabnb.room.repository.CreateRoomRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
+import com.prgrms.amabnb.room.repository.CreateRoomRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @Transactional
@@ -16,4 +18,5 @@ public class CreateRoomService {
     public Long createRoom(CreateRoomRequest createRoomRequest) {
         return createRoomRepository.save(createRoomRequest.toRoom()).getId();
     }
+
 }

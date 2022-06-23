@@ -1,13 +1,14 @@
 package com.prgrms.amabnb.room.entity.vo;
 
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
 import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
 
 @Getter
 @Embeddable
@@ -25,7 +26,7 @@ public class RoomOption {
     private int bathRoomCnt;
 
     public RoomOption(int bedCnt, int bedRoomCnt, int bathRoomCnt) {
-        validateRoomOption(bedCnt,bedRoomCnt,bathRoomCnt);
+        validateRoomOption(bedCnt, bedRoomCnt, bathRoomCnt);
         this.bedCnt = bedCnt;
         this.bedRoomCnt = bedRoomCnt;
         this.bathRoomCnt = bathRoomCnt;
@@ -42,11 +43,13 @@ public class RoomOption {
             throw new RoomInvalidValueException("침대 수 입렵값이 잘못됐습니다");
         }
     }
+
     private void validateBedRoomCnt(int bedRoomCnt) {
         if (bedRoomCnt < 0) {
             throw new RoomInvalidValueException("침실 수 입렵값이 잘못됐습니다");
         }
     }
+
     private void validateBathRoomCnt(int bathRoomCnt) {
         if (bathRoomCnt < 0) {
             throw new RoomInvalidValueException("욕실 수 입렵값이 잘못됐습니다");

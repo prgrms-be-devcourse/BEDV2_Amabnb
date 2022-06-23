@@ -1,19 +1,20 @@
 package com.prgrms.amabnb.room.repository;
 
+import static org.assertj.core.api.Assertions.*;
+
+import java.time.LocalDateTime;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
 import com.prgrms.amabnb.common.model.Money;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-
-import java.time.LocalDateTime;
-
-import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
 class CreateRoomRepositoryTest {
@@ -30,15 +31,15 @@ class CreateRoomRepositoryTest {
     void roomJpaSave() {
         //given
         Room room = Room.builder()
-                .id(1L)
-                .maxGuestNum(1)
-                .description("description")
-                .address(roomAddress)
-                .price(price)
-                .roomOption(roomOption)
-                .roomType(RoomType.APARTMENT)
-                .roomScope(RoomScope.PRIVATE)
-                .build();
+            .id(1L)
+            .maxGuestNum(1)
+            .description("description")
+            .address(roomAddress)
+            .price(price)
+            .roomOption(roomOption)
+            .roomType(RoomType.APARTMENT)
+            .roomScope(RoomScope.PRIVATE)
+            .build();
 
         //when
         createRoomRepository.save(room);

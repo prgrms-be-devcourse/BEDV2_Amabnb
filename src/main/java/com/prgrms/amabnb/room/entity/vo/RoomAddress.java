@@ -1,14 +1,16 @@
 package com.prgrms.amabnb.room.entity.vo;
 
+import java.util.Objects;
+
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
 import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
+
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import java.util.Objects;
 
 @Getter
 @Embeddable

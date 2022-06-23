@@ -4,7 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import javax.persistence.*;
+import javax.persistence.AttributeOverride;
+import javax.persistence.Column;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
 import com.prgrms.amabnb.common.model.Money;
@@ -63,8 +75,8 @@ public class Room extends BaseEntity {
 
     @Builder
     public Room(Long id, Money price, String description, int maxGuestNum, RoomAddress address, RoomOption roomOption,
-                RoomType roomType, RoomScope roomScope) {
-        validateRoom(price, maxGuestNum, description, address, roomOption,roomType, roomScope);
+        RoomType roomType, RoomScope roomScope) {
+        validateRoom(price, maxGuestNum, description, address, roomOption, roomType, roomScope);
         this.id = id;
         this.price = price;
         this.description = description;
@@ -75,7 +87,8 @@ public class Room extends BaseEntity {
         this.roomScope = roomScope;
     }
 
-    private void validateRoom(Money price, int maxGuestNum, String description, RoomAddress roomAddress, RoomOption roomOption, RoomType roomType, RoomScope roomScope) {
+    private void validateRoom(Money price, int maxGuestNum, String description, RoomAddress roomAddress,
+        RoomOption roomOption, RoomType roomType, RoomScope roomScope) {
         validateMaxGuestNum(maxGuestNum);
         validateDescription(description);
         isPresentPrice(price);
