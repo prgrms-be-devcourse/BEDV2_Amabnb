@@ -11,7 +11,6 @@ import com.prgrms.amabnb.room.repository.CreateRoomRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -31,7 +30,18 @@ class CreateRoomServiceTest {
     @DisplayName("숙소를 생성할 수 있다.")
     void createRoomTest() {
         //given
-        CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
+        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
+        given(createRoomRepository.save(any())).willReturn(createRoom());
+
+        //when
+        Long savedRoomId = createRoomService.createRoom(createRoomRequest);
+
+        //then
+        then(createRoomRepository).should(times(1)).save(any(Room.class));
+    }
+
+    private CreateRoomRequest createCreateRoomRequest() {
+        return CreateRoomRequest.builder()
                 .price(1)
                 .description("방설명")
                 .maxGuestNum(1)
@@ -44,13 +54,6 @@ class CreateRoomServiceTest {
                 .roomType(RoomType.APARTMENT)
                 .roomScope(RoomScope.PRIVATE)
                 .build();
-        given(createRoomRepository.save(any())).willReturn(createRoom());
-
-        //when
-        Long savedRoomId = createRoomService.createRoom(createRoomRequest);
-
-        //then
-        then(createRoomRepository).should(times(1)).save(any(Room.class));
     }
 
     private Room createRoom(){
