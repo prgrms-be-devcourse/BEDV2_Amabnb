@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.room.entity.vo;
 
+import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -28,7 +29,7 @@ class RoomAddressTest {
     )
     void notNullAndBlankZipcode(String zipcode) {
         //then
-        assertThrows(IllegalArgumentException.class, () -> new RoomAddress(zipcode, "창원", "의창구"));
+        assertThrows(RoomInvalidValueException.class, () -> new RoomAddress(zipcode, "창원", "의창구"));
     }
 
     @DisplayName("address는 빈 값이면 안된다")
@@ -36,6 +37,6 @@ class RoomAddressTest {
     @NullAndEmptySource
     void notNullAndBlankAddress(String address) {
         //then
-        assertThrows(IllegalArgumentException.class, () -> new RoomAddress("55555", address, "321"));
+        assertThrows(RoomInvalidValueException.class, () -> new RoomAddress("55555", address, "321"));
     }
 }

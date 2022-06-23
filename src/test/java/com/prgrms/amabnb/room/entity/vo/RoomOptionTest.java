@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.room.entity.vo;
 
+import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -24,7 +25,7 @@ class RoomOptionTest {
         //given
         int bedCnt = -1;
         //then
-        assertThrows(IllegalArgumentException.class, () -> new RoomOption(bedCnt, 1, 1));
+        assertThrows(RoomInvalidValueException.class, () -> new RoomOption(bedCnt, 1, 1));
     }
 
     @Test
@@ -33,7 +34,7 @@ class RoomOptionTest {
         //given
         int bedRoomCnt = -1;
         //then
-        assertThrows(IllegalArgumentException.class, () -> new RoomOption(1, bedRoomCnt, 1));
+        assertThrows(RoomInvalidValueException.class, () -> new RoomOption(1, bedRoomCnt, 1));
     }
 
     @Test
@@ -42,6 +43,6 @@ class RoomOptionTest {
         //given
         int bathRoomCnt = -1;
         //then
-        assertThrows(IllegalArgumentException.class, () -> new RoomOption(0, 1, bathRoomCnt));
+        assertThrows(RoomInvalidValueException.class, () -> new RoomOption(0, 1, bathRoomCnt));
     }
 }

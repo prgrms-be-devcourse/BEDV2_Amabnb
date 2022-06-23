@@ -3,6 +3,7 @@ package com.prgrms.amabnb.room.entity;
 import com.prgrms.amabnb.common.model.Money;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
+import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -51,7 +52,7 @@ class RoomTest {
     )
     void notMinusAndZeroGuestNum(int guestNum) {
         //then
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(RoomInvalidValueException.class,
                 () -> Room.builder()
                         .id(1l)
                         .maxGuestNum(guestNum)
@@ -70,7 +71,7 @@ class RoomTest {
     @NullAndEmptySource
     void notBlankDescription(String description) {
         //then
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(RoomInvalidValueException.class,
                 () -> Room.builder()
                         .id(1l)
                         .maxGuestNum(1)
@@ -87,6 +88,6 @@ class RoomTest {
     @DisplayName("id를 제외한 모든값은 가지고 있어야한다")
     @Test
     void isPresentTest() {
-        assertThatThrownBy(() -> Room.builder().id(1l).build()).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Room.builder().id(1l).build()).isInstanceOf(RoomInvalidValueException.class);
     }
 }
