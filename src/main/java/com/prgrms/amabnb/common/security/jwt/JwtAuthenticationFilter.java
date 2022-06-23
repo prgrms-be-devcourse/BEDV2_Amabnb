@@ -1,7 +1,5 @@
 package com.prgrms.amabnb.common.security.jwt;
 
-import static org.springframework.http.HttpHeaders.*;
-
 import java.io.IOException;
 import java.util.List;
 
@@ -29,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
         throws ServletException, IOException {
-        
+
         var accessToken = getAccessToken(req);
 
         if (accessToken != null) {
@@ -40,14 +38,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getAccessToken(HttpServletRequest request) {
-        var header = request.getHeader(AUTHORIZATION);
-        if (header == null) {
-            return null;
+        var token = AuthorizationExtractor.extract(request);
+        if (token != null) {
+            jwtTokenProvider.validateToken(token);
+            return token;
         }
-
-        var token = AuthorizationExtractor.extract(header);
-        jwtTokenProvider.validateToken(token);
-        return token;
+        return null;
     }
 
     private JwtAuthenticationToken createAuthentication(String accessToken) {
