@@ -12,7 +12,10 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
@@ -35,24 +38,15 @@ class RoomApiControllerTest {
     ObjectMapper objectMapper = new ObjectMapper();
 
     @Test
+    @WithMockUser
     void createRoom() throws Exception {
-        CreateRoomRequest createRoomRequest = CreateRoomRequest.builder()
-                .price(1)
-                .description("방설명")
-                .maxGuestNum(1)
-                .zipcode("00000")
-                .address("창원")
-                .detailAddress("의창구")
-                .bedCnt(2)
-                .bedRoomCnt(1)
-                .bathRoomCnt(1)
-                .roomType(RoomType.APARTMENT)
-                .roomScope(RoomScope.PRIVATE)
-                .build();
+        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
 
         mockMvc.perform(post("/rooms")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createRoomRequest)))
+                        .content(objectMapper.writeValueAsString(createRoomRequest))
+                        .with(SecurityMockMvcRequestPostProcessors.csrf()))
+                .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andDo(print())
                 .andDo(document("room-create",
                         requestFields(
@@ -68,6 +62,23 @@ class RoomApiControllerTest {
                                 fieldWithPath("bathRoomCnt").type(JsonFieldType.NUMBER).description("bathRoomCnt"),
                                 fieldWithPath("roomType").type(JsonFieldType.STRING).description("roomType"),
                                 fieldWithPath("roomScope").type(JsonFieldType.STRING).description("roomScope")
-                        )));
+                        )
+                ));
+    }
+
+    private CreateRoomRequest createCreateRoomRequest() {
+        return CreateRoomRequest.builder()
+                .price(1)
+                .description("방설명")
+                .maxGuestNum(1)
+                .zipcode("00000")
+                .address("창원")
+                .detailAddress("의창구")
+                .bedCnt(2)
+                .bedRoomCnt(1)
+                .bathRoomCnt(1)
+                .roomType(RoomType.APARTMENT)
+                .roomScope(RoomScope.PRIVATE)
+                .build();
     }
 }
