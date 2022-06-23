@@ -20,14 +20,21 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.issuer}")
-    private String issuer;
-    @Value("${jwt.secret-key}")
-    private String secretKey;
-    @Value("${jwt.access-token.expire-length}")
-    private long accessTokenValidityInMilliseconds;
-    @Value("${jwt.refresh-token.expire-length}")
-    private long refreshTokenValidityInMilliseconds;
+    private final String issuer;
+    private final String secretKey;
+    private final long accessTokenValidityInMilliseconds;
+    private final long refreshTokenValidityInMilliseconds;
+
+    public JwtTokenProvider(
+        @Value("${jwt.issuer}") String issuer,
+        @Value("${jwt.secret-key}") String secretKey,
+        @Value("${jwt.access-token.expire-length}") long accessTokenValidityInMilliseconds,
+        @Value("${jwt.refresh-token.expire-length}") long refreshTokenValidityInMilliseconds) {
+        this.issuer = issuer;
+        this.secretKey = secretKey;
+        this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds;
+        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
+    }
 
     public String createAccessToken(long payload, String role) {
         Map<String, Object> claims = Map.of("userId", payload, "role", role);
