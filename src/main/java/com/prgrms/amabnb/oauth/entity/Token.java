@@ -24,7 +24,7 @@ public class Token {
     @Column(nullable = false, unique = true)
     private long userId;
 
-    public Token(String refreshToken, long userId) {
+    public Token(String refreshToken, Long userId) {
         this.refreshToken = refreshToken;
         this.userId = userId;
     }

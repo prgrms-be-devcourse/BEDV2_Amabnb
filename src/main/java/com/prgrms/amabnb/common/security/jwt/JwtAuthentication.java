@@ -2,7 +2,9 @@ package com.prgrms.amabnb.common.security.jwt;
 
 import java.util.Objects;
 
-public record JwtAuthentication(String token, long id) {
+public record JwtAuthentication(String token, Long id) {
+
+    public static final long MIN_ID_VALUE = 1L;
 
     public JwtAuthentication {
         validateToken(token);
@@ -15,8 +17,8 @@ public record JwtAuthentication(String token, long id) {
         }
     }
 
-    private void validateUserId(long id) {
-        if (id < 1L) {
+    private void validateUserId(Long id) {
+        if (id == null || id < MIN_ID_VALUE) {
             throw new IllegalArgumentException();
         }
     }
