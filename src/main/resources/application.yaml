@@ -7,6 +7,7 @@ spring:
     password:
     url: jdbc:h2:mem:test
     driver-class-name: org.h2.Driver
+
   jpa:
     database: H2
     open-in-view: false
@@ -17,5 +18,6 @@ spring:
         format_sql: true
     hibernate:
       ddl-auto: create
+
   profiles:
     include: security

@@ -29,6 +29,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
         throws ServletException, IOException {
+        
         var accessToken = getAccessToken(req);
 
         if (accessToken != null) {
