@@ -1,6 +1,5 @@
 package com.prgrms.amabnb.user.entity;
 
-import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -44,8 +43,6 @@ public class User extends BaseEntity {
     @Column(length = NAME_MAX_LENGTH, nullable = false)
     private String name;
 
-    private LocalDate birth;
-
     @Embedded
     private Email email;
 
@@ -59,15 +56,13 @@ public class User extends BaseEntity {
     private UserRole userRole;
 
     @Builder
-    public User(Long id, String oauthId, String provider, String name, LocalDate birth,
-        Email email, PhoneNumber phoneNumber, String profileImgUrl, UserRole userRole) {
+    public User(Long id, String oauthId, String provider, String name, Email email, PhoneNumber phoneNumber,
+        String profileImgUrl, UserRole userRole) {
         setOauthId(oauthId);
         setName(name);
         setProvider(provider);
         setProfileImgUrl(profileImgUrl);
-        setBirth(birth);
         this.id = id;
-        this.birth = birth;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.userRole = userRole;
@@ -105,23 +100,6 @@ public class User extends BaseEntity {
             throw new UserInvalidValueException("인증 아이디는 비어있을 수 없습니다.");
         }
         this.oauthId = oauthId;
-    }
-
-    public Optional<LocalDate> getBirth() {
-        return Optional.ofNullable(birth);
-    }
-
-    private void setBirth(LocalDate birth) {
-        if (Objects.nonNull(birth)) {
-            validateBirth(birth);
-        }
-        this.birth = birth;
-    }
-
-    private void validateBirth(LocalDate birth) {
-        if (birth.isAfter(LocalDate.now())) {
-            throw new UserInvalidValueException("생일은 현재보다 미래일 수 없습니다.");
-        }
     }
 
     public Optional<PhoneNumber> getPhoneNumber() {

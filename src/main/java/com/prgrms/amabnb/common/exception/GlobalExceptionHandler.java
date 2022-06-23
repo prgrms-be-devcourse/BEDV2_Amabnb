@@ -6,8 +6,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.prgrms.amabnb.token.exception.TokenException;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -28,13 +26,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
         return ResponseEntity
             .status(e.getHttpStatus())
-            .body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(TokenException.class)
-    public ResponseEntity<ErrorResponse> handleTokenException(TokenException e) {
-        return ResponseEntity
-            .status(HttpStatus.UNAUTHORIZED)
             .body(new ErrorResponse(e.getMessage()));
     }
 

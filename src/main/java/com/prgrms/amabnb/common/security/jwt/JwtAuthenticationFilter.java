@@ -1,6 +1,4 @@
-package com.prgrms.amabnb.security.jwt;
-
-import static org.springframework.http.HttpHeaders.*;
+package com.prgrms.amabnb.common.security.jwt;
 
 import java.io.IOException;
 import java.util.List;
@@ -16,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.prgrms.amabnb.security.jwt.util.AuthorizationExtractor;
+import com.prgrms.amabnb.common.security.jwt.util.AuthorizationExtractor;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
         throws ServletException, IOException {
+
         var accessToken = getAccessToken(req);
 
         if (accessToken != null) {
@@ -39,13 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private String getAccessToken(HttpServletRequest request) {
-        var header = request.getHeader(AUTHORIZATION);
-        if (header == null) {
-            return null;
+        var token = AuthorizationExtractor.extract(request);
+        if (token != null) {
+            jwtTokenProvider.validateToken(token);
         }
-
-        var token = AuthorizationExtractor.extract(header);
-        jwtTokenProvider.validateToken(token);
         return token;
     }
 

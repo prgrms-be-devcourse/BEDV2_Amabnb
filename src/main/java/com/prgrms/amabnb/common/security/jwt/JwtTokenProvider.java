@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.security.jwt;
+package com.prgrms.amabnb.common.security.jwt;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -8,7 +8,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.prgrms.amabnb.token.exception.TokenException;
+import com.prgrms.amabnb.common.security.jwt.exception.ExpiredTokenException;
+import com.prgrms.amabnb.common.security.jwt.exception.InvalidTokenException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -19,23 +20,30 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.issuer}")
-    private String issuer;
-    @Value("${jwt.secret-key}")
-    private String secretKey;
-    @Value("${jwt.access-token.expire-length}")
-    private long accessTokenValidityInMilliseconds;
-    @Value("${jwt.refresh-token.expire-length}")
-    private long refreshTokenValidityInMilliseconds;
+    private final String issuer;
+    private final String secretKey;
+    private final long accessTokenValidityInMilliseconds;
+    private final long refreshTokenValidityInMilliseconds;
+
+    public JwtTokenProvider(
+        @Value("${jwt.issuer}") String issuer,
+        @Value("${jwt.secret-key}") String secretKey,
+        @Value("${jwt.access-token.expire-length}") long accessTokenValidityInMilliseconds,
+        @Value("${jwt.refresh-token.expire-length}") long refreshTokenValidityInMilliseconds) {
+        this.issuer = issuer;
+        this.secretKey = secretKey;
+        this.accessTokenValidityInMilliseconds = accessTokenValidityInMilliseconds;
+        this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
+    }
 
     public String createAccessToken(long payload, String role) {
-        Map<String, Object> Claims = Map.of("userId", payload, "role", role);
+        Map<String, Object> claims = Map.of("userId", payload, "role", role);
         Date now = new Date();
         Date expiredDate = new Date(now.getTime() + accessTokenValidityInMilliseconds);
 
         return Jwts.builder()
             .setIssuer(issuer)
-            .setClaims(Claims)
+            .setClaims(claims)
             .setIssuedAt(now)
             .setExpiration(expiredDate)
             .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
@@ -72,9 +80,9 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            throw new TokenException("만료된 토큰입니다.");
+            throw new ExpiredTokenException();
         } catch (JwtException | IllegalArgumentException e) {
-            throw new TokenException("유효하지 않은 토큰입니다.");
+            throw new InvalidTokenException();
         }
     }
 

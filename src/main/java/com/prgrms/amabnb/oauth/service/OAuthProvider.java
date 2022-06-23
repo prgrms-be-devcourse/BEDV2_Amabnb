@@ -1,13 +1,11 @@
 package com.prgrms.amabnb.oauth.service;
 
-import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.prgrms.amabnb.user.entity.User;
-import com.prgrms.amabnb.user.entity.UserRole;
-import com.prgrms.amabnb.user.entity.vo.Email;
+import com.prgrms.amabnb.oauth.dto.UserProfile;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -15,25 +13,32 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum OAuthProvider {
-    KAKAO("KAKAO") {
-        public User toUser(OAuth2User oauth) {
+    KAKAO("kakao") {
+        @Override
+        public UserProfile toUserProfile(OAuth2User oauth) {
             Map<String, Object> response = oauth.getAttributes();
             Map<String, Object> properties = oauth.getAttribute("properties");
             Map<String, Object> account = oauth.getAttribute("kakao_account");
 
-            return User.builder()
-                .oauthId("" + response.get("id"))
-                .provider(String.valueOf(OAuthProvider.KAKAO))
-                .name("" + properties.get("nickname"))
-                .birth(LocalDate.now())
-                .email(new Email("" + account.get("email")))
-                .profileImgUrl("" + properties.get("profile_image"))
-                .userRole(UserRole.GUEST)
+            return UserProfile.builder()
+                .oauthId(String.valueOf(response.get("id")))
+                .provider(KAKAO.registrationId)
+                .name(String.valueOf(properties.get("nickname")))
+                .email(String.valueOf(account.get("email")))
+                .profileImgUrl(String.valueOf(properties.get("profile_image")))
                 .build();
         }
     };
 
-    private final String name;
+    private final String registrationId;
 
-    public abstract User toUser(OAuth2User userInfo);
+    public static OAuthProvider findByRegisterId(String registrationId) {
+        return Arrays.stream(values())
+            .filter(provider -> provider.registrationId.equals(registrationId))
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 로그인입니다."));
+    }
+
+    public abstract UserProfile toUserProfile(OAuth2User userInfo);
+
 }
