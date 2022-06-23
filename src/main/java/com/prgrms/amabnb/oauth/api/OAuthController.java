@@ -1,6 +1,7 @@
 package com.prgrms.amabnb.oauth.api;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,11 +20,11 @@ import lombok.RequiredArgsConstructor;
 public class OAuthController {
 
     private final TokenService tokenService;
-    
+
     @PostMapping("/token")
     public ResponseEntity<AccessTokenResponse> refreshAccessToken(
         HttpServletRequest httpServletRequest,
-        @RequestBody RefreshTokenRequest refreshToken
+        @Valid @RequestBody RefreshTokenRequest refreshToken
     ) {
         String accessToken = AuthorizationExtractor.extract(httpServletRequest);
         return ResponseEntity.ok(tokenService.refreshAccessToken(accessToken, refreshToken));
