@@ -29,16 +29,22 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
+        String registerId = getRegisterId(request);
         Object principal = authentication.getPrincipal();
 
         if (principal instanceof OAuth2User oauth) {
-            TokenResponse tokenResponse = oauthService.register(oauth);
+            TokenResponse tokenResponse = oauthService.register(registerId, oauth);
 
             response.setStatus(HttpStatus.OK.value());
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(objectMapper.writeValueAsString(tokenResponse));
         }
+    }
+
+    private String getRegisterId(HttpServletRequest request) {
+        var splitURI = request.getRequestURI().split("/");
+        return splitURI[splitURI.length - 1];
     }
 
 }
