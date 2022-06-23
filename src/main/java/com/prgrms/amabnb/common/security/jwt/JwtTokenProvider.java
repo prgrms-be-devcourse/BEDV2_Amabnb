@@ -8,7 +8,8 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.prgrms.amabnb.common.security.jwt.exception.TokenException;
+import com.prgrms.amabnb.common.security.jwt.exception.ExpiredTokenException;
+import com.prgrms.amabnb.common.security.jwt.exception.InvalidTokenException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -72,9 +73,9 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token);
         } catch (ExpiredJwtException e) {
-            throw new TokenException("만료된 토큰입니다.");
+            throw new ExpiredTokenException();
         } catch (JwtException | IllegalArgumentException e) {
-            throw new TokenException("유효하지 않은 토큰입니다.");
+            throw new InvalidTokenException();
         }
     }
 

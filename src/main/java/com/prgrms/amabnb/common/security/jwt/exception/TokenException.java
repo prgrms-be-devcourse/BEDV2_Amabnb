@@ -1,8 +1,13 @@
 package com.prgrms.amabnb.common.security.jwt.exception;
 
-public class TokenException extends RuntimeException {
+import org.springframework.http.HttpStatus;
 
-    public TokenException(String message) {
-        super(message);
+import com.prgrms.amabnb.common.exception.BusinessException;
+
+public class TokenException extends BusinessException {
+
+    public TokenException(HttpStatus httpStatus, String message) {
+        super(httpStatus, message);
     }
+
 }
