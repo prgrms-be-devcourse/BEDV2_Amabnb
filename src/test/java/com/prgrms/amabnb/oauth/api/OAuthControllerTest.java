@@ -32,15 +32,12 @@ import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class OAuthControllerTest {
 
-    MockMvc mockMvc;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    TokenResponse token;
-
     @Autowired
     TokenService tokenService;
+    @Autowired
+    ObjectMapper objectMapper;
+    MockMvc mockMvc;
+    TokenResponse givenToken;
 
     @BeforeEach
     void setUp(WebApplicationContext webApplicationContext) {
@@ -53,7 +50,7 @@ class OAuthControllerTest {
 
     @BeforeEach
     public void createGivenToken() {
-        token = tokenService.createToken(new UserRegisterResponse(1L, "ROLE_GUEST"));
+        givenToken = tokenService.createToken(new UserRegisterResponse(1L, "ROLE_GUEST"));
     }
 
     String toJson(Object object) throws JsonProcessingException {
@@ -69,8 +66,8 @@ class OAuthControllerTest {
         void refreshAccessToken_success() throws Exception {
             mockMvc.perform(post("/token")
                     .with(oauth2Login())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.accessToken())
-                    .contentType(MediaType.APPLICATION_JSON).content(toJson(token.refreshToken())))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenToken.accessToken())
+                    .contentType(MediaType.APPLICATION_JSON).content(toJson(givenToken.refreshToken())))
                 .andExpect(handler().methodName("refreshAccessToken"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("accessToken").exists())
@@ -84,7 +81,7 @@ class OAuthControllerTest {
 
             mockMvc.perform(post("/token")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + illegalToken)
-                    .contentType(MediaType.APPLICATION_JSON).content(toJson(token.refreshToken())))
+                    .contentType(MediaType.APPLICATION_JSON).content(toJson(givenToken.refreshToken())))
                 .andExpect(handler().methodName("refreshAccessToken"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("message", "유효하지 않은 토큰입니다.").exists())
@@ -97,7 +94,7 @@ class OAuthControllerTest {
         void refreshTokenRequestDto_validation(String value) throws Exception {
             var request = new RefreshTokenRequest(value);
             mockMvc.perform(post("/token")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token.accessToken())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenToken.accessToken())
                     .contentType(MediaType.APPLICATION_JSON).content(toJson(request)))
 
                 .andExpect(handler().methodName("refreshAccessToken"))
