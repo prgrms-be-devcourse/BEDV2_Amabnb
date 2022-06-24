@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.common.security.handler;
+package com.prgrms.amabnb.security.handler;
 
 import java.io.IOException;
 

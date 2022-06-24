@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.common.security.jwt;
+package com.prgrms.amabnb.security.jwt;
 
 import java.util.Collection;
 

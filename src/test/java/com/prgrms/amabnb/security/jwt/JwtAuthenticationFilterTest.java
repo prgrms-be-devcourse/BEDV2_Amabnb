@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.common.security.jwt;
+package com.prgrms.amabnb.security.jwt;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,8 +16,8 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.context.SecurityContextHolder;
 
-import com.prgrms.amabnb.common.security.jwt.exception.ExpiredTokenException;
-import com.prgrms.amabnb.common.security.jwt.exception.InvalidTokenException;
+import com.prgrms.amabnb.security.jwt.exception.ExpiredTokenException;
+import com.prgrms.amabnb.security.jwt.exception.InvalidTokenException;
 
 class JwtAuthenticationFilterTest {
 

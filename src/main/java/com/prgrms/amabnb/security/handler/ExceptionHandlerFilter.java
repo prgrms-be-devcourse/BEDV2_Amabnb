@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.common.security.handler;
+package com.prgrms.amabnb.security.handler;
 
 import java.io.IOException;
 
@@ -12,14 +12,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.amabnb.common.exception.ErrorResponse;
-import com.prgrms.amabnb.common.security.jwt.exception.TokenException;
+import com.prgrms.amabnb.security.jwt.exception.TokenException;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
-    
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
         FilterChain filterChain) throws ServletException, IOException {

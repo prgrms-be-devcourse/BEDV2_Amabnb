@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.common.security.jwt.util;
+package com.prgrms.amabnb.security.jwt.util;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.http.HttpHeaders.*;

@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.common.security.config;
+package com.prgrms.amabnb.security.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -8,10 +8,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import com.prgrms.amabnb.common.security.handler.ExceptionHandlerFilter;
-import com.prgrms.amabnb.common.security.handler.JwtAuthenticationEntryPoint;
-import com.prgrms.amabnb.common.security.handler.OAuthAuthenticationSuccessHandler;
-import com.prgrms.amabnb.common.security.jwt.JwtAuthenticationFilter;
+import com.prgrms.amabnb.security.handler.ExceptionHandlerFilter;
+import com.prgrms.amabnb.security.handler.JwtAuthenticationEntryPoint;
+import com.prgrms.amabnb.security.handler.OAuthAuthenticationSuccessHandler;
+import com.prgrms.amabnb.security.jwt.JwtAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +28,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests()
+            .antMatchers("/token").permitAll()
             .anyRequest().authenticated()
             .and()
 
@@ -54,5 +55,4 @@ public class SecurityConfig {
             .addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
         return http.build();
     }
-
 }

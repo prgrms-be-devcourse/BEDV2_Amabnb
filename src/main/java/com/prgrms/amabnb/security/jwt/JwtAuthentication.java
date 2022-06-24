@@ -1,8 +1,8 @@
-package com.prgrms.amabnb.common.security.jwt;
+package com.prgrms.amabnb.security.jwt;
 
 import java.util.Objects;
 
-import com.prgrms.amabnb.common.security.jwt.exception.InvalidTokenException;
+import com.prgrms.amabnb.security.jwt.exception.InvalidTokenException;
 
 public record JwtAuthentication(String token, Long id) {
 

@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.common.security.jwt.exception;
+package com.prgrms.amabnb.security.jwt.exception;
 
 import org.springframework.http.HttpStatus;
 
