@@ -1,6 +1,6 @@
 package com.prgrms.amabnb.oauth.dto;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RefreshTokenRequest {
 
-    @NotNull(message = "refreshToken은 비어있을 수 없습니다.")
+    @NotBlank(message = "refreshToken은 비어있을 수 없습니다.")
     private String refreshToken;
 
 }
