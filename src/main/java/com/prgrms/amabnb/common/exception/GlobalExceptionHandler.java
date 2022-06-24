@@ -30,7 +30,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedExceptionException(AccessDeniedException e) {
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
         return ResponseEntity
             .status(HttpStatus.FORBIDDEN)
             .body(new ErrorResponse("접근권한이 없습니다."));
