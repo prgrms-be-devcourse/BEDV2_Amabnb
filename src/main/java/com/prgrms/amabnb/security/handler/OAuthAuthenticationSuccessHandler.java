@@ -29,11 +29,11 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
-        var providerName = parsingProviderName(request);
+        var providerName = parseProviderName(request);
         var principal = authentication.getPrincipal();
 
         if (principal instanceof OAuth2User oauth) {
-            
+
             var userProfile = OAuthProvider
                 .getProviderFromName(providerName)
                 .toUserProfile(oauth);
@@ -47,7 +47,7 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
         }
     }
 
-    private String parsingProviderName(HttpServletRequest request) {
+    private String parseProviderName(HttpServletRequest request) {
         var splitURI = request.getRequestURI().split("/");
         return splitURI[splitURI.length - 1];
     }

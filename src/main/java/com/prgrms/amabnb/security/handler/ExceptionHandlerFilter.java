@@ -14,11 +14,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.amabnb.common.exception.ErrorResponse;
 import com.prgrms.amabnb.security.jwt.exception.TokenException;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class ExceptionHandlerFilter extends OncePerRequestFilter {
+
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -35,7 +39,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         response.setStatus(e.getHttpStatus().value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        response.getWriter().write(new ObjectMapper().writeValueAsString(new ErrorResponse(e.getMessage())));
+        response.getWriter().write(objectMapper.writeValueAsString(new ErrorResponse(e.getMessage())));
     }
 
 }
