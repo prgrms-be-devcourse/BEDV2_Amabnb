@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    public static final String ERROR_LOG_MESSAGE = "[ERROR] {} : {}";
+    private static final String ERROR_LOG_MESSAGE = "[ERROR] {} : {}";
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {

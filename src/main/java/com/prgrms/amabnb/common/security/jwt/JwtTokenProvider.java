@@ -86,4 +86,11 @@ public class JwtTokenProvider {
         }
     }
 
+    public void validateAccessToken(String accessToken) {
+        try {
+            validateToken(accessToken);
+        } catch (ExpiredTokenException ignored) {
+        }
+    }
+
 }

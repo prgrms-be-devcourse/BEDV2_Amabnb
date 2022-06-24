@@ -32,6 +32,8 @@ public class TokenService {
 
     @Transactional
     public AccessTokenResponse refreshAccessToken(String accessToken, RefreshTokenRequest refreshTokenRequest) {
+        jwtTokenProvider.validateAccessToken(accessToken);
+
         var refreshToken = refreshTokenRequest.getRefreshToken();
         jwtTokenProvider.validateToken(refreshToken);
 

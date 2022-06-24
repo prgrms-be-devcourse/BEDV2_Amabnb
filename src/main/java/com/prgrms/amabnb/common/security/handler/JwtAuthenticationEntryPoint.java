@@ -14,18 +14,22 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.amabnb.common.exception.ErrorResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     private static final String ERROR_MESSAGE = "로그인이 필요합니다.";
+    private static final String ERROR_LOG_MESSAGE = "[ERROR] {} : {}";
 
     private final ObjectMapper objectMapper;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
         AuthenticationException authException) throws IOException {
+        log.info(ERROR_LOG_MESSAGE, authException.getClass().getSimpleName(), ERROR_MESSAGE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");

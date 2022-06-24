@@ -49,8 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         var claims = jwtTokenProvider.getClaims(accessToken);
         var userId = claims.get("userId", Long.class);
         var role = claims.get("role", String.class);
-        return new JwtAuthenticationToken(new JwtAuthentication(accessToken, userId),
-            null, toAuthorities(role));
+        return new JwtAuthenticationToken(new JwtAuthentication(accessToken, userId), null, toAuthorities(role));
     }
 
     private List<GrantedAuthority> toAuthorities(String role) {
