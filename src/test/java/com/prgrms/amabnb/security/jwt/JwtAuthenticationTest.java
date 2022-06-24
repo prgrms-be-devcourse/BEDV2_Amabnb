@@ -8,7 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.prgrms.amabnb.common.security.jwt.exception.InvalidTokenException;
+import com.prgrms.amabnb.security.jwt.exception.InvalidTokenException;
 
 class JwtAuthenticationTest {
 

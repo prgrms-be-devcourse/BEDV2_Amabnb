@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.prgrms.amabnb.common.security.jwt.exception.ExpiredTokenException;
-import com.prgrms.amabnb.common.security.jwt.exception.InvalidTokenException;
+import com.prgrms.amabnb.security.jwt.exception.ExpiredTokenException;
+import com.prgrms.amabnb.security.jwt.exception.InvalidTokenException;
 
 import io.jsonwebtoken.Claims;
 
