@@ -12,7 +12,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prgrms.amabnb.oauth.dto.TokenResponse;
+import com.prgrms.amabnb.oauth.service.OAuthProvider;
 import com.prgrms.amabnb.oauth.service.OAuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,11 +29,16 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
         Authentication authentication) throws IOException {
-        String registerId = getRegisterId(request);
-        Object principal = authentication.getPrincipal();
+        var providerName = parsingProviderName(request);
+        var principal = authentication.getPrincipal();
 
         if (principal instanceof OAuth2User oauth) {
-            TokenResponse tokenResponse = oauthService.register(registerId, oauth);
+            
+            var userProfile = OAuthProvider
+                .getProviderFromName(providerName)
+                .toUserProfile(oauth);
+
+            var tokenResponse = oauthService.register(userProfile);
 
             response.setStatus(HttpStatus.OK.value());
             response.setContentType("application/json");
@@ -42,7 +47,7 @@ public class OAuthAuthenticationSuccessHandler implements AuthenticationSuccessH
         }
     }
 
-    private String getRegisterId(HttpServletRequest request) {
+    private String parsingProviderName(HttpServletRequest request) {
         var splitURI = request.getRequestURI().split("/");
         return splitURI[splitURI.length - 1];
     }
