@@ -1,7 +1,5 @@
 package com.prgrms.amabnb.reservation.entity;
 
-import java.time.LocalDate;
-
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -16,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
+import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.entity.Room;
@@ -35,9 +34,7 @@ public class Reservation extends BaseEntity {
     @GeneratedValue
     private Long id;
 
-    private LocalDate checkIn;
-
-    private LocalDate checkOut;
+    private ReservationDate reservationDate;
 
     private int maxGuest;
 
@@ -63,8 +60,7 @@ public class Reservation extends BaseEntity {
     @Builder
     public Reservation(
         Long id,
-        LocalDate checkIn,
-        LocalDate checkOut,
+        ReservationDate reservationDate,
         int maxGuest,
         Money totalPrice,
         ReservationStatus reservationStatus,
@@ -72,8 +68,7 @@ public class Reservation extends BaseEntity {
         User guest
     ) {
         this.id = id;
-        this.checkIn = checkIn;
-        this.checkOut = checkOut;
+        this.reservationDate = reservationDate;
         this.maxGuest = maxGuest;
         this.totalPrice = totalPrice;
         this.reservationStatus = reservationStatus;
