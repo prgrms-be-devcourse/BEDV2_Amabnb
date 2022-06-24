@@ -29,12 +29,13 @@ class OAuthServiceTest {
     @Mock
     UserService userService;
 
-    UserProfile givenUserProfile;
-    TokenResponse givenToken;
-    UserRegisterResponse givenRegisteredUser;
-
     @Nested
     class Register {
+
+        UserProfile givenUserProfile;
+        TokenResponse givenToken;
+        UserRegisterResponse givenRegisteredUser;
+
         @BeforeEach
         void MOCK_SET() {
             givenUserProfile = UserProfile.builder()
