@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.prgrms.amabnb.common.security.jwt.util.AuthorizationExtractor;
 import com.prgrms.amabnb.oauth.dto.AccessTokenResponse;
 import com.prgrms.amabnb.oauth.dto.RefreshTokenRequest;
 import com.prgrms.amabnb.oauth.service.TokenService;
+import com.prgrms.amabnb.security.jwt.util.AuthorizationExtractor;
 
 import lombok.RequiredArgsConstructor;
 

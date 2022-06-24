@@ -22,7 +22,7 @@ public enum OAuthProvider {
 
             return UserProfile.builder()
                 .oauthId(String.valueOf(response.get("id")))
-                .provider(KAKAO.registrationId)
+                .provider(KAKAO.name)
                 .name(String.valueOf(properties.get("nickname")))
                 .email(String.valueOf(account.get("email")))
                 .profileImgUrl(String.valueOf(properties.get("profile_image")))
@@ -30,11 +30,11 @@ public enum OAuthProvider {
         }
     };
 
-    private final String registrationId;
+    private final String name;
 
-    public static OAuthProvider findByRegisterId(String registrationId) {
+    public static OAuthProvider getProviderFromName(String providerName) {
         return Arrays.stream(values())
-            .filter(provider -> provider.registrationId.equals(registrationId))
+            .filter(provider -> provider.name.equals(providerName))
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("지원하지 않는 로그인입니다."));
     }

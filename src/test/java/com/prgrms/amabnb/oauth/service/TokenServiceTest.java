@@ -13,13 +13,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.prgrms.amabnb.common.security.jwt.JwtTokenProvider;
-import com.prgrms.amabnb.common.security.jwt.exception.InvalidTokenException;
 import com.prgrms.amabnb.oauth.dto.AccessTokenResponse;
 import com.prgrms.amabnb.oauth.dto.RefreshTokenRequest;
 import com.prgrms.amabnb.oauth.dto.TokenResponse;
 import com.prgrms.amabnb.oauth.entity.Token;
-import com.prgrms.amabnb.oauth.entity.TokenRepository;
+import com.prgrms.amabnb.oauth.repository.TokenRepository;
+import com.prgrms.amabnb.security.jwt.JwtTokenProvider;
+import com.prgrms.amabnb.security.jwt.exception.InvalidTokenException;
+import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
 
 import io.jsonwebtoken.impl.DefaultClaims;
 
@@ -45,11 +46,11 @@ class TokenServiceTest {
         given(jwtTokenProvider.createRefreshToken()).willReturn(refreshToken);
 
         // when
-        TokenResponse tokenResponse = tokenService.createToken(1L, "ROLE_GUEST");
+        TokenResponse tokenResponse = tokenService.createToken(new UserRegisterResponse(1L, "ROLE_GUEST"));
 
         // then
-        assertThat(tokenResponse.getAccessToken()).isEqualTo(accessToken);
-        assertThat(tokenResponse.getRefreshToken()).isEqualTo(refreshToken);
+        assertThat(tokenResponse.accessToken()).isEqualTo(accessToken);
+        assertThat(tokenResponse.refreshToken()).isEqualTo(refreshToken);
     }
 
     @DisplayName("accessToken을 재생성한다.")
