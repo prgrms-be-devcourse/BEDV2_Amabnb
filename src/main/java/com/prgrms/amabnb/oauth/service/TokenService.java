@@ -3,13 +3,14 @@ package com.prgrms.amabnb.oauth.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.prgrms.amabnb.common.security.jwt.JwtTokenProvider;
-import com.prgrms.amabnb.common.security.jwt.exception.InvalidTokenException;
 import com.prgrms.amabnb.oauth.dto.AccessTokenResponse;
 import com.prgrms.amabnb.oauth.dto.RefreshTokenRequest;
 import com.prgrms.amabnb.oauth.dto.TokenResponse;
 import com.prgrms.amabnb.oauth.entity.Token;
 import com.prgrms.amabnb.oauth.entity.TokenRepository;
+import com.prgrms.amabnb.security.jwt.JwtTokenProvider;
+import com.prgrms.amabnb.security.jwt.exception.InvalidTokenException;
+import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,10 @@ public class TokenService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public TokenResponse createToken(Long userId, String role) {
-        var accessToken = jwtTokenProvider.createAccessToken(userId, role);
+    public TokenResponse createToken(UserRegisterResponse user) {
+        var accessToken = jwtTokenProvider.createAccessToken(user.id(), user.role());
         var refreshToken = jwtTokenProvider.createRefreshToken();
-        tokenRepository.save(new Token(refreshToken, userId));
+        tokenRepository.save(new Token(refreshToken, user.id()));
         return new TokenResponse(accessToken, refreshToken);
     }
 
