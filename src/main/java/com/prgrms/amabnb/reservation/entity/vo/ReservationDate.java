@@ -1,6 +1,7 @@
 package com.prgrms.amabnb.reservation.entity.vo;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -25,9 +26,15 @@ public class ReservationDate {
 
     public ReservationDate(LocalDate checkIn, LocalDate checkOut) {
         validateNull(checkIn, checkOut);
+        validateBeforeNowCheckIn(checkIn);
+        validateBeforeOrSameNowCheckOut(checkOut);
         validateDate(checkIn, checkOut);
         this.checkIn = checkIn;
         this.checkOut = checkOut;
+    }
+
+    public long getPeriod() {
+        return ChronoUnit.DAYS.between(checkIn, checkOut);
     }
 
     private void validateNull(LocalDate checkIn, LocalDate checkOut) {
@@ -36,9 +43,21 @@ public class ReservationDate {
         }
     }
 
+    private void validateBeforeNowCheckIn(LocalDate checkIn) {
+        if (checkIn.isBefore(LocalDate.now())) {
+            throw new ReservationInvalidValueException("체크인은 현재보다 전일 수 없습니다.");
+        }
+    }
+
+    private void validateBeforeOrSameNowCheckOut(LocalDate checkOut) {
+        if (checkOut.isBefore(LocalDate.now()) || checkOut.isEqual(LocalDate.now())) {
+            throw new ReservationInvalidValueException("체크아웃은 현재보다 전이거나 현재일 수 없습니다.");
+        }
+    }
+
     private void validateDate(LocalDate checkIn, LocalDate checkOut) {
-        if (checkIn.isAfter(checkOut)) {
-            throw new ReservationInvalidValueException("체크 아웃 날짜가 체크인 날짜 전일 수 없습니다.");
+        if (checkOut.isBefore(checkIn) || checkIn.isEqual(checkOut)) {
+            throw new ReservationInvalidValueException("체크 아웃 날짜가 체크인 날짜 전이거나 같을 수 없습니다.");
         }
     }
 
