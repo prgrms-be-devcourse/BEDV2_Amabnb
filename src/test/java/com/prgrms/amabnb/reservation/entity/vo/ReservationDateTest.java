@@ -94,13 +94,13 @@ class ReservationDateTest {
     @Test
     void getPeriod() {
         // given
-        long period = 5;
+        int period = 5;
         LocalDate checkIn = LocalDate.now();
         LocalDate checkOut = checkIn.plusDays(5L);
         ReservationDate reservationDate = new ReservationDate(checkIn, checkOut);
 
         // when
-        long calculatePeriod = reservationDate.getPeriod();
+        int calculatePeriod = reservationDate.getPeriod();
 
         // then
         assertThat(calculatePeriod).isEqualTo(period);

@@ -1,7 +1,6 @@
 package com.prgrms.amabnb.reservation.entity.vo;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -33,8 +32,8 @@ public class ReservationDate {
         this.checkOut = checkOut;
     }
 
-    public long getPeriod() {
-        return ChronoUnit.DAYS.between(checkIn, checkOut);
+    public int getPeriod() {
+        return checkIn.until(checkOut).getDays();
     }
 
     private void validateNull(LocalDate checkIn, LocalDate checkOut) {
