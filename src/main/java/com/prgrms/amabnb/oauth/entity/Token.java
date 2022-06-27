@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.auth.entity;
+package com.prgrms.amabnb.oauth.entity;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -24,7 +24,12 @@ public class Token {
     @Column(nullable = false, unique = true)
     private long userId;
 
-    public Token(String refreshToken, long userId) {
+    public Token(String refreshToken, Long userId) {
+        this(null, refreshToken, userId);
+    }
+
+    public Token(Long id, String refreshToken, Long userId) {
+        this.id = id;
         this.refreshToken = refreshToken;
         this.userId = userId;
     }
