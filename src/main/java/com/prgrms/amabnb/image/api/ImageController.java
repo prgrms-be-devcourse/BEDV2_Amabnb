@@ -19,7 +19,8 @@ public class ImageController {
     private final AWSS3Uploader s3Uploader;
 
     @PostMapping("/room-images")
-    public List<String> upload(@RequestParam("images") MultipartFile[] images) throws IOException {
+    public List<String> upload(@RequestParam List<MultipartFile> images) throws
+        IOException {
         return s3Uploader.upload(images, "static");
     }
 }

@@ -27,7 +27,7 @@ public class AWSS3Uploader {
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
-    public List<String> upload(MultipartFile[] images, String dirName) throws IOException {
+    public List<String> upload(List<MultipartFile> images, String dirName) throws IOException {
         List<String> s3urlPathList = new ArrayList<>();
 
         int fileSequence = 1;
