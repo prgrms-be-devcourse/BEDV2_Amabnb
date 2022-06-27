@@ -1,6 +1,5 @@
 package com.prgrms.amabnb.user.entity;
 
-import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -44,8 +43,6 @@ public class User extends BaseEntity {
     @Column(length = NAME_MAX_LENGTH, nullable = false)
     private String name;
 
-    private LocalDate birth;
-
     @Embedded
     private Email email;
 
@@ -53,31 +50,29 @@ public class User extends BaseEntity {
     private PhoneNumber phoneNumber;
 
     @Column(nullable = false)
-    private String imageUrl;
+    private String profileImgUrl;
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
     @Builder
-    public User(Long id, String oauthId, String provider, String name, LocalDate birth,
-        Email email, PhoneNumber phoneNumber, String imageUrl, UserRole userRole) {
+    public User(Long id, String oauthId, String provider, String name, Email email, PhoneNumber phoneNumber,
+        String profileImgUrl, UserRole userRole) {
         setOauthId(oauthId);
         setName(name);
         setProvider(provider);
-        setImageUrl(imageUrl);
-        setBirth(birth);
+        setProfileImgUrl(profileImgUrl);
         this.id = id;
-        this.birth = birth;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.userRole = userRole;
     }
 
-    private void setImageUrl(String imageUrl) {
+    private void setProfileImgUrl(String imageUrl) {
         if (Objects.isNull(imageUrl) || imageUrl.isBlank()) {
             throw new UserInvalidValueException("이미지 URL은 비어있을 수 없습니다.");
         }
-        this.imageUrl = imageUrl;
+        this.profileImgUrl = imageUrl;
     }
 
     private void setProvider(String provider) {
@@ -105,23 +100,6 @@ public class User extends BaseEntity {
             throw new UserInvalidValueException("인증 아이디는 비어있을 수 없습니다.");
         }
         this.oauthId = oauthId;
-    }
-
-    public Optional<LocalDate> getBirth() {
-        return Optional.ofNullable(birth);
-    }
-
-    private void setBirth(LocalDate birth) {
-        if (Objects.nonNull(birth)) {
-            validateBirth(birth);
-        }
-        this.birth = birth;
-    }
-
-    private void validateBirth(LocalDate birth) {
-        if (birth.isAfter(LocalDate.now())) {
-            throw new UserInvalidValueException("생일은 현재보다 미래일 수 없습니다.");
-        }
     }
 
     public Optional<PhoneNumber> getPhoneNumber() {
