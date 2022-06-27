@@ -18,14 +18,8 @@ spring:
     hibernate:
       ddl-auto: create
 
-jwt:
-  issuer:
-  secret-key:
-  access-token:
-    expire-length:
-  refresh-token:
-    expire-length:
-
+  profiles:
+    include: security
 
 cloud:
   aws:
