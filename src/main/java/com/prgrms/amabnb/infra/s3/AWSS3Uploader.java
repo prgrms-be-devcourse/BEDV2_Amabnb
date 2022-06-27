@@ -41,7 +41,8 @@ public class AWSS3Uploader {
                         bucket,
                         fileName,
                         inputStream,
-                        objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead));
+                        objectMetadata).withCannedAcl(CannedAccessControlList.PublicRead)
+                );
 
                 s3urlPathList.add(amazonS3Client.getUrl(bucket, fileName).toString());
             } catch (IOException e) {
