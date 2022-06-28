@@ -2,6 +2,12 @@ package com.prgrms.amabnb.reservation.dto.request;
 
 import java.time.LocalDate;
 
+import javax.validation.constraints.Future;
+import javax.validation.constraints.FutureOrPresent;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
@@ -17,10 +23,26 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CreateReservationRequest {
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @NotNull(message = "체크인은 비어있을 수 없습니다.")
+    @FutureOrPresent(message = "체크인은 현재보다 전일 수 없습니다.")
     private LocalDate checkIn;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
+    @NotNull(message = "체크아웃은 비어있을 수 없습니다.")
+    @Future(message = "체크아웃은 현재보다 전이거나 현재일 수 없습니다.")
     private LocalDate checkOut;
+
+    @NotNull(message = "총 인원 수는 비어있을 수 없습니다.")
+    @Positive(message = "총 인원 수는 양수여야 합니다.")
     private Integer totalGuest;
+
+    @NotNull(message = "총 가격은 비어있을 수 없습니다.")
+    @Positive(message = "총 가격은 양수여야 합니다.")
     private Integer totalPrice;
+
+    @NotNull(message = "숙소 아이디는 비어있을 수 없습니다.")
+    @Positive(message = "숙소 아이디는 양수여야 합니다.")
     private Long roomId;
 
     @Builder
