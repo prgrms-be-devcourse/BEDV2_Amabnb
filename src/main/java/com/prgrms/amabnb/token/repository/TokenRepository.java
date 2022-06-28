@@ -10,4 +10,7 @@ public interface TokenRepository extends JpaRepository<Token, Long> {
 
     Optional<Token> findTokenByUserId(long userId);
 
+    void deleteByUserId(Long userId);
+
+    boolean existsByUserId(Long userId);
 }
