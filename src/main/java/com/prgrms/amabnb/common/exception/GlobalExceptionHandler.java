@@ -43,18 +43,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(ERROR_LOG_MESSAGE, e.getClass().getSimpleName(), e.getMessage(), e);
+        ErrorResponse errorResponse = ErrorResponse.of("잘못된 값입니다.", e.getBindingResult());
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(new ErrorResponse("Validation 에러가 발생했습니다."));
+            .body(errorResponse);
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
         MethodArgumentTypeMismatchException e) {
         log.error(ERROR_LOG_MESSAGE, e.getClass().getSimpleName(), e.getMessage(), e);
+        ErrorResponse errorResponse = ErrorResponse.of("잘못된 타입입니다.", e);
         return ResponseEntity
             .status(HttpStatus.BAD_REQUEST)
-            .body(new ErrorResponse("Request 타입 불일치 에러가 발생했습니다."));
+            .body(errorResponse);
     }
 
 }
