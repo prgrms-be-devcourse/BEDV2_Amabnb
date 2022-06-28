@@ -86,10 +86,9 @@ class ReservationRepositoryTest {
             .provider("testProvider")
             .userRole(UserRole.GUEST)
             .name("testUser")
-            .birth(LocalDate.of(2000, 1, 12))
             .email(new Email("asdsadsad@gmail.com"))
             .phoneNumber(new PhoneNumber("010-2312-1231"))
-            .imageUrl("urlurlrurlrurlurlurl")
+            .profileImgUrl("urlurlrurlrurlurlurl")
             .build();
 
         return userRepository.save(user);

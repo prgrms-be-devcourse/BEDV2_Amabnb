@@ -32,7 +32,7 @@ class ReservationTest {
         // given
         int maxGuest = 5;
         Money totalPrice = new Money(10_000);
-        ReservationDate reservationDate = new ReservationDate(LocalDate.of(2022, 6, 20), LocalDate.now());
+        ReservationDate reservationDate = new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L));
         Room room = createRoom();
         User guest = createUser();
 
@@ -110,7 +110,7 @@ class ReservationTest {
         return Reservation.builder()
             .maxGuest(5)
             .totalPrice(new Money(10_000))
-            .reservationDate(new ReservationDate(LocalDate.of(2022, 6, 20), LocalDate.now()))
+            .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
             .room(room)
             .guest(user);
     }
@@ -134,10 +134,9 @@ class ReservationTest {
             .provider("testProvider")
             .userRole(UserRole.GUEST)
             .name("testUser")
-            .birth(LocalDate.of(2000, 1, 12))
             .email(new Email("asdsadsad@gmail.com"))
             .phoneNumber(new PhoneNumber("010-2312-1231"))
-            .imageUrl("urlurlrurlrurlurlurl")
+            .profileImgUrl("urlurlrurlrurlurlurl")
             .build();
     }
 
