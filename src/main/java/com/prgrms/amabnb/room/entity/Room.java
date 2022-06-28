@@ -76,7 +76,8 @@ public class Room extends BaseEntity {
     @JoinColumn(name = "review_id")
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.PERSIST)
+    @OneToMany(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "room_id")
     private List<RoomImage> roomImages = new ArrayList<>();
 
     @Builder
@@ -96,7 +97,6 @@ public class Room extends BaseEntity {
 
     public void addRoomImages(List<RoomImage> roomImages) {
         this.roomImages.addAll(roomImages);
-        roomImages.forEach(roomImage -> roomImage.setRoom(this));
     }
 
     public void setUser(User user) {
