@@ -40,7 +40,7 @@ public class Reservation extends BaseEntity {
     @Embedded
     private ReservationDate reservationDate;
 
-    private int maxGuest;
+    private int totalGuest;
 
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "total_price"))
@@ -65,14 +65,14 @@ public class Reservation extends BaseEntity {
     public Reservation(
         Long id,
         ReservationDate reservationDate,
-        int maxGuest,
+        int totalGuest,
         Money totalPrice,
         Room room,
         User guest
     ) {
         this.id = id;
         setReservationDate(reservationDate);
-        setMaxGuest(maxGuest);
+        setTotalGuest(totalGuest);
         setTotalPrice(totalPrice);
         setRoom(room);
         setGuest(guest);
@@ -86,11 +86,11 @@ public class Reservation extends BaseEntity {
         this.reservationDate = reservationDate;
     }
 
-    private void setMaxGuest(int maxGuest) {
-        if (maxGuest < GUEST_MIN_VALUE) {
-            throw new ReservationInvalidValueException("최대 인원 수는 0미만일 수 없습니다.");
+    private void setTotalGuest(int totalGuest) {
+        if (totalGuest < GUEST_MIN_VALUE) {
+            throw new ReservationInvalidValueException("숙박 인원는 0미만일 수 없습니다.");
         }
-        this.maxGuest = maxGuest;
+        this.totalGuest = totalGuest;
     }
 
     private void setTotalPrice(Money totalPrice) {

@@ -30,7 +30,7 @@ class ReservationTest {
     @Test
     void create() {
         // given
-        int maxGuest = 5;
+        int totalGuest = 5;
         Money totalPrice = new Money(10_000);
         ReservationDate reservationDate = new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L));
         Room room = createRoom();
@@ -38,7 +38,7 @@ class ReservationTest {
 
         // when
         Reservation reservation = Reservation.builder()
-            .maxGuest(maxGuest)
+            .totalGuest(totalGuest)
             .totalPrice(totalPrice)
             .reservationDate(reservationDate)
             .room(room)
@@ -52,12 +52,12 @@ class ReservationTest {
         );
     }
 
-    @DisplayName("최대 인원은 0미만이면 안된다.")
+    @DisplayName("총 인원은 0미만이면 안된다.")
     @ParameterizedTest
     @ValueSource(ints = {0, -1, -100})
-    void create_MaxGuest_Less_Then_Zero(int maxGuest) {
+    void create_MaxGuest_Less_Then_Zero(int totalGuest) {
         assertThatThrownBy(() -> createReservationBuilder()
-            .maxGuest(maxGuest)
+            .totalGuest(totalGuest)
             .build()
         ).isInstanceOf(ReservationInvalidValueException.class)
             .hasMessage("최대 인원 수는 0미만일 수 없습니다.");
@@ -108,7 +108,7 @@ class ReservationTest {
         User user = createUser();
 
         return Reservation.builder()
-            .maxGuest(5)
+            .totalGuest(5)
             .totalPrice(new Money(10_000))
             .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
             .room(room)

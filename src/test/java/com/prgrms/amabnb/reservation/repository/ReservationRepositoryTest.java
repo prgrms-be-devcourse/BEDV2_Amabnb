@@ -107,7 +107,7 @@ class ReservationRepositoryTest extends RepositoryTest {
     private Reservation createReservation(User guest, ReservationDate reservationDate) {
         Reservation reservation = Reservation.builder()
             .reservationDate(reservationDate)
-            .maxGuest(3)
+            .totalGuest(3)
             .totalPrice(new Money(100_000))
             .room(room)
             .guest(guest)
