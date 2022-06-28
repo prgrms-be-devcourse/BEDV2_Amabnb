@@ -1,10 +1,10 @@
 package com.prgrms.amabnb.user.service;
 
-import java.security.Principal;
-
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.prgrms.amabnb.security.jwt.JwtAuthentication;
 import com.prgrms.amabnb.security.oauth.UserProfile;
 import com.prgrms.amabnb.user.dto.response.MyUserInfoResponse;
 import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
@@ -27,15 +27,11 @@ public class UserService {
         return new UserRegisterResponse(user.getId(), user.getUserRole().getGrantedAuthority());
     }
 
-    public MyUserInfoResponse findUserInfo(Principal user) {
-        var findUser = userRepository.findById(parseUserId(user.getName()))
+    public MyUserInfoResponse findUserInfo(Authentication user) {
+        var userAuth = (JwtAuthentication)user.getPrincipal();
+        var findUser = userRepository.findById(userAuth.id())
             .orElseThrow(UserNotFoundException::new);
         return MyUserInfoResponse.from(findUser);
-    }
-
-    private Long parseUserId(String principal) {
-        var userId = principal.split("id=")[1];
-        return Long.parseLong(userId.substring(0, userId.length() - 1));
     }
 
 }

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +14,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import com.prgrms.amabnb.common.vo.Email;
+import com.prgrms.amabnb.security.jwt.JwtAuthentication;
+import com.prgrms.amabnb.security.jwt.JwtAuthenticationToken;
 import com.prgrms.amabnb.security.oauth.UserProfile;
 import com.prgrms.amabnb.user.dto.response.MyUserInfoResponse;
 import com.prgrms.amabnb.user.entity.User;
@@ -96,7 +101,8 @@ class UserServiceTest {
     @DisplayName("유저 정보를 조회할 수 있다 #45")
     class FindUserInfo {
         User givenUser = createUser(1L, UserRole.GUEST);
-        String givenPrincipalName = "jwtAuthentication=[token=aaaa.bbbb.cccc, id=1]";
+        Authentication givenAuth = new JwtAuthenticationToken(new JwtAuthentication("token", 1L), null,
+            List.of(new SimpleGrantedAuthority("ROLE_GUEST")));
 
         @DisplayName("Principle 에서 userId를 파싱해 유저정보를 db 에서 가져온다")
         @Test
@@ -106,7 +112,7 @@ class UserServiceTest {
             given(userRepository.findById(any(Long.class))).willReturn(Optional.of(givenUser));
 
             // when
-            var userInfo = userService.findUserInfo(() -> givenPrincipalName);
+            var userInfo = userService.findUserInfo(givenAuth);
 
             // then
             assertAll(
@@ -122,7 +128,7 @@ class UserServiceTest {
         void noMatchUser() {
             given(userRepository.findById(any(Long.class))).willReturn(Optional.empty()); // userNotFound
 
-            assertThatThrownBy(() -> userService.findUserInfo(() -> givenPrincipalName))
+            assertThatThrownBy(() -> userService.findUserInfo(givenAuth))
                 .isInstanceOf(UserNotFoundException.class);
         }
     }
