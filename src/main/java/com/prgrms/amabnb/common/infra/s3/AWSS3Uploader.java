@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3Client;
@@ -18,7 +18,7 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
+@Component
 @RequiredArgsConstructor
 public class AWSS3Uploader {
 
@@ -45,11 +45,12 @@ public class AWSS3Uploader {
                 );
 
                 s3urlPathList.add(amazonS3Client.getUrl(bucket, fileName).toString());
+
+                fileSequence++;
+                
             } catch (IOException e) {
                 throw new IOException("image upload to s3 IOException: ", e);
             }
-
-            fileSequence++;
         }
 
         return s3urlPathList;
