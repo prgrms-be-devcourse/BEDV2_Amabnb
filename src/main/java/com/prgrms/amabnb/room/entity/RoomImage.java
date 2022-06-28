@@ -17,15 +17,15 @@ public class RoomImage {
     @GeneratedValue
     private Long id;
 
-    private String filePath;
+    private String imagePath;
 
-    public RoomImage(String filePath) {
-        this(null, filePath);
+    public RoomImage(String imagePath) {
+        this(null, imagePath);
     }
 
-    public RoomImage(Long id, String filePath) {
+    public RoomImage(Long id, String imagePath) {
         this.id = id;
-        this.filePath = filePath;
+        this.imagePath = imagePath;
     }
 
 }
