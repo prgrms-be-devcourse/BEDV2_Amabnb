@@ -70,11 +70,11 @@ public class Room extends BaseEntity {
     private RoomScope roomScope;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
+    private User host;
 
     @OneToMany
     @JoinColumn(name = "review_id")
-    private List<Review> reviews;
+    private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.PERSIST)
     private List<RoomImage> roomImages = new ArrayList<>();
@@ -100,7 +100,7 @@ public class Room extends BaseEntity {
     }
 
     public void setUser(User user) {
-        this.user = user;
+        this.host = user;
     }
 
     public boolean isValidatePrice(Money totalPrice, int period) {
