@@ -20,7 +20,6 @@ import javax.persistence.OneToMany;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
 import com.prgrms.amabnb.common.model.Money;
-import com.prgrms.amabnb.image.entity.Image;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
@@ -37,43 +36,38 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends BaseEntity {
 
-    @OneToMany
-    @JoinColumn(name = "review_id")
-    private final List<Review> reviews = new ArrayList<>();
-
-    @OneToMany
-    @JoinColumn(name = "room_id")
-    private final List<Image> images = new ArrayList<>();
-
     @Id
     @GeneratedValue
     private Long id;
+    
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private Money price;
+    
     @Lob
     @Column(nullable = false)
     private String description;
+    
     @Column(nullable = false)
     private int maxGuestNum;
+    
     @Embedded
     private RoomAddress address;
+    
     @Embedded
     private RoomOption roomOption;
+    
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
+    
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomScope roomScope;
+    
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id")
     private User host;
-
-    @Builder
-    public Room(Long id) {
-        this.id = id;
-    }
 
     @Builder
     public Room(Long id, Money price, String description, int maxGuestNum, RoomAddress address, RoomOption roomOption,
