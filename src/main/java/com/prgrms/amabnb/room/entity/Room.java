@@ -107,6 +107,10 @@ public class Room extends BaseEntity {
         return totalPrice.equals(price.multiply(period));
     }
 
+    public boolean isOverMaxGuestNum(int totalGuest) {
+        return totalGuest > maxGuestNum;
+    }
+
     private void validateRoom(String name, Money price, int maxGuestNum, String description, RoomAddress roomAddress,
         RoomOption roomOption, RoomType roomType, RoomScope roomScope) {
         validateName(name);
