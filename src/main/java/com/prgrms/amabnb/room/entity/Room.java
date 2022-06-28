@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import javax.persistence.AttributeOverride;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -40,6 +41,9 @@ public class Room extends BaseEntity {
     @GeneratedValue
     private Long id;
 
+    @Column(nullable = false)
+    private String name;
+
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private Money price;
@@ -66,18 +70,21 @@ public class Room extends BaseEntity {
     private RoomScope roomScope;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users_id")
-    private User host;
+    private User user;
 
     @OneToMany
     @JoinColumn(name = "review_id")
-    private List<Review> reviews = new ArrayList<>();
+    private List<Review> reviews;
+
+    @OneToMany(mappedBy = "room", cascade = CascadeType.PERSIST)
+    private List<RoomImage> roomImages = new ArrayList<>();
 
     @Builder
-    public Room(Long id, Money price, String description, int maxGuestNum, RoomAddress address, RoomOption roomOption,
-        RoomType roomType, RoomScope roomScope) {
-        validateRoom(price, maxGuestNum, description, address, roomOption, roomType, roomScope);
+    public Room(Long id, String name, Money price, String description, int maxGuestNum,
+        RoomAddress address, RoomOption roomOption, RoomType roomType, RoomScope roomScope) {
+        validateRoom(name, price, maxGuestNum, description, address, roomOption, roomType, roomScope);
         this.id = id;
+        this.name = name;
         this.price = price;
         this.description = description;
         this.maxGuestNum = maxGuestNum;
@@ -87,8 +94,22 @@ public class Room extends BaseEntity {
         this.roomScope = roomScope;
     }
 
-    private void validateRoom(Money price, int maxGuestNum, String description, RoomAddress roomAddress,
+    public void addRoomImages(List<RoomImage> roomImages) {
+        this.roomImages.addAll(roomImages);
+        roomImages.forEach(roomImage -> roomImage.setRoom(this));
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public boolean isValidatePrice(Money totalPrice, int period) {
+        return totalPrice.equals(price.multiply(period));
+    }
+
+    private void validateRoom(String name, Money price, int maxGuestNum, String description, RoomAddress roomAddress,
         RoomOption roomOption, RoomType roomType, RoomScope roomScope) {
+        validateName(name);
         validateMaxGuestNum(maxGuestNum);
         validateDescription(description);
         isPresentPrice(price);
@@ -96,6 +117,12 @@ public class Room extends BaseEntity {
         isPresentRoomOption(roomOption);
         isPresentRoomType(roomType);
         isPresentRoomScope(roomScope);
+    }
+
+    private void validateName(String name) {
+        if (Objects.isNull(name) || name.isBlank() || name.length() > 255) {
+            throw new RoomInvalidValueException("숙소 이름 입력값이 잘못됐습니다");
+        }
     }
 
     private void validateMaxGuestNum(int maxGuestNum) {
@@ -139,4 +166,5 @@ public class Room extends BaseEntity {
             throw new RoomInvalidValueException("숙소 이용 범위가 정해지지 않았습니다");
         }
     }
+
 }
