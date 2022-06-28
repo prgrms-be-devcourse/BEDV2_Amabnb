@@ -13,8 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
-import com.prgrms.amabnb.user.entity.vo.Email;
-import com.prgrms.amabnb.user.entity.vo.PhoneNumber;
+import com.prgrms.amabnb.common.vo.Email;
+import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.user.exception.UserInvalidValueException;
 
 import lombok.AccessLevel;

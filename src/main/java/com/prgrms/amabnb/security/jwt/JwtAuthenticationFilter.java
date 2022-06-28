@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.prgrms.amabnb.security.jwt.util.AuthorizationExtractor;
+import com.prgrms.amabnb.security.util.AuthorizationExtractor;
 
 import lombok.RequiredArgsConstructor;
 
