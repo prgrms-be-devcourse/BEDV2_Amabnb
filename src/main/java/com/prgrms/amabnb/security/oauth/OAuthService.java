@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.oauth;
+package com.prgrms.amabnb.security.oauth;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

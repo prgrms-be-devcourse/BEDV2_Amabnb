@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.oauth;
+package com.prgrms.amabnb.security.oauth;
 
 import java.util.Arrays;
 import java.util.Map;

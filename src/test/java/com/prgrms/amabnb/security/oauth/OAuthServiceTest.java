@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.oauth;
+package com.prgrms.amabnb.security.oauth;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;

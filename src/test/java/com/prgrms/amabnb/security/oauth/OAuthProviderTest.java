@@ -1,6 +1,6 @@
-package com.prgrms.amabnb.oauth;
+package com.prgrms.amabnb.security.oauth;
 
-import static com.prgrms.amabnb.oauth.OAuthProvider.*;
+import static com.prgrms.amabnb.security.oauth.OAuthProvider.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;

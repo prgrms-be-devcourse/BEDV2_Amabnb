@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.oauth;
+package com.prgrms.amabnb.security.oauth;
 
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.user.entity.User;
