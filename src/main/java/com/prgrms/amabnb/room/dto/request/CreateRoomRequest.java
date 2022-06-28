@@ -1,5 +1,8 @@
 package com.prgrms.amabnb.room.dto.request;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -9,6 +12,7 @@ import javax.validation.constraints.PositiveOrZero;
 
 import com.prgrms.amabnb.common.model.Money;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
@@ -22,7 +26,11 @@ import lombok.Setter;
 @Setter
 public class CreateRoomRequest {
 
+    @NotNull
     private Long userId;
+
+    @NotBlank
+    private String name;
 
     @Max(value = 10000000)
     @PositiveOrZero
@@ -57,11 +65,15 @@ public class CreateRoomRequest {
     @NotNull
     private RoomScope roomScope;
 
-    @Builder
-    public CreateRoomRequest(int price, String description, int maxGuestNum, String zipcode, String address,
-        String detailAddress, int bedCnt, int bedRoomCnt, int bathRoomCnt, RoomType roomType,
-        RoomScope roomScope) {
+    @NotNull
+    private List<String> imagePaths;
 
+    @Builder
+    public CreateRoomRequest(Long userId, String name, int price, String description, int maxGuestNum,
+        String zipcode, String address, String detailAddress, int bedCnt, int bedRoomCnt, int bathRoomCnt,
+        RoomType roomType, RoomScope roomScope, List<String> imagePaths) {
+        this.userId = userId;
+        this.name = name;
         this.price = price;
         this.description = description;
         this.maxGuestNum = maxGuestNum;
@@ -73,11 +85,12 @@ public class CreateRoomRequest {
         this.bathRoomCnt = bathRoomCnt;
         this.roomType = roomType;
         this.roomScope = roomScope;
-
+        this.imagePaths = imagePaths;
     }
 
     public Room toRoom() {
         return Room.builder()
+            .name(name)
             .price(new Money(price))
             .description(description)
             .maxGuestNum(maxGuestNum)
@@ -86,6 +99,16 @@ public class CreateRoomRequest {
             .roomType(roomType)
             .roomScope(roomScope)
             .build();
+    }
+
+    public List<RoomImage> toRoomImages() {
+        List<RoomImage> roomImages = new ArrayList<>();
+
+        imagePaths.forEach(
+            imagePath -> roomImages.add(new RoomImage(imagePath))
+        );
+
+        return roomImages;
     }
 
 }
