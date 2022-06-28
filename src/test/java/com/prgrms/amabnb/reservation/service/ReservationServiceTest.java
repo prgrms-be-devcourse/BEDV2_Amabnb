@@ -12,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.prgrms.amabnb.common.model.Money;
+import com.prgrms.amabnb.common.vo.Email;
+import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
@@ -29,7 +30,6 @@ import com.prgrms.amabnb.room.exception.RoomNotFoundException;
 import com.prgrms.amabnb.room.repository.CreateRoomRepository;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;
-import com.prgrms.amabnb.user.entity.vo.Email;
 import com.prgrms.amabnb.user.exception.UserNotFoundException;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
@@ -153,7 +153,7 @@ class ReservationServiceTest {
         // then
         assertThatThrownBy(() -> reservationService.createReservation(100L, request))
             .isInstanceOf(UserNotFoundException.class)
-            .hasMessage("해당 유저를 찾을 수 없습니다.");
+            .hasMessage("존재 하지 않는 유저입니다.");
     }
 
     private CreateReservationRequest createReservationRequest(int totalGuest, int totalPrice, Long roomId) {

@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.prgrms.amabnb.common.model.Money;
+import com.prgrms.amabnb.common.vo.Email;
+import com.prgrms.amabnb.common.vo.Money;
+import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.room.entity.Room;
@@ -21,8 +23,6 @@ import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;
-import com.prgrms.amabnb.user.entity.vo.Email;
-import com.prgrms.amabnb.user.entity.vo.PhoneNumber;
 
 class ReservationTest {
 
@@ -60,7 +60,7 @@ class ReservationTest {
             .totalGuest(totalGuest)
             .build()
         ).isInstanceOf(ReservationInvalidValueException.class)
-            .hasMessage("최대 인원 수는 0미만일 수 없습니다.");
+            .hasMessage("숙박 인원는 0미만일 수 없습니다.");
     }
 
     @DisplayName("총 가격은 비어있으면 안된다.")
