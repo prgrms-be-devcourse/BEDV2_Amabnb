@@ -1,7 +1,8 @@
-package com.prgrms.amabnb.room.entity.dto.request;
+package com.prgrms.amabnb.room.dto.request;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -18,8 +19,8 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 
@@ -38,6 +39,8 @@ class CreateRoomRequestTest {
     @BeforeEach
     void setup() {
         createRoomRequest = CreateRoomRequest.builder()
+            .userId(1L)
+            .name("방 이름")
             .price(1)
             .description("방설명")
             .maxGuestNum(1)
@@ -49,6 +52,7 @@ class CreateRoomRequestTest {
             .bathRoomCnt(1)
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .imagePaths(List.of("aaa", "bbb"))
             .build();
     }
 
@@ -187,5 +191,18 @@ class CreateRoomRequestTest {
     void toRoomTest() {
         //then
         assertThat(createRoomRequest.toRoom()).isInstanceOf(Room.class);
+    }
+
+    @Test
+    @DisplayName("toRoomImage 테스트")
+    void toRoomImageTest() {
+        //given
+        List<RoomImage> roomImages = createRoomRequest.toRoomImages();
+        //when
+        RoomImage roomImage = roomImages.get(0);
+        int roomImagesSize = roomImages.size();
+        //then
+        assertThat(roomImage.getImagePath()).isEqualTo("aaa");
+        assertThat(roomImagesSize).isEqualTo(2);
     }
 }
