@@ -39,35 +39,39 @@ public class Room extends BaseEntity {
     @Id
     @GeneratedValue
     private Long id;
-    
+
     @Embedded
     @AttributeOverride(name = "value", column = @Column(name = "price"))
     private Money price;
-    
+
     @Lob
     @Column(nullable = false)
     private String description;
-    
+
     @Column(nullable = false)
     private int maxGuestNum;
-    
+
     @Embedded
     private RoomAddress address;
-    
+
     @Embedded
     private RoomOption roomOption;
-    
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomType roomType;
-    
+
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private RoomScope roomScope;
-    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "users_id")
     private User host;
+
+    @OneToMany
+    @JoinColumn(name = "review_id")
+    private List<Review> reviews = new ArrayList<>();
 
     @Builder
     public Room(Long id, Money price, String description, int maxGuestNum, RoomAddress address, RoomOption roomOption,
