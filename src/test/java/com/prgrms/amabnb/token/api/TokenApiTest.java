@@ -106,7 +106,7 @@ class TokenApiTest {
     }
 
     @Nested
-    @DisplayName("유저가 로그아웃을 하면, Refresh 토큰을 지운다")
+    @DisplayName("유저가 로그아웃을 하면, Refresh 토큰을 지운다 #58")
     class deleteRefreshToken {
         @Test
         void deleteRefreshToken() throws Exception {

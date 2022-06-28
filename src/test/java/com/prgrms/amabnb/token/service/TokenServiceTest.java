@@ -146,6 +146,7 @@ class TokenServiceTest {
     }
 
     @Nested
+    @DisplayName("유저 정보를 통해 관련된 RefreshToken 을 지운다 #58")
     class DeleteTokenByUserId {
 
         @DisplayName("유저가 있으면 성공적으로 삭제한다")
