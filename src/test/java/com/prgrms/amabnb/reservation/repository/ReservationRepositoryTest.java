@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
+import com.prgrms.amabnb.common.TestConfig;
 import com.prgrms.amabnb.common.model.Money;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
@@ -33,7 +34,7 @@ import com.prgrms.amabnb.user.repository.UserRepository;
 
 @DataJpaTest
 @ActiveProfiles("test")
-@Import(QueryDslConfig.class)
+@Import(TestConfig.class)
 class ReservationRepositoryTest {
 
     @Autowired

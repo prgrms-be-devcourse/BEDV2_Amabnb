@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.user.entity.User;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -33,6 +34,23 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
         return fetchOne != null;
     }
 
+    @Override
+    public boolean existReservationByGuest(User guest, ReservationDate reservationDate) {
+        LocalDate checkIn = reservationDate.getCheckIn();
+        LocalDate checkOut = reservationDate.getCheckOut();
+
+        Integer fetchOne = queryFactory.selectOne()
+            .from(reservation)
+            .where(
+                eqGuest(guest)
+                    .and(notInCanceled())
+                    .and(betweenCheckIn(checkIn, checkOut).or(betweenCheckOut(checkIn, checkOut)))
+            )
+            .fetchFirst();
+
+        return fetchOne != null;
+    }
+
     private BooleanExpression notInCanceled() {
         return reservation.reservationStatus.notIn(ReservationStatus.GUEST_CANCELED, ReservationStatus.GUEST_CANCELED);
     }
@@ -47,6 +65,10 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
 
     private BooleanExpression eqRoom(Room room) {
         return reservation.room.eq(room);
+    }
+
+    private BooleanExpression eqGuest(User guest) {
+        return reservation.guest.eq(guest);
     }
 
 }
