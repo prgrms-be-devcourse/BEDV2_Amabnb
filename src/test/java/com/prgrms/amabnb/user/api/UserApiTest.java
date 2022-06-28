@@ -80,4 +80,16 @@ class UserApiTest {
         }
     }
 
+    @Nested
+    @DisplayName("유저는 서비스 탈퇴를 할 수 있다 #46")
+    class DeleteAccount {
+        @Test
+        void deleteUser() throws Exception {
+            mockMvc.perform(delete("/me")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenToken.accessToken()))
+                .andExpect(handler().methodName("deleteAccount"))
+                .andExpect(status().isOk())
+                .andDo(print());
+        }
+    }
 }
