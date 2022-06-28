@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.infra.s3;
+package com.prgrms.amabnb.common.infra.s3;
 
 import java.io.File;
 import java.io.IOException;

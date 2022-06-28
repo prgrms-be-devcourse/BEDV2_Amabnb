@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.infra.config;
+package com.prgrms.amabnb.common.infra.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

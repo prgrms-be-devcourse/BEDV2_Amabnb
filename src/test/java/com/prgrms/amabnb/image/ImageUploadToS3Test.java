@@ -20,7 +20,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.prgrms.amabnb.infra.s3.AWSS3Uploader;
+import com.prgrms.amabnb.common.infra.s3.AWSS3Uploader;
 
 @SpringBootTest
 public class ImageUploadToS3Test {
