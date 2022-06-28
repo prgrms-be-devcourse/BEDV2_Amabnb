@@ -20,10 +20,12 @@ import com.prgrms.amabnb.room.entity.vo.RoomOption;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 public class CreateRoomRequest {
 
     @NotNull
