@@ -26,18 +26,12 @@ public class ErrorResponse {
     }
 
     public static ErrorResponse of(String message, MethodArgumentTypeMismatchException e) {
-        return new ErrorResponse(message, FieldError.of(e.getName(), getValue(e.getValue()), e.getErrorCode()));
+        String value = e.getValue() == null ? "" : e.getValue().toString();
+        return new ErrorResponse(message, FieldError.of(e.getName(), value, e.getErrorCode()));
     }
 
     public static ErrorResponse of(String message, BindingResult bindingResult) {
         return new ErrorResponse(message, FieldError.from(bindingResult));
-    }
-
-    private static String getValue(Object errorValue) {
-        if (errorValue == null) {
-            return "";
-        }
-        return errorValue.toString();
     }
 
     @Getter
@@ -60,7 +54,7 @@ public class ErrorResponse {
             return bindingResult.getFieldErrors().stream()
                 .map(error -> new FieldError(
                     error.getField(),
-                    ErrorResponse.getValue(error.getRejectedValue()),
+                    error.getRejectedValue() == null ? "" : error.getRejectedValue().toString(),
                     error.getDefaultMessage()
                 ))
                 .toList();
