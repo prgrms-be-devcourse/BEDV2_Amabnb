@@ -9,7 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.prgrms.amabnb.common.model.Money;
+import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.room.exception.RoomInvalidValueException;

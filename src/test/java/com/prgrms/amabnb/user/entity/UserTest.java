@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
-import com.prgrms.amabnb.user.entity.vo.Email;
-import com.prgrms.amabnb.user.entity.vo.PhoneNumber;
+import com.prgrms.amabnb.common.vo.Email;
+import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.user.exception.UserInvalidValueException;
 
 class UserTest {

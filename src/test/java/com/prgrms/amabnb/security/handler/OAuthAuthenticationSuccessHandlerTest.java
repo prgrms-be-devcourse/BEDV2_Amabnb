@@ -21,8 +21,8 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prgrms.amabnb.oauth.dto.TokenResponse;
-import com.prgrms.amabnb.oauth.service.OAuthService;
+import com.prgrms.amabnb.security.oauth.OAuthService;
+import com.prgrms.amabnb.token.dto.TokenResponse;
 
 @ExtendWith(MockitoExtension.class)
 class OAuthAuthenticationSuccessHandlerTest {

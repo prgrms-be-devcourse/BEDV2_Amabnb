@@ -13,7 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.prgrms.amabnb.oauth.dto.UserProfile;
+import com.prgrms.amabnb.oauth.UserProfile;
 import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;

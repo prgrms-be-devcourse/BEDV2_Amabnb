@@ -3,7 +3,7 @@ package com.prgrms.amabnb.user.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.prgrms.amabnb.oauth.dto.UserProfile;
+import com.prgrms.amabnb.oauth.UserProfile;
 import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
