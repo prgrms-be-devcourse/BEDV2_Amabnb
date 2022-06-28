@@ -29,4 +29,7 @@ public class Money {
         }
     }
 
+    public Money multiply(int period) {
+        return new Money(this.value * period);
+    }
 }
