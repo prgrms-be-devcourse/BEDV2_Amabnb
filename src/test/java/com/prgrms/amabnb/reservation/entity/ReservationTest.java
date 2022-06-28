@@ -118,6 +118,7 @@ class ReservationTest {
     private Room createRoom() {
         return Room.builder()
             .id(1L)
+            .name("별이 빛나는 밤")
             .maxGuestNum(1)
             .description("방 설명 입니다")
             .address(new RoomAddress("00000", "창원", "의창구"))

@@ -11,12 +11,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
-import com.prgrms.amabnb.common.TestConfig;
+import com.prgrms.amabnb.common.RepositoryTest;
 import com.prgrms.amabnb.common.model.Money;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
@@ -32,10 +29,7 @@ import com.prgrms.amabnb.user.entity.vo.Email;
 import com.prgrms.amabnb.user.entity.vo.PhoneNumber;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
-@DataJpaTest
-@ActiveProfiles("test")
-@Import(TestConfig.class)
-class ReservationRepositoryTest {
+class ReservationRepositoryTest extends RepositoryTest {
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -97,6 +91,7 @@ class ReservationRepositoryTest {
 
     private Room createRoom() {
         Room room = Room.builder()
+            .name("별이 빛나는 밤")
             .maxGuestNum(1)
             .description("방 설명 입니다")
             .address(new RoomAddress("00000", "창원", "의창구"))
