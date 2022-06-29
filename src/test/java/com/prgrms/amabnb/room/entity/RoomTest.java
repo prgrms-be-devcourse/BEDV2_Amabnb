@@ -1,17 +1,18 @@
 package com.prgrms.amabnb.room.entity;
 
-import com.prgrms.amabnb.common.model.Money;
-import com.prgrms.amabnb.room.entity.vo.RoomAddress;
-import com.prgrms.amabnb.room.entity.vo.RoomOption;
-import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
+import com.prgrms.amabnb.common.vo.Money;
+import com.prgrms.amabnb.room.entity.vo.RoomAddress;
+import com.prgrms.amabnb.room.entity.vo.RoomOption;
+import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
 
 class RoomTest {
 
@@ -24,15 +25,15 @@ class RoomTest {
     void createRoom() {
         //given
         Room room = Room.builder()
-                .id(1l)
-                .maxGuestNum(1)
-                .description("방 설명 입니다")
-                .address(roomAddress)
-                .price(price)
-                .roomOption(roomOption)
-                .roomType(RoomType.APARTMENT)
-                .roomScope(RoomScope.PRIVATE)
-                .build();
+            .id(1l)
+            .maxGuestNum(1)
+            .description("방 설명 입니다")
+            .address(roomAddress)
+            .price(price)
+            .roomOption(roomOption)
+            .roomType(RoomType.APARTMENT)
+            .roomScope(RoomScope.PRIVATE)
+            .build();
 
         //then
         assertThat(room.getId()).isEqualTo(1L);
@@ -48,21 +49,21 @@ class RoomTest {
     @DisplayName("게스트 수는 0이하는 될 수 없다.")
     @ParameterizedTest
     @ValueSource(
-            ints = {0, -1, -123}
+        ints = {0, -1, -123}
     )
     void notMinusAndZeroGuestNum(int guestNum) {
         //then
         assertThrows(RoomInvalidValueException.class,
-                () -> Room.builder()
-                        .id(1l)
-                        .maxGuestNum(guestNum)
-                        .description("방 설명 입니다")
-                        .address(roomAddress)
-                        .price(price)
-                        .roomOption(roomOption)
-                        .roomType(RoomType.APARTMENT)
-                        .roomScope(RoomScope.PRIVATE)
-                        .build()
+            () -> Room.builder()
+                .id(1l)
+                .maxGuestNum(guestNum)
+                .description("방 설명 입니다")
+                .address(roomAddress)
+                .price(price)
+                .roomOption(roomOption)
+                .roomType(RoomType.APARTMENT)
+                .roomScope(RoomScope.PRIVATE)
+                .build()
         );
     }
 
@@ -72,16 +73,16 @@ class RoomTest {
     void notBlankDescription(String description) {
         //then
         assertThrows(RoomInvalidValueException.class,
-                () -> Room.builder()
-                        .id(1l)
-                        .maxGuestNum(1)
-                        .description(description)
-                        .address(roomAddress)
-                        .price(price)
-                        .roomOption(roomOption)
-                        .roomType(RoomType.APARTMENT)
-                        .roomScope(RoomScope.PRIVATE)
-                        .build()
+            () -> Room.builder()
+                .id(1l)
+                .maxGuestNum(1)
+                .description(description)
+                .address(roomAddress)
+                .price(price)
+                .roomOption(roomOption)
+                .roomType(RoomType.APARTMENT)
+                .roomScope(RoomScope.PRIVATE)
+                .build()
         );
     }
 
@@ -89,5 +90,27 @@ class RoomTest {
     @Test
     void isPresentTest() {
         assertThatThrownBy(() -> Room.builder().id(1l).build()).isInstanceOf(RoomInvalidValueException.class);
+    }
+
+    @DisplayName("허용할 수 있는 인원을 초과하는 지 확인한다.")
+    @Test
+    void isOverMaxGuestNum() {
+        // given
+        Room room = Room.builder()
+            .name("별이 빛나는 밤")
+            .maxGuestNum(5)
+            .description("방 설명 입니다")
+            .address(roomAddress)
+            .price(price)
+            .roomOption(roomOption)
+            .roomType(RoomType.APARTMENT)
+            .roomScope(RoomScope.PRIVATE)
+            .build();
+
+        // when
+        boolean result = room.isOverMaxGuestNum(6);
+
+        // then
+        assertThat(result).isTrue();
     }
 }
