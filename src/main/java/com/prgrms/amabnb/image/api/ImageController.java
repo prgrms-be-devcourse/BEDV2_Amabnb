@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.prgrms.amabnb.common.infra.s3.AWSS3Uploader;
+import com.prgrms.amabnb.image.service.ImageUploader;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,10 +17,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ImageController {
 
-    private final AWSS3Uploader s3Uploader;
+    private final ImageUploader imageUploader;
 
     @PostMapping("/room-images")
     public ResponseEntity<List<String>> upload(@RequestParam List<MultipartFile> images) throws IOException {
-        return ResponseEntity.ok(s3Uploader.uploadImage(images, "static"));
+        return ResponseEntity.ok(imageUploader.uploadImage(images));
     }
 }

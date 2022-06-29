@@ -23,18 +23,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AWSS3Uploader implements ImageUploader {
 
+    public static final String s3RootDirName = "static";
     private final AmazonS3Client amazonS3Client;
-
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
     @Override
-    public List<String> uploadImage(List<MultipartFile> images, String dirName) throws IOException {
+    public List<String> uploadImage(List<MultipartFile> images) throws IOException {
         List<String> s3urlPathList = new ArrayList<>();
 
         int fileSequence = 1;
         for (MultipartFile file : images) {
-            String fileName = dirName + createNewFileName(fileSequence);
+            String fileName = s3RootDirName + createNewFileName(fileSequence);
             ObjectMetadata objectMetadata = getObjectMetadata(file);
 
             try (InputStream inputStream = file.getInputStream()) {
