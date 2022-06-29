@@ -20,8 +20,7 @@ public class ImageController {
     private final AWSS3Uploader s3Uploader;
 
     @PostMapping("/room-images")
-    public ResponseEntity<List<String>> upload(@RequestParam List<MultipartFile> images) throws
-        IOException {
-        return ResponseEntity.ok(s3Uploader.upload(images, "static"));
+    public ResponseEntity<List<String>> upload(@RequestParam List<MultipartFile> images) throws IOException {
+        return ResponseEntity.ok(s3Uploader.uploadImage(images, "static"));
     }
 }

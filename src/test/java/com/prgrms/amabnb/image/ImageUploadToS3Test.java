@@ -51,7 +51,7 @@ public class ImageUploadToS3Test {
                 MediaType.MULTIPART_FORM_DATA_VALUE,
                 fileResource.getInputStream());
 
-            when(awss3Uploader.upload(List.of(), "testDir")).thenReturn(List.of());
+            when(awss3Uploader.uploadImage(List.of(), "testDir")).thenReturn(List.of());
 
             mockMvc.perform(MockMvcRequestBuilders
                     .multipart("/room-images")

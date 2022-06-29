@@ -15,24 +15,26 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.prgrms.amabnb.image.service.ImageUploader;
 
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class AWSS3Uploader {
+public class AWSS3Uploader implements ImageUploader {
 
     private final AmazonS3Client amazonS3Client;
 
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;
 
-    public List<String> upload(List<MultipartFile> images, String dirName) throws IOException {
+    @Override
+    public List<String> uploadImage(List<MultipartFile> images, String dirName) throws IOException {
         List<String> s3urlPathList = new ArrayList<>();
 
         int fileSequence = 1;
         for (MultipartFile file : images) {
-            String fileName = dirName + createS3FileName(fileSequence);
+            String fileName = dirName + createNewFileName(fileSequence);
             ObjectMetadata objectMetadata = getObjectMetadata(file);
 
             try (InputStream inputStream = file.getInputStream()) {
@@ -47,7 +49,7 @@ public class AWSS3Uploader {
                 s3urlPathList.add(amazonS3Client.getUrl(bucket, fileName).toString());
 
                 fileSequence++;
-                
+
             } catch (IOException e) {
                 throw new IOException("image upload to s3 IOException: ", e);
             }
@@ -63,7 +65,8 @@ public class AWSS3Uploader {
         return objectMetadata;
     }
 
-    public String createS3FileName(int fileSequence) {
+    public String createNewFileName(int fileSequence) {
         return File.separator + UUID.randomUUID() + "-" + fileSequence;
     }
+
 }
