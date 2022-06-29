@@ -41,6 +41,7 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
             )
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
+            .orderBy(room.id.desc())
             .fetch();
 
     }
@@ -72,5 +73,5 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
     private BooleanExpression bedsGoe(Integer minBeds) {
         return Objects.isNull(minBeds) ? null : room.roomOption.bedCnt.goe(minBeds);
     }
-    
+
 }
