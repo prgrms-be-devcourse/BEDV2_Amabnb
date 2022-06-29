@@ -34,7 +34,6 @@ public class RoomApiController {
 
     @PostMapping
     public ResponseEntity<Void> createRoom(
-
         @Valid @RequestBody CreateRoomRequest createRoomRequest,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
