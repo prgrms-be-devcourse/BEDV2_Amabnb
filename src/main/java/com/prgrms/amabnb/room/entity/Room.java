@@ -37,6 +37,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends BaseEntity {
 
+    private static final int MAX_NAME_LENGTH = 255;
+
     @Id
     @GeneratedValue
     private Long id;
@@ -131,7 +133,7 @@ public class Room extends BaseEntity {
     }
 
     private void validateName(String name) {
-        if (Objects.isNull(name) || name.isBlank() || name.length() > 255) {
+        if (Objects.isNull(name) || name.isBlank() || name.length() > MAX_NAME_LENGTH) {
             throw new RoomInvalidValueException("숙소 이름 입력값이 잘못됐습니다");
         }
     }
