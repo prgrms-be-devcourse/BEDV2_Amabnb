@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,20 +46,11 @@ public class RoomApiController {
     }
 
     @GetMapping
-    public ResponseEntity<List<RoomResponse>> getRooms(
-        @Nullable @RequestParam String minBeds,
-        @Nullable @RequestParam String minBedrooms,
-        @Nullable @RequestParam String minBathrooms,
-        @Nullable @RequestParam String minPrice,
-        @Nullable @RequestParam String maxPrice,
-        @Nullable @RequestParam List<RoomType> roomTypes,
-        @Nullable @RequestParam List<RoomScope> roomScopes,
-        Pageable pageable
-    ) {
+    public ResponseEntity<List<RoomResponse>> getRooms(SearchRoomFilterCondition searchRoomFilterCondition,
+        PageRoomRequest pageRoomRequest) {
 
         List<RoomResponse> roomResponses = searchRoomService.searchRoomsByFilterCondition(
-            SearchRoomFilterCondition.from(minBeds, minBedrooms, minBathrooms, minPrice, maxPrice, roomTypes,
-                roomScopes), pageable);
+            searchRoomFilterCondition, pageRoomRequest.of());
 
         return ResponseEntity.ok(roomResponses);
     }
