@@ -1,6 +1,5 @@
 package com.prgrms.amabnb.room.dto.request;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.constraints.Max;
@@ -100,13 +99,9 @@ public class CreateRoomRequest {
     }
 
     public List<RoomImage> toRoomImages() {
-        List<RoomImage> roomImages = new ArrayList<>();
 
-        imagePaths.forEach(
-            imagePath -> roomImages.add(new RoomImage(imagePath))
-        );
+        return imagePaths.stream().map(RoomImage::new).toList();
 
-        return roomImages;
     }
 
 }
