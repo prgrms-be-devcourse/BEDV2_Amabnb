@@ -18,4 +18,3 @@ out/
 
 ### project file ##
 /src/main/resources/application-security.yaml
-/src/main/resources/application-cloud.yaml
