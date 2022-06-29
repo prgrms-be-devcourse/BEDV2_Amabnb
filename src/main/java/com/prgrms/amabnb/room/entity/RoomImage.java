@@ -4,6 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
@@ -22,6 +23,7 @@ public class RoomImage {
     private String imagePath;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
     private Room room;
 
     public RoomImage(String imagePath) {
@@ -34,10 +36,6 @@ public class RoomImage {
     }
 
     public void setRoom(Room room) {
-        if (this.room != null) {
-            this.room.getRoomImages().remove(this);
-        }
         this.room = room;
-        room.getRoomImages().add(this);
     }
 }

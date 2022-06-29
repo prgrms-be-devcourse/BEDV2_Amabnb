@@ -76,7 +76,7 @@ public class Room extends BaseEntity {
     @JoinColumn(name = "review_id")
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "room", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "room", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<RoomImage> roomImages = new ArrayList<>();
 
     @Builder
