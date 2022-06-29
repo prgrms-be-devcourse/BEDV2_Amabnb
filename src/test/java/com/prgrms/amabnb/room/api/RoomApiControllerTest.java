@@ -137,6 +137,11 @@ class RoomApiControllerTest {
     @WithMockUser
     @DisplayName("필터를 설정하지 않아도 숙소를 들고온다.")
     void noFilterSearchTest() throws Exception {
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("page", "10");
+        params.add("size", "10");
+
         // when, then
         mockMvc.perform(get("/rooms")
                 .contentType(MediaType.APPLICATION_JSON)
