@@ -22,18 +22,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prgrms.amabnb.common.vo.Email;
-import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
-import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
+import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
+import com.prgrms.amabnb.room.repository.RoomRepository;
 import com.prgrms.amabnb.room.service.CreateRoomService;
 import com.prgrms.amabnb.room.service.SearchRoomService;
 import com.prgrms.amabnb.security.oauth.OAuthService;
 import com.prgrms.amabnb.security.oauth.UserProfile;
-import com.prgrms.amabnb.user.entity.User;
-import com.prgrms.amabnb.user.entity.UserRole;
 
 @Transactional
 @SpringBootTest
@@ -49,6 +46,9 @@ class RoomApiControllerTest {
 
     @Autowired
     SearchRoomService searchRoomService;
+
+    @Autowired
+    RoomRepository roomRepository;
 
     @Autowired
     OAuthService oAuthService;
@@ -105,18 +105,27 @@ class RoomApiControllerTest {
     @WithMockUser
     @DisplayName("필터 검색을 할 수 있다.")
     void filterSearchTest() throws Exception {
+        //given
+        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
+        Room room = createRoomRequest.toRoom();
+        room.addRoomImages(createRoomRequest.toRoomImages());
+        roomRepository.save(room);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("minBeds", "1");
+        params.add("minBedrooms", "1");
+        params.add("minBathrooms", "1");
+        params.add("minPrice", "1");
+        params.add("maxPrice", "10000000");
+        params.add("roomTypes", "HOUSE");
+        params.add("roomScopes", "PRIVATE");
+        params.add("size", "10");
+        params.add("page", "1");
+
         // when, then
         mockMvc.perform(get("/rooms")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("minBeds", "1")
-                .param("minBedrooms", "1")
-                .param("minBathrooms", "1")
-                .param("minPrice", "1")
-                .param("maxPrice", "10000000")
-                .param("roomTypes", "HOUSE")
-                .param("roomScopes", "PRIVATE")
-                .param("size", "10")
-                .param("page", "0"))
+                .params(params))
             .andExpect(status().isOk())
             .andDo(print());
 
@@ -129,23 +138,43 @@ class RoomApiControllerTest {
         // when, then
         mockMvc.perform(get("/rooms")
                 .contentType(MediaType.APPLICATION_JSON)
-                .param("size", "10")
-                .param("page", "0"))
+                .params(params))
             .andExpect(status().isOk())
             .andDo(print());
 
     }
 
-    private User createUser() {
-        return User.builder()
-            .oauthId("testOauthId")
-            .provider("testProvider")
-            .userRole(UserRole.GUEST)
-            .name("testUser")
-            .email(new Email("asdsadsad@gmail.com"))
-            .phoneNumber(new PhoneNumber("010-2312-1231"))
-            .profileImgUrl("urlurlrurlrurlurlurl")
-            .build();
+    @Test
+    @WithMockUser
+    @DisplayName("숙소 상세정보를 가져온다.")
+    void getRoomDetail() throws Exception {
+        //given
+        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
+        Room room = createRoomRequest.toRoom();
+        room.addRoomImages(createRoomRequest.toRoomImages());
+        Room savedRoom = roomRepository.save(room);
+
+        //when, then
+        mockMvc.perform(get("/rooms/" + savedRoom.getId())
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andDo(print());
+
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("등록되지 않은 숙소 상세정보를 가져오지 못한다.")
+    void getRoomDetailFailTest() throws Exception {
+        //given
+        Long notSavedRoomId = 3712893721L;
+
+        //when, then
+        mockMvc.perform(get("/rooms/" + notSavedRoomId)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isNotFound())
+            .andDo(print());
+
     }
 
     private String 로그인_요청() {
@@ -174,21 +203,9 @@ class RoomApiControllerTest {
             .bedCnt(2)
             .bedRoomCnt(1)
             .bathRoomCnt(1)
-            .roomType(RoomType.APARTMENT)
+            .roomType(RoomType.HOUSE)
             .roomScope(RoomScope.PRIVATE)
             .imagePaths(List.of("aaa", "bbb"))
-            .build();
-    }
-
-    private SearchRoomFilterCondition createFilterCondition() {
-        return SearchRoomFilterCondition.builder()
-            .minBeds(0)
-            .minBedrooms(0)
-            .minBathrooms(0)
-            .minPrice(100)
-            .maxPrice(100000000)
-            .roomScopes(List.of(RoomScope.PUBLIC))
-            .roomTypes(List.of(RoomType.HOUSE))
             .build();
     }
 
