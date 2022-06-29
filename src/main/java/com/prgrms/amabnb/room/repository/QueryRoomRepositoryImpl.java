@@ -3,7 +3,6 @@ package com.prgrms.amabnb.room.repository;
 import static com.prgrms.amabnb.room.entity.QRoom.*;
 import static com.prgrms.amabnb.room.entity.QRoomImage.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,31 +30,27 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
         return jpaQueryFactory.selectFrom(room)
             .leftJoin(room.roomImages, roomImage)
             .fetchJoin()
-            .where(applyAllFilters(filterCondition))
+            .where(
+                bedsGoe(filterCondition.getMinBeds()),
+                bedroomsGoe(filterCondition.getMinBedrooms()),
+                bathroomsGoe(filterCondition.getMinBathrooms()),
+                priceGoe(filterCondition.getMinPrice()),
+                priceLoe(filterCondition.getMaxPrice()),
+                roomTypeEq(filterCondition.getRoomTypes()),
+                roomScopesEq(filterCondition.getRoomScopes())
+            )
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
 
     }
 
-    private BooleanExpression applyAllFilters(SearchRoomFilterCondition filterCondition) {
-        return Objects.isNull(filterCondition) ? null : bedsGoe(filterCondition.getMinBeds())
-            .and(bedroomsGoe(filterCondition.getMinBedrooms()))
-            .and(bathroomsGoe(filterCondition.getMinBathrooms()))
-            .and(priceGoe(filterCondition.getMinPrice()))
-            .and(priceLoe(filterCondition.getMaxPrice()))
-            .and(roomTypeEq(filterCondition.getRoomTypes()))
-            .and(roomScopesEq(filterCondition.getRoomScopes()));
+    private BooleanExpression roomScopesEq(List<RoomScope> roomScopes) {
+        return Objects.isNull(roomScopes) ? null : room.roomScope.in(roomScopes);
     }
 
-    private BooleanExpression roomScopesEq(List<String> roomScopes) {
-        return Objects.isNull(roomScopes) ? null :
-            room.roomScope.in(toRoomScope(roomScopes));
-    }
-
-    private BooleanExpression roomTypeEq(List<String> roomTypes) {
-        return Objects.isNull(roomTypes) ? null :
-            room.roomType.in(toRoomType(roomTypes));
+    private BooleanExpression roomTypeEq(List<RoomType> roomTypes) {
+        return Objects.isNull(roomTypes) ? null : room.roomType.in(roomTypes);
     }
 
     private BooleanExpression priceLoe(Integer maxPrice) {
@@ -77,20 +72,5 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
     private BooleanExpression bedsGoe(Integer minBeds) {
         return Objects.isNull(minBeds) ? null : room.roomOption.bedCnt.goe(minBeds);
     }
-
-    private List<RoomType> toRoomType(List<String> roomTypes) {
-        List<RoomType> roomTypeList = new ArrayList<>();
-        for (String roomType : roomTypes) {
-            roomTypeList.add(RoomType.valueOf(roomType));
-        }
-        return roomTypeList;
-    }
-
-    private List<RoomScope> toRoomScope(List<String> roomScopes) {
-        List<RoomScope> roomScopeList = new ArrayList<>();
-        for (String roomScope : roomScopes) {
-            roomScopeList.add(RoomScope.valueOf(roomScope));
-        }
-        return roomScopeList;
-    }
+    
 }

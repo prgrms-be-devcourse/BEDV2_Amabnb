@@ -26,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
+import com.prgrms.amabnb.room.dto.request.PageRequestDto;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
@@ -105,22 +106,31 @@ class RoomApiControllerTest {
     @Test
     @WithMockUser
     @DisplayName("필터 검색을 할 수 있다.")
-    void name() throws Exception {
-        //given
-        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-
+    void filterSearchTest() throws Exception {
         // when, then
-        // mockMvc.perform(get("/rooms")
-        //         .contentType(MediaType.APPLICATION_JSON)
-        //         .param("minBeds", "1")
-        //         .param("minBedrooms", "1")
-        //         .param("minBathrooms", "1")
-        //         .param("minPrice", "1")
-        //         .param("maxPrice", "10000000")
-        //         .param("roomTypes", "HOUSE")
-        //         .param("roomScopes", "PRIVATE")
-        //         .content(objectMapper.writeValueAsString(new PageRequestDto(2, 10))))
-        //     .andExpect(status().isOk());
+        mockMvc.perform(get("/rooms")
+                .contentType(MediaType.APPLICATION_JSON)
+                .param("minBeds", "1")
+                .param("minBedrooms", "1")
+                .param("minBathrooms", "1")
+                .param("minPrice", "1")
+                .param("maxPrice", "10000000")
+                .param("roomTypes", "HOUSE")
+                .param("roomScopes", "PRIVATE")
+                .content(objectMapper.writeValueAsString(new PageRequestDto(0, 10))))
+            .andExpect(status().isOk());
+
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("필터를 설정하지 않아도 숙소를 들고온다.")
+    void noFilterSearchTest() throws Exception {
+        // when, then
+        mockMvc.perform(get("/rooms")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new PageRequestDto(0, 10))))
+            .andExpect(status().isOk());
 
     }
 
@@ -179,8 +189,8 @@ class RoomApiControllerTest {
             .minBathrooms(0)
             .minPrice(100)
             .maxPrice(100000000)
-            .roomScopes(List.of("PRIVATE"))
-            .roomTypes(List.of("HOUSE"))
+            .roomScopes(List.of(RoomScope.PUBLIC))
+            .roomTypes(List.of(RoomType.HOUSE))
             .build();
     }
 
