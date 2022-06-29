@@ -1,15 +1,11 @@
 package com.prgrms.amabnb.room.dto.request;
 
 import java.util.List;
-import java.util.Objects;
 
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
@@ -25,19 +21,15 @@ public class SearchRoomFilterCondition {
     private List<RoomType> roomTypes;
     private List<RoomScope> roomScopes;
 
-    public static SearchRoomFilterCondition from(String minBeds, String minBedrooms, String minBathrooms,
-        String minPrice, String maxPrice, List<RoomType> roomTypes, List<RoomScope> roomScopes) {
-
-        return SearchRoomFilterCondition.builder()
-            .minBeds(Objects.isNull(minBeds) ? null : Integer.valueOf(minBeds))
-            .minBedrooms(Objects.isNull(minBedrooms) ? null : Integer.valueOf(minBedrooms))
-            .minBathrooms(Objects.isNull(minBathrooms) ? null : Integer.valueOf(minBathrooms))
-            .minPrice(Objects.isNull(minPrice) ? null : Integer.valueOf(minPrice))
-            .maxPrice(Objects.isNull(maxPrice) ? null : Integer.valueOf(maxPrice))
-            .roomTypes(Objects.isNull(roomTypes) ? null : roomTypes)
-            .roomScopes(Objects.isNull(roomScopes) ? null : roomScopes)
-            .build();
+    public SearchRoomFilterCondition(Integer minBeds, Integer minBedrooms, Integer minBathrooms, Integer minPrice,
+        Integer maxPrice, List<RoomType> roomTypes, List<RoomScope> roomScopes) {
+        this.minBeds = minBeds;
+        this.minBedrooms = minBedrooms;
+        this.minBathrooms = minBathrooms;
+        this.minPrice = minPrice;
+        this.maxPrice = maxPrice;
+        this.roomTypes = roomTypes;
+        this.roomScopes = roomScopes;
     }
-
 }
 
