@@ -6,21 +6,18 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
+import com.prgrms.amabnb.room.dto.request.PageRoomRequest;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.dto.response.RoomResponse;
-import com.prgrms.amabnb.room.entity.RoomScope;
-import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.service.CreateRoomService;
 import com.prgrms.amabnb.room.service.SearchRoomService;
 import com.prgrms.amabnb.security.jwt.JwtAuthentication;

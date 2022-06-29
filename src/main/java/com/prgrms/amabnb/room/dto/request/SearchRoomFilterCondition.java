@@ -8,9 +8,6 @@ import com.prgrms.amabnb.room.entity.RoomType;
 import lombok.Getter;
 
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class SearchRoomFilterCondition {
 
     private Integer minBeds;
