@@ -3,7 +3,8 @@ package com.prgrms.amabnb.room.dto.response;
 import java.util.List;
 
 import com.prgrms.amabnb.room.entity.Room;
-import com.prgrms.amabnb.room.entity.RoomImage;
+import com.prgrms.amabnb.room.entity.RoomScope;
+import com.prgrms.amabnb.room.entity.RoomType;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -22,14 +23,11 @@ public class RoomResponse {
     private int bedCnt;
     private int bedRoomCnt;
     private int bathRoomCnt;
-    private String roomType;
-    private String roomScope;
-    private List<String> imagePaths;
+    private RoomType roomType;
+    private RoomScope roomScope;
+    private List<RoomImageResponse> imagePaths;
 
     public static RoomResponse from(Room room) {
-        List<String> roomImagePaths = room.getRoomImages().stream()
-            .map(RoomImage::getImagePath)
-            .toList();
 
         return RoomResponse.builder()
             .name(room.getName())
@@ -42,10 +40,11 @@ public class RoomResponse {
             .bedCnt(room.getRoomOption().getBedCnt())
             .bedRoomCnt(room.getRoomOption().getBedRoomCnt())
             .bathRoomCnt(room.getRoomOption().getBathRoomCnt())
-            .roomType(room.getRoomType().toString())
-            .roomScope(room.getRoomScope().toString())
-            .imagePaths(roomImagePaths)
+            .roomType(room.getRoomType())
+            .roomScope(room.getRoomScope())
+            .imagePaths(RoomImageResponse.from(room.getRoomImages()))
             .build();
+
     }
 
 }
