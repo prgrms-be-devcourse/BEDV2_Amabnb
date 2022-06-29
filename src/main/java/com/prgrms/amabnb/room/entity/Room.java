@@ -106,7 +106,7 @@ public class Room extends BaseEntity {
         this.getRoomImages().add(roomImage);
     }
 
-    public void setUser(User user) {
+    public void setHost(User user) {
         this.host = user;
     }
 

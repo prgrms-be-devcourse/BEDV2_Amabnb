@@ -22,7 +22,7 @@ public class CreateRoomService {
     public Long createRoom(Long id, CreateRoomRequest createRoomRequest) {
         Room room = createRoomRequest.toRoom();
         room.addRoomImages(createRoomRequest.toRoomImages());
-        room.setUser(userRepository.findById(id).orElseThrow(UserNotFoundException::new));
+        room.setHost(userRepository.findById(id).orElseThrow(UserNotFoundException::new));
         return roomRepository.save(room).getId();
     }
 }
