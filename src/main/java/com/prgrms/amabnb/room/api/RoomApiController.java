@@ -21,6 +21,8 @@ import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.dto.request.PageRequestDto;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.dto.response.RoomResponse;
+import com.prgrms.amabnb.room.entity.RoomScope;
+import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.service.CreateRoomService;
 import com.prgrms.amabnb.room.service.SearchRoomService;
 import com.prgrms.amabnb.security.jwt.JwtAuthentication;
@@ -52,13 +54,14 @@ public class RoomApiController {
         @Nullable @RequestParam String minBathrooms,
         @Nullable @RequestParam String minPrice,
         @Nullable @RequestParam String maxPrice,
-        @Nullable @RequestParam List<String> roomTypes,
-        @Nullable @RequestParam List<String> roomScopes,
-        PageRequestDto pageRequestDto
+        @Nullable @RequestParam List<RoomType> roomTypes,
+        @Nullable @RequestParam List<RoomScope> roomScopes,
+        @Valid @RequestBody PageRequestDto pageRequestDto
     ) {
+
         List<RoomResponse> roomResponses = searchRoomService.searchRoomsByFilterCondition(
-            toParam(minBeds, minBedrooms, minBathrooms, minPrice, maxPrice, roomTypes, roomScopes),
-            PageRequest.of(pageRequestDto.getPage(), pageRequestDto.getSize()));
+            SearchRoomFilterCondition.from(minBeds, minBedrooms, minBathrooms, minPrice, maxPrice, roomTypes,
+                roomScopes), PageRequest.of(pageRequestDto.getPage(), pageRequestDto.getSize()));
 
         return ResponseEntity.ok(roomResponses);
     }
@@ -69,17 +72,4 @@ public class RoomApiController {
         return ResponseEntity.ok(roomResponse);
     }
 
-    private SearchRoomFilterCondition toParam(String minBeds, String minBedrooms, String minBathrooms, String minPrice,
-        String maxPrice, List<String> roomTypes, List<String> roomScopes) {
-
-        return SearchRoomFilterCondition.builder()
-            .minBeds(Integer.valueOf(minBeds))
-            .minBedrooms(Integer.valueOf(minBedrooms))
-            .minBathrooms(Integer.valueOf(minBathrooms))
-            .minPrice(Integer.valueOf(minPrice))
-            .maxPrice(Integer.valueOf(maxPrice))
-            .roomTypes(roomTypes)
-            .roomScopes(roomScopes)
-            .build();
-    }
 }
