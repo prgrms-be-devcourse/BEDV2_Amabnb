@@ -50,7 +50,7 @@ class CreateRoomServiceTest {
         given(roomRepository.save(any())).willReturn(createRoom());
 
         //when
-        Long savedRoomId = createRoomService.createRoom(createRoomRequest);
+        Long savedRoomId = createRoomService.createRoom(1L, createRoomRequest);
 
         //then
         then(roomRepository).should(times(1)).save(any(Room.class));
@@ -65,7 +65,7 @@ class CreateRoomServiceTest {
         User user = createUser();
         given(userRepository.findById(anyLong())).willThrow(EntityNotFoundException.class);
         //when,then
-        assertThatThrownBy(() -> createRoomService.createRoom(createRoomRequest))
+        assertThatThrownBy(() -> createRoomService.createRoom(1L, createRoomRequest))
             .isInstanceOf(EntityNotFoundException.class);
     }
 
@@ -83,7 +83,6 @@ class CreateRoomServiceTest {
 
     private CreateRoomRequest createCreateRoomRequest() {
         return CreateRoomRequest.builder()
-            .userId(2L)
             .name("방이름")
             .price(1)
             .description("방설명")

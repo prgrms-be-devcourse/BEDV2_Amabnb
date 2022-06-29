@@ -22,9 +22,14 @@ public class CreateRoomService {
     public Long createRoom(CreateRoomRequest createRoomRequest) {
         Room room = createRoomRequest.toRoom();
         room.addRoomImages(createRoomRequest.toRoomImages());
-        room.setUser(userRepository.findById(createRoomRequest.getUserId())
-            .orElseThrow(() -> new EntityNotFoundException("유저를 찾지 못했습니다")));
         return roomRepository.save(room).getId();
     }
 
+    public Long createRoom(Long id, CreateRoomRequest createRoomRequest) {
+        Room room = createRoomRequest.toRoom();
+        room.addRoomImages(createRoomRequest.toRoomImages());
+        room.setUser(userRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("유저를 찾지 못했습니다")));
+        return roomRepository.save(room).getId();
+    }
 }

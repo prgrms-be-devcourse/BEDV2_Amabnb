@@ -15,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -30,9 +31,10 @@ import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.service.CreateRoomService;
 import com.prgrms.amabnb.room.service.SearchRoomService;
+import com.prgrms.amabnb.security.oauth.OAuthService;
+import com.prgrms.amabnb.security.oauth.UserProfile;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;
-import com.prgrms.amabnb.user.repository.UserRepository;
 
 @Transactional
 @SpringBootTest
@@ -50,26 +52,26 @@ class RoomApiControllerTest {
     SearchRoomService searchRoomService;
 
     @Autowired
-    UserRepository userRepository;
+    OAuthService oAuthService;
 
-    ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Test
     @WithMockUser
     @DisplayName("숙소 등록 성공 테스트")
     void createRoom() throws Exception {
-        User savedUser = userRepository.save(createUser());
+        String accessToken = 로그인_요청();
         CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-        createRoomRequest.setUserId(savedUser.getId());
 
         mockMvc.perform(post("/rooms")
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createRoomRequest)))
             .andExpect(status().isCreated())
             .andDo(print())
             .andDo(document("room-create",
                 requestFields(
-                    fieldWithPath("userId").type(JsonFieldType.NUMBER).description("userId"),
                     fieldWithPath("name").type(JsonFieldType.STRING).description("roomName"),
                     fieldWithPath("price").type(JsonFieldType.NUMBER).description("price"),
                     fieldWithPath("description").type(JsonFieldType.STRING).description("description"),
@@ -88,34 +90,16 @@ class RoomApiControllerTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("숙소는 userId가 없으면 등록되지 않는다.")
     void nullUserIdTest() throws Exception {
         //given
         CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-        createRoomRequest.setUserId(null);
 
         //when,then
         mockMvc.perform(post("/rooms")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createRoomRequest)))
-            .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @WithMockUser
-    @DisplayName("숙소는 등록된 유저가 아니면 등록되지 않는다.")
-    void notSavedUserRoomRegisterTest() throws Exception {
-        //given
-        Long notSavedUserId = 17842319782341L;
-        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-        createRoomRequest.setUserId(notSavedUserId);
-
-        //when,then
-        mockMvc.perform(post("/rooms")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createRoomRequest)))
-            .andExpect(status().isNotFound());
+            .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -123,9 +107,7 @@ class RoomApiControllerTest {
     @DisplayName("필터 검색을 할 수 있다.")
     void name() throws Exception {
         //given
-        User savedUser = userRepository.save(createUser());
         CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-        createRoomRequest.setUserId(savedUser.getId());
 
         // when, then
         // mockMvc.perform(get("/rooms")
@@ -151,6 +133,20 @@ class RoomApiControllerTest {
             .email(new Email("asdsadsad@gmail.com"))
             .phoneNumber(new PhoneNumber("010-2312-1231"))
             .profileImgUrl("urlurlrurlrurlurlurl")
+            .build();
+    }
+
+    private String 로그인_요청() {
+        return "Bearer" + oAuthService.register(createUserProfile()).accessToken();
+    }
+
+    private UserProfile createUserProfile() {
+        return UserProfile.builder()
+            .oauthId("1")
+            .provider("kakao")
+            .name("아만드")
+            .email("asdasd@gmail.com")
+            .profileImgUrl("url")
             .build();
     }
 

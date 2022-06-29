@@ -28,9 +28,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class CreateRoomRequest {
 
-    @NotNull
-    private Long userId;
-
     @NotBlank
     private String name;
 
@@ -71,10 +68,9 @@ public class CreateRoomRequest {
     private List<String> imagePaths;
 
     @Builder
-    public CreateRoomRequest(Long userId, String name, int price, String description, int maxGuestNum,
+    public CreateRoomRequest(String name, int price, String description, int maxGuestNum,
         String zipcode, String address, String detailAddress, int bedCnt, int bedRoomCnt, int bathRoomCnt,
         RoomType roomType, RoomScope roomScope, List<String> imagePaths) {
-        this.userId = userId;
         this.name = name;
         this.price = price;
         this.description = description;

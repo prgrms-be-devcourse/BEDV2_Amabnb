@@ -39,7 +39,6 @@ class CreateRoomRequestTest {
     @BeforeEach
     void setup() {
         createRoomRequest = CreateRoomRequest.builder()
-            .userId(1L)
             .name("방 이름")
             .price(1)
             .description("방설명")

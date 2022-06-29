@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.dto.response.RoomResponse;
 import com.prgrms.amabnb.room.service.CreateRoomService;
 import com.prgrms.amabnb.room.service.SearchRoomService;
+import com.prgrms.amabnb.security.jwt.JwtAuthentication;
 
 import lombok.RequiredArgsConstructor;
 
@@ -34,8 +36,12 @@ public class RoomApiController {
     private final SearchRoomService searchRoomService;
 
     @PostMapping
-    public ResponseEntity<Void> createRoom(@Valid @RequestBody CreateRoomRequest createRoomRequest) {
-        Long savedRoomId = createRoomService.createRoom(createRoomRequest);
+    public ResponseEntity<Void> createRoom(
+
+        @Valid @RequestBody CreateRoomRequest createRoomRequest,
+        @AuthenticationPrincipal JwtAuthentication user
+    ) {
+        Long savedRoomId = createRoomService.createRoom(user.id(), createRoomRequest);
         return ResponseEntity.created(URI.create("/rooms/" + savedRoomId)).build();
     }
 
@@ -48,8 +54,8 @@ public class RoomApiController {
         @Nullable @RequestParam String maxPrice,
         @Nullable @RequestParam List<String> roomTypes,
         @Nullable @RequestParam List<String> roomScopes,
-        PageRequestDto pageRequestDto) {
-
+        PageRequestDto pageRequestDto
+    ) {
         List<RoomResponse> roomResponses = searchRoomService.searchRoomsByFilterCondition(
             toParam(minBeds, minBedrooms, minBathrooms, minPrice, maxPrice, roomTypes, roomScopes),
             PageRequest.of(pageRequestDto.getPage(), pageRequestDto.getSize()));

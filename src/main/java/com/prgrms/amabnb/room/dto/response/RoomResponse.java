@@ -1,9 +1,9 @@
 package com.prgrms.amabnb.room.dto.response;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -27,9 +27,9 @@ public class RoomResponse {
     private List<String> imagePaths;
 
     public static RoomResponse from(Room room) {
-        List<String> roomImagePaths = new ArrayList<>();
-
-        room.getRoomImages().forEach(roomImage -> roomImagePaths.add(roomImage.getImagePath()));
+        List<String> roomImagePaths = room.getRoomImages().stream()
+            .map(RoomImage::getImagePath)
+            .toList();
 
         return RoomResponse.builder()
             .name(room.getName())
