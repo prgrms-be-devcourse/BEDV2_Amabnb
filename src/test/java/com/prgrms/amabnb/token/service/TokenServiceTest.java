@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +22,7 @@ import com.prgrms.amabnb.token.dto.TokenResponse;
 import com.prgrms.amabnb.token.entity.Token;
 import com.prgrms.amabnb.token.repository.TokenRepository;
 import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
+import com.prgrms.amabnb.user.exception.UserNotFoundException;
 
 import io.jsonwebtoken.impl.DefaultClaims;
 
@@ -141,6 +143,26 @@ class TokenServiceTest {
 
     private Optional<Token> createToken(long userId) {
         return Optional.of(new Token(1L, "refreshToken", userId));
+    }
+
+    @Nested
+    @DisplayName("유저 정보를 통해 관련된 RefreshToken 을 지운다 #58")
+    class DeleteTokenByUserId {
+
+        @DisplayName("유저가 있으면 성공적으로 삭제한다")
+        @Test
+        void deleteTokenByUserId_success() {
+            when(tokenRepository.existsByUserId(any())).thenReturn(true);
+            tokenService.deleteTokenByUserId(1L);
+        }
+
+        @DisplayName("유저가 없으면 UserNotFoundException")
+        @Test
+        void deleteTokenByUserId_fail() {
+            when(tokenRepository.existsByUserId(any())).thenReturn(false);
+            assertThatThrownBy(() -> tokenService.deleteTokenByUserId(1L))
+                .isInstanceOf(UserNotFoundException.class);
+        }
     }
 
 }
