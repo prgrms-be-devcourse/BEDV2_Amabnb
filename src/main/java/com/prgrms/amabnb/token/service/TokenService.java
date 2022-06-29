@@ -11,6 +11,7 @@ import com.prgrms.amabnb.token.dto.TokenResponse;
 import com.prgrms.amabnb.token.entity.Token;
 import com.prgrms.amabnb.token.repository.TokenRepository;
 import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
+import com.prgrms.amabnb.user.exception.UserNotFoundException;
 
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -53,4 +54,11 @@ public class TokenService {
         return new AccessTokenResponse(newAccessToken);
     }
 
+    @Transactional
+    public void deleteTokenByUserId(Long userId) {
+        if (!tokenRepository.existsByUserId(userId)) {
+            throw new UserNotFoundException();
+        }
+        tokenRepository.deleteByUserId(userId);
+    }
 }

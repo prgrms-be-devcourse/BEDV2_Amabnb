@@ -30,7 +30,7 @@ import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
 
 @Transactional
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class TokenControllerTest {
+class TokenApiTest {
 
     @Autowired
     TokenService tokenService;
@@ -64,7 +64,7 @@ class TokenControllerTest {
         @Test
         @DisplayName("access 토큰에 있는 정보를 기반으로 새 access 토큰을 발급해준다")
         void refreshAccessToken_success() throws Exception {
-            mockMvc.perform(post("/token")
+            mockMvc.perform(post("/tokens")
                     .with(oauth2Login())
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenToken.accessToken())
                     .contentType(MediaType.APPLICATION_JSON).content(toJson(givenToken.refreshToken())))
@@ -79,7 +79,7 @@ class TokenControllerTest {
         void refreshAccessToken_invalidTokenException() throws Exception {
             var illegalToken = "illegal~";
 
-            mockMvc.perform(post("/token")
+            mockMvc.perform(post("/tokens")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + illegalToken)
                     .contentType(MediaType.APPLICATION_JSON).content(toJson(givenToken.refreshToken())))
                 .andExpect(handler().methodName("refreshAccessToken"))
@@ -93,7 +93,7 @@ class TokenControllerTest {
         @NullAndEmptySource
         void refreshTokenRequestDto_validation(String value) throws Exception {
             var request = new RefreshTokenRequest(value);
-            mockMvc.perform(post("/token")
+            mockMvc.perform(post("/tokens")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenToken.accessToken())
                     .contentType(MediaType.APPLICATION_JSON).content(toJson(request)))
 
@@ -105,4 +105,16 @@ class TokenControllerTest {
         }
     }
 
+    @Nested
+    @DisplayName("유저가 로그아웃을 하면, Refresh 토큰을 지운다 #58")
+    class deleteRefreshToken {
+        @Test
+        void deleteRefreshToken() throws Exception {
+            mockMvc.perform(delete("/tokens")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenToken.accessToken()))
+                .andExpect(handler().methodName("deleteRefreshToken"))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+        }
+    }
 }
