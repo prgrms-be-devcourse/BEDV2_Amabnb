@@ -20,7 +20,6 @@ import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationUserException;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
-import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
@@ -38,14 +37,12 @@ import com.prgrms.amabnb.user.repository.UserRepository;
 class ReservationServiceTest {
 
     @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
     private CreateRoomRepository roomRepository;
 
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
     private ReservationService reservationService;
 
     private Long guestId;
@@ -56,7 +53,6 @@ class ReservationServiceTest {
     void setUp() {
         guestId = userRepository.save(createUser()).getId();
         roomId = roomRepository.save(createRoom()).getId();
-        reservationService = new ReservationService(reservationRepository, roomRepository, userRepository);
     }
 
     @DisplayName("예약을 생성한다.")
@@ -153,7 +149,7 @@ class ReservationServiceTest {
         // then
         assertThatThrownBy(() -> reservationService.createReservation(100L, request))
             .isInstanceOf(UserNotFoundException.class)
-            .hasMessage("존재 하지 않는 유저입니다.");
+            .hasMessage("존재하지 않는 유저입니다");
     }
 
     private CreateReservationRequest createReservationRequest(int totalGuest, int totalPrice, Long roomId) {
