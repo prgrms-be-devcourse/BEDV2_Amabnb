@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
-import com.prgrms.amabnb.room.dto.request.PageRequestDto;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
@@ -117,8 +115,10 @@ class RoomApiControllerTest {
                 .param("maxPrice", "10000000")
                 .param("roomTypes", "HOUSE")
                 .param("roomScopes", "PRIVATE")
-                .content(objectMapper.writeValueAsString(new PageRequestDto(0, 10))))
-            .andExpect(status().isOk());
+                .param("size", "10")
+                .param("page", "0"))
+            .andExpect(status().isOk())
+            .andDo(print());
 
     }
 
@@ -129,8 +129,10 @@ class RoomApiControllerTest {
         // when, then
         mockMvc.perform(get("/rooms")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(new PageRequestDto(0, 10))))
-            .andExpect(status().isOk());
+                .param("size", "10")
+                .param("page", "0"))
+            .andExpect(status().isOk())
+            .andDo(print());
 
     }
 
@@ -158,10 +160,6 @@ class RoomApiControllerTest {
             .email("asdasd@gmail.com")
             .profileImgUrl("url")
             .build();
-    }
-
-    private PageRequest createPageRequest() {
-        return PageRequest.of(0, 10);
     }
 
     private CreateRoomRequest createCreateRoomRequest() {

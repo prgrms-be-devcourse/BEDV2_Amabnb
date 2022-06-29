@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
-import com.prgrms.amabnb.room.dto.request.PageRequestDto;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.dto.response.RoomResponse;
 import com.prgrms.amabnb.room.entity.RoomScope;
@@ -56,12 +55,12 @@ public class RoomApiController {
         @Nullable @RequestParam String maxPrice,
         @Nullable @RequestParam List<RoomType> roomTypes,
         @Nullable @RequestParam List<RoomScope> roomScopes,
-        @Valid @RequestBody PageRequestDto pageRequestDto
+        Pageable pageable
     ) {
 
         List<RoomResponse> roomResponses = searchRoomService.searchRoomsByFilterCondition(
             SearchRoomFilterCondition.from(minBeds, minBedrooms, minBathrooms, minPrice, maxPrice, roomTypes,
-                roomScopes), PageRequest.of(pageRequestDto.getPage(), pageRequestDto.getSize()));
+                roomScopes), pageable);
 
         return ResponseEntity.ok(roomResponses);
     }
