@@ -23,9 +23,12 @@ class RoomAddressTest {
         //then
         RoomAddress roomAddress = new RoomAddress(zipcode, address, detailAddress);
 
-        assertThat(roomAddress.getZipcode()).isEqualTo(zipcode);
-        assertThat(roomAddress.getAddress()).isEqualTo(address);
-        assertThat(roomAddress.getDetailAddress()).isEqualTo(detailAddress);
+        assertAll(
+            () -> assertThat(roomAddress.getZipcode()).isEqualTo(zipcode),
+            () -> assertThat(roomAddress.getAddress()).isEqualTo(address),
+            () -> assertThat(roomAddress.getDetailAddress()).isEqualTo(detailAddress)
+        );
+
     }
 
     @DisplayName("zipcode는 5자리이고 숫자외에는 입력할 수 없다")

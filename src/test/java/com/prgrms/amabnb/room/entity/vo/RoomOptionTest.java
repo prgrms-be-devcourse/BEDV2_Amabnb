@@ -20,9 +20,12 @@ class RoomOptionTest {
     void createRoomOption(int bedCnt, int bedRoomCnt, int bathRoomCnt) {
         RoomOption roomOption = new RoomOption(bedCnt, bedRoomCnt, bathRoomCnt);
 
-        assertThat(roomOption.getBedCnt()).isEqualTo(bedCnt);
-        assertThat(roomOption.getBedRoomCnt()).isEqualTo(bedRoomCnt);
-        assertThat(roomOption.getBathRoomCnt()).isEqualTo(bathRoomCnt);
+        assertAll(
+            () -> assertThat(roomOption.getBedCnt()).isEqualTo(bedCnt),
+            () -> assertThat(roomOption.getBedRoomCnt()).isEqualTo(bedRoomCnt),
+            () -> assertThat(roomOption.getBathRoomCnt()).isEqualTo(bathRoomCnt)
+        );
+
     }
 
     @Test
