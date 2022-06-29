@@ -10,7 +10,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 
-import com.prgrms.amabnb.common.model.Money;
+import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;

@@ -20,7 +20,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
-import com.prgrms.amabnb.common.model.Money;
+import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
@@ -105,6 +105,10 @@ public class Room extends BaseEntity {
 
     public boolean isValidatePrice(Money totalPrice, int period) {
         return totalPrice.equals(price.multiply(period));
+    }
+
+    public boolean isOverMaxGuestNum(int totalGuest) {
+        return totalGuest > maxGuestNum;
     }
 
     private void validateRoom(String name, Money price, int maxGuestNum, String description, RoomAddress roomAddress,

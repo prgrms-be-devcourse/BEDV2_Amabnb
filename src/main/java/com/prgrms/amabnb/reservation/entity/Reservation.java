@@ -16,7 +16,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
-import com.prgrms.amabnb.common.model.Money;
+import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.user.entity.User;

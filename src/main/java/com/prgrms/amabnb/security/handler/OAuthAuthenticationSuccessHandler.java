@@ -12,8 +12,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prgrms.amabnb.oauth.service.OAuthProvider;
-import com.prgrms.amabnb.oauth.service.OAuthService;
+import com.prgrms.amabnb.security.oauth.OAuthProvider;
+import com.prgrms.amabnb.security.oauth.OAuthService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
