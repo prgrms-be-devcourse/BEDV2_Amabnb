@@ -33,7 +33,7 @@ class RoomRepositoryTest {
     void roomJpaSave() {
         //given
         Room room = Room.builder()
-            .id(1L)
+            .name("aa")
             .maxGuestNum(1)
             .description("description")
             .address(roomAddress)

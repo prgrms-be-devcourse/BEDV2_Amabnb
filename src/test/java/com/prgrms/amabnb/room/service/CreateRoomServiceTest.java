@@ -14,7 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.prgrms.amabnb.common.exception.EntityNotFoundException;
-import com.prgrms.amabnb.common.model.Money;
+import com.prgrms.amabnb.common.vo.Email;
+import com.prgrms.amabnb.common.vo.Money;
+import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
@@ -24,8 +26,6 @@ import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.room.repository.RoomRepository;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;
-import com.prgrms.amabnb.user.entity.vo.Email;
-import com.prgrms.amabnb.user.entity.vo.PhoneNumber;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)

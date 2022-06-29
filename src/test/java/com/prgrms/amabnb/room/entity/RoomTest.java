@@ -26,6 +26,7 @@ class RoomTest {
         //given
         Room room = Room.builder()
             .id(1l)
+            .name("aa")
             .maxGuestNum(1)
             .description("방 설명 입니다")
             .address(roomAddress)
