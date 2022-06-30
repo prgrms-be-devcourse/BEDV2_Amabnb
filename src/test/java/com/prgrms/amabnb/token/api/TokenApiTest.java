@@ -1,7 +1,6 @@
 package com.prgrms.amabnb.token.api;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -13,40 +12,22 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.token.dto.RefreshTokenRequest;
 import com.prgrms.amabnb.token.dto.TokenResponse;
 import com.prgrms.amabnb.token.service.TokenService;
 import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
 
-@Transactional
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class TokenApiTest {
+class TokenApiTest extends ApiTest {
 
     @Autowired
     TokenService tokenService;
-    @Autowired
-    ObjectMapper objectMapper;
-    MockMvc mockMvc;
-    TokenResponse givenToken;
 
-    @BeforeEach
-    void setUp(WebApplicationContext webApplicationContext) {
-        this.mockMvc = MockMvcBuilders
-            .webAppContextSetup(webApplicationContext)
-            .apply(springSecurity())
-            .alwaysDo(print())
-            .build();
-    }
+    TokenResponse givenToken;
 
     @BeforeEach
     public void createGivenToken() {
@@ -82,7 +63,6 @@ class TokenApiTest {
             mockMvc.perform(post("/tokens")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + illegalToken)
                     .contentType(MediaType.APPLICATION_JSON).content(toJson(givenToken.refreshToken())))
-                .andExpect(handler().methodName("refreshAccessToken"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("message", "유효하지 않은 토큰입니다.").exists())
                 .andDo(print());

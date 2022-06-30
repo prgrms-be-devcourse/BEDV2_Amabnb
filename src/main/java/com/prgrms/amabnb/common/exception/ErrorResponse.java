@@ -7,11 +7,14 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ErrorResponse {
-    private final String message;
+    private String message;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<FieldError> fieldErrors;
