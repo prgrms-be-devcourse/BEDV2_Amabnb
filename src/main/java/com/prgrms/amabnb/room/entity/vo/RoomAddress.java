@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RoomAddress {
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String zipcode;
 
     @Column(nullable = false)

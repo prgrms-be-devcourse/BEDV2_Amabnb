@@ -37,6 +37,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Room extends BaseEntity {
 
+    private static final int MAX_NAME_LENGTH = 255;
+
     @Id
     @GeneratedValue
     private Long id;
@@ -76,8 +78,7 @@ public class Room extends BaseEntity {
     @JoinColumn(name = "review_id")
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "room_id")
+    @OneToMany(mappedBy = "room", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<RoomImage> roomImages = new ArrayList<>();
 
     @Builder
@@ -96,10 +97,18 @@ public class Room extends BaseEntity {
     }
 
     public void addRoomImages(List<RoomImage> roomImages) {
-        this.roomImages.addAll(roomImages);
+        roomImages.forEach(this::addRoomImage);
     }
 
-    public void setUser(User user) {
+    public void addRoomImage(RoomImage roomImage) {
+        if (roomImage.getRoom() != this) {
+            roomImage.setRoom(this);
+        }
+
+        this.getRoomImages().add(roomImage);
+    }
+
+    public void setHost(User user) {
         this.host = user;
     }
 
@@ -124,7 +133,7 @@ public class Room extends BaseEntity {
     }
 
     private void validateName(String name) {
-        if (Objects.isNull(name) || name.isBlank() || name.length() > 255) {
+        if (Objects.isNull(name) || name.isBlank() || name.length() > MAX_NAME_LENGTH) {
             throw new RoomInvalidValueException("숙소 이름 입력값이 잘못됐습니다");
         }
     }

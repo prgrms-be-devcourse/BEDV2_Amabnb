@@ -26,6 +26,7 @@ class RoomTest {
         //given
         Room room = Room.builder()
             .id(1l)
+            .name("aa")
             .maxGuestNum(1)
             .description("방 설명 입니다")
             .address(roomAddress)
@@ -36,14 +37,16 @@ class RoomTest {
             .build();
 
         //then
-        assertThat(room.getId()).isEqualTo(1L);
-        assertThat(room.getMaxGuestNum()).isEqualTo(1);
-        assertThat(room.getDescription()).isEqualTo("방 설명 입니다");
-        assertThat(room.getAddress()).isEqualTo(roomAddress);
-        assertThat(room.getPrice()).isEqualTo(price);
-        assertThat(room.getRoomOption()).isEqualTo(roomOption);
-        assertThat(room.getRoomType()).isEqualTo(RoomType.APARTMENT);
-        assertThat(room.getRoomScope()).isEqualTo(RoomScope.PRIVATE);
+        assertAll(
+            () -> assertThat(room.getId()).isEqualTo(1L),
+            () -> assertThat(room.getMaxGuestNum()).isEqualTo(1),
+            () -> assertThat(room.getDescription()).isEqualTo("방 설명 입니다"),
+            () -> assertThat(room.getAddress()).isEqualTo(roomAddress),
+            () -> assertThat(room.getPrice()).isEqualTo(price),
+            () -> assertThat(room.getRoomOption()).isEqualTo(roomOption),
+            () -> assertThat(room.getRoomType()).isEqualTo(RoomType.APARTMENT),
+            () -> assertThat(room.getRoomScope()).isEqualTo(RoomScope.PRIVATE)
+        );
     }
 
     @DisplayName("게스트 수는 0이하는 될 수 없다.")

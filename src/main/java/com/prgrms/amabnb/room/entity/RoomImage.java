@@ -1,8 +1,11 @@
 package com.prgrms.amabnb.room.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -17,15 +20,22 @@ public class RoomImage {
     @GeneratedValue
     private Long id;
 
-    private String filePath;
+    private String imagePath;
 
-    public RoomImage(String filePath) {
-        this(null, filePath);
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id")
+    private Room room;
+
+    public RoomImage(String imagePath) {
+        this(null, imagePath);
     }
 
-    public RoomImage(Long id, String filePath) {
+    public RoomImage(Long id, String imagePath) {
         this.id = id;
-        this.filePath = filePath;
+        this.imagePath = imagePath;
     }
 
+    public void setRoom(Room room) {
+        this.room = room;
+    }
 }
