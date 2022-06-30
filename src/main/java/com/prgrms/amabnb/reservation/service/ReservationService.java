@@ -41,11 +41,9 @@ public class ReservationService {
     }
 
     public ReservationDatesResponse getImpossibleReservationDates(Long roomId, ReservationDateRequest request) {
-        return new ReservationDatesResponse(reservationRepository.findImpossibleReservationDate(
-            roomId,
-            request.getStartDate(),
-            request.getEndDate()
-        ));
+        return new ReservationDatesResponse(
+            reservationRepository.findImpossibleReservationDate(roomId, request.getStartDate(), request.getEndDate())
+        );
     }
 
     private void isAlreadyReservedRoom(Reservation reservation) {
