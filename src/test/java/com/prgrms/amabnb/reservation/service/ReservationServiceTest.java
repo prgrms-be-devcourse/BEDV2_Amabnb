@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,9 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
-import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
@@ -153,6 +154,26 @@ class ReservationServiceTest extends ApiTest {
             .hasMessage("존재하지 않는 유저입니다");
     }
 
+    @DisplayName("예약 불가능한 날짜를 조회한다.")
+    @Test
+    void getImpossibleReservationDates() {
+        // given
+        CreateReservationRequest request = createReservationRequest(3, 30_000, roomId);
+        reservationService.createReservation(guestId, request);
+
+        // when
+        List<ReservationDateResponse> result = reservationService.getImpossibleReservationDates(
+            roomId,
+            LocalDate.now(),
+            LocalDate.now().plusMonths(1L)
+        );
+
+        // then
+        assertThat(result).hasSize(1);
+        assertThat(result).extracting("checkIn", "checkOut")
+            .containsExactly(tuple(LocalDate.now(), LocalDate.now().plusDays(2L)));
+    }
+
     private CreateReservationRequest createReservationRequest(int totalGuest, int totalPrice, Long roomId) {
         return CreateReservationRequest.builder()
             .checkIn(LocalDate.now())
@@ -181,7 +202,6 @@ class ReservationServiceTest extends ApiTest {
             .userRole(UserRole.HOST)
             .name("host")
             .email(new Email("host@gmail.com"))
-            .phoneNumber(new PhoneNumber("010-2313-1231"))
             .profileImgUrl("urlurlrurlrurlurlurl")
             .build();
 

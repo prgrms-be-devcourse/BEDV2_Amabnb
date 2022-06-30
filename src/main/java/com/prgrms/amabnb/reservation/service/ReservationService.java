@@ -1,9 +1,13 @@
 package com.prgrms.amabnb.reservation.service;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
@@ -36,6 +40,14 @@ public class ReservationService {
         isAlreadyReservedRoom(reservation);
         isAlreadyReservedGuest(reservation);
         return ReservationResponseForGuest.from(reservationRepository.save(reservation));
+    }
+
+    public List<ReservationDateResponse> getImpossibleReservationDates(
+        Long roomId,
+        LocalDate startDate,
+        LocalDate endDate
+    ) {
+        return reservationRepository.findImpossibleReservationDate(roomId, startDate, endDate);
     }
 
     private void isAlreadyReservedRoom(Reservation reservation) {
