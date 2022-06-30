@@ -13,18 +13,18 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @AllArgsConstructor
 public class ReservationResponseForGuest {
 
-    // TODO : HostInfo 추가해야 함
     private Long id;
     private LocalDate checkIn;
     private LocalDate checkOut;
     private int totalGuest;
     private int totalPrice;
     private ReservationStatus reservationStatus;
-    private RoomInfoResponse roomInfoResponse;
+    private RoomInfoResponse room;
+    private HostInfoResponse host;
 
     public static ReservationResponseForGuest from(Reservation reservation) {
         return ReservationResponseForGuest.builder()
@@ -34,7 +34,8 @@ public class ReservationResponseForGuest {
             .totalGuest(reservation.getTotalGuest())
             .totalPrice(reservation.getTotalPrice().getValue())
             .reservationStatus(reservation.getReservationStatus())
-            .roomInfoResponse(RoomInfoResponse.from(reservation.getRoom()))
+            .room(RoomInfoResponse.from(reservation.getRoom()))
+            .host(HostInfoResponse.from(reservation.getRoom().getHost()))
             .build();
     }
 

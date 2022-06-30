@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
+import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
@@ -46,10 +47,13 @@ class ReservationServiceTest extends ApiTest {
 
     private Long roomId;
 
+    private User host;
+
     @BeforeEach
     void setUp() {
         guestId = userRepository.save(createUser()).getId();
-        roomId = roomRepository.save(createRoom()).getId();
+        host = createHost();
+        roomId = roomRepository.save(createRoom(host)).getId();
     }
 
     @DisplayName("예약을 생성한다.")
@@ -113,7 +117,7 @@ class ReservationServiceTest extends ApiTest {
     void create_reservation_already_reserved_guest() {
         // given
         reservationService.createReservation(guestId, createReservationRequest(3, 30_000, roomId));
-        Long anotherRoomId = roomRepository.save(createRoom()).getId();
+        Long anotherRoomId = roomRepository.save(createRoom(host)).getId();
         CreateReservationRequest request = createReservationRequest(3, 30_000, anotherRoomId);
 
         // when
@@ -170,8 +174,22 @@ class ReservationServiceTest extends ApiTest {
             .build();
     }
 
-    private Room createRoom() {
-        return Room.builder()
+    private User createHost() {
+        User user = User.builder()
+            .oauthId("host")
+            .provider("host")
+            .userRole(UserRole.HOST)
+            .name("host")
+            .email(new Email("host@gmail.com"))
+            .phoneNumber(new PhoneNumber("010-2313-1231"))
+            .profileImgUrl("urlurlrurlrurlurlurl")
+            .build();
+
+        return userRepository.save(user);
+    }
+
+    private Room createRoom(User host) {
+        Room room = Room.builder()
             .name("별이 빛나는 밤")
             .maxGuestNum(10)
             .description("방 설명 입니다")
@@ -181,6 +199,9 @@ class ReservationServiceTest extends ApiTest {
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
             .build();
+
+        room.setHost(host);
+        return room;
     }
 
 }
