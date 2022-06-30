@@ -101,8 +101,8 @@ class ReservationRepositoryTest extends RepositoryTest {
             () -> assertThat(result).hasSize(2),
             () -> assertThat(result).extracting("checkIn", "checkOut")
                 .containsExactly(
-                    tuple(now.plusDays(10L), now.plusDays(14L)),
-                    tuple(now, now.plusDays(4L))
+                    tuple(now, now.plusDays(4L)),
+                    tuple(now.plusDays(10L), now.plusDays(14L))
                 )
         );
     }

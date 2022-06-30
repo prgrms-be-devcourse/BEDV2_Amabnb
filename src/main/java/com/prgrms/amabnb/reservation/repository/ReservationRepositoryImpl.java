@@ -67,7 +67,6 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
             .where(reservation.room.id.eq(roomId),
                 notInCanceled(),
                 reservation.reservationDate.checkIn.between(startDate, endDate))
-            .orderBy(reservation.id.desc())
             .fetch();
     }
 
