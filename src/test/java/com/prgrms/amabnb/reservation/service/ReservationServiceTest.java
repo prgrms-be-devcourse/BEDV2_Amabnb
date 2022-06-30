@@ -26,7 +26,7 @@ import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.room.exception.RoomNotFoundException;
-import com.prgrms.amabnb.room.repository.CreateRoomRepository;
+import com.prgrms.amabnb.room.repository.RoomRepository;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;
 import com.prgrms.amabnb.user.exception.UserNotFoundException;
@@ -37,7 +37,7 @@ import com.prgrms.amabnb.user.repository.UserRepository;
 class ReservationServiceTest {
 
     @Autowired
-    private CreateRoomRepository roomRepository;
+    private RoomRepository roomRepository;
 
     @Autowired
     private UserRepository userRepository;

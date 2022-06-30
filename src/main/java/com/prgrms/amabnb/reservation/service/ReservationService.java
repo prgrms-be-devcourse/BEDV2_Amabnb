@@ -11,7 +11,7 @@ import com.prgrms.amabnb.reservation.exception.AlreadyReservationUserException;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.exception.RoomNotFoundException;
-import com.prgrms.amabnb.room.repository.CreateRoomRepository;
+import com.prgrms.amabnb.room.repository.RoomRepository;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.exception.UserNotFoundException;
 import com.prgrms.amabnb.user.repository.UserRepository;
@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ReservationService {
     private final ReservationRepository reservationRepository;
-    private final CreateRoomRepository roomRepository;
+    private final RoomRepository roomRepository;
     private final UserRepository userRepository;
     private final ReservationValidator reservationValidator;
 
