@@ -7,19 +7,16 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.Import;
 
 import com.prgrms.amabnb.common.vo.Money;
+import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 
-@DataJpaTest
-@Import(RoomTestConfig.class)
-class RoomRepositoryTest {
+class RoomRepositoryTest extends RepositoryTest {
 
     private final RoomAddress roomAddress = new RoomAddress("00000", "창원", "의창구");
     private final Money price = new Money(20000);
