@@ -60,7 +60,7 @@ class ReservationTest {
             .totalGuest(totalGuest)
             .build()
         ).isInstanceOf(ReservationInvalidValueException.class)
-            .hasMessage("숙박 인원는 0미만일 수 없습니다.");
+            .hasMessage("숙박 인원는 1미만일 수 없습니다.");
     }
 
     @DisplayName("총 가격은 비어있으면 안된다.")

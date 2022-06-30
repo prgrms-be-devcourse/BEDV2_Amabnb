@@ -14,9 +14,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
+import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
-import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.user.entity.User;
@@ -88,7 +88,7 @@ public class Reservation extends BaseEntity {
 
     private void setTotalGuest(int totalGuest) {
         if (totalGuest < GUEST_MIN_VALUE) {
-            throw new ReservationInvalidValueException("숙박 인원는 0미만일 수 없습니다.");
+            throw new ReservationInvalidValueException("숙박 인원는 1미만일 수 없습니다.");
         }
         this.totalGuest = totalGuest;
     }
