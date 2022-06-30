@@ -11,19 +11,14 @@ import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
@@ -34,14 +29,7 @@ import com.prgrms.amabnb.room.service.SearchRoomService;
 import com.prgrms.amabnb.security.oauth.OAuthService;
 import com.prgrms.amabnb.security.oauth.UserProfile;
 
-@Transactional
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-class RoomApiControllerTest {
-
-    @Autowired
-    MockMvc mockMvc;
+class RoomApiControllerTest extends ApiTest {
 
     @Autowired
     CreateRoomService createRoomService;
@@ -54,9 +42,6 @@ class RoomApiControllerTest {
 
     @Autowired
     OAuthService oAuthService;
-
-    @Autowired
-    ObjectMapper objectMapper;
 
     @Test
     @WithMockUser

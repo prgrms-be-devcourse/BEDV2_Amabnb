@@ -5,8 +5,9 @@ spring:
   datasource:
     username: sa
     password:
-    url: jdbc:h2:mem:test
+    url: jdbc:h2:mem:amabnb
     driver-class-name: org.h2.Driver
+
   jpa:
     database: H2
     open-in-view: false

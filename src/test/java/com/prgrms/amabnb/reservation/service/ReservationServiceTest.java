@@ -9,11 +9,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
+import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
@@ -32,9 +31,7 @@ import com.prgrms.amabnb.user.entity.UserRole;
 import com.prgrms.amabnb.user.exception.UserNotFoundException;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
-@SpringBootTest
-@Transactional
-class ReservationServiceTest {
+class ReservationServiceTest extends ApiTest {
 
     @Autowired
     private RoomRepository roomRepository;
@@ -136,7 +133,7 @@ class ReservationServiceTest {
         // then
         assertThatThrownBy(() -> reservationService.createReservation(guestId, request))
             .isInstanceOf(RoomNotFoundException.class)
-            .hasMessage("해당 숙소를 찾을 수 없습니다.");
+            .hasMessage("존재하지 않는 숙소입니다");
     }
 
     @DisplayName("유저가 존재하지 않다면 예외를 발생한다.")

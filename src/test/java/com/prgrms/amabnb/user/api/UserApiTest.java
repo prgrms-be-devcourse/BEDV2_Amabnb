@@ -1,6 +1,5 @@
 package com.prgrms.amabnb.user.api;
 
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -10,14 +9,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.prgrms.amabnb.common.vo.Email;
+import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.token.dto.TokenResponse;
 import com.prgrms.amabnb.token.service.TokenService;
 import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
@@ -26,9 +22,7 @@ import com.prgrms.amabnb.user.entity.UserRole;
 import com.prgrms.amabnb.user.repository.UserRepository;
 import com.prgrms.amabnb.user.service.UserService;
 
-@Transactional
-@SpringBootTest
-class UserApiTest {
+class UserApiTest extends ApiTest {
 
     @Autowired
     UserService userService;
@@ -36,19 +30,13 @@ class UserApiTest {
     UserRepository userRepository;
     @Autowired
     TokenService tokenService;
-    MockMvc mockMvc;
+
     TokenResponse givenToken;
     User givenUser;
 
     @BeforeEach
     @Transactional
-    void setUp(WebApplicationContext webApplicationContext) {
-        this.mockMvc = MockMvcBuilders
-            .webAppContextSetup(webApplicationContext)
-            .apply(springSecurity())
-            .alwaysDo(print())
-            .build();
-
+    void setUp() {
         var user = User.builder()
             .name("su")
             .userRole(UserRole.GUEST)
@@ -88,7 +76,7 @@ class UserApiTest {
             mockMvc.perform(delete("/me")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenToken.accessToken()))
                 .andExpect(handler().methodName("deleteAccount"))
-                .andExpect(status().isOk())
+                .andExpect(status().isNoContent())
                 .andDo(print());
         }
     }

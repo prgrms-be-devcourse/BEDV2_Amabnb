@@ -8,15 +8,15 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.prgrms.amabnb.common.RepositoryTest;
 import com.prgrms.amabnb.common.vo.Money;
+import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 
-class CreateRoomRepositoryTest extends RepositoryTest {
+class RoomRepositoryTest extends RepositoryTest {
 
     private final RoomAddress roomAddress = new RoomAddress("00000", "창원", "의창구");
     private final Money price = new Money(20000);

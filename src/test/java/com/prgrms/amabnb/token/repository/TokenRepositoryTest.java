@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
-import com.prgrms.amabnb.common.RepositoryTest;
+import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.token.entity.Token;
 
 class TokenRepositoryTest extends RepositoryTest {

@@ -1,11 +1,9 @@
-package com.prgrms.amabnb.common;
+package com.prgrms.amabnb.config;
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
-@ActiveProfiles("test")
-@Import(TestConfig.class)
+@Import(QueryConfig.class)
 public abstract class RepositoryTest {
 }

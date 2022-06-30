@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.common;
+package com.prgrms.amabnb.config;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 @TestConfiguration
-public class TestConfig {
+public class QueryConfig {
 
     @PersistenceContext
     private EntityManager entityManager;
