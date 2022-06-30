@@ -27,16 +27,15 @@ spring:
             client-name: Kakao
             client-id: test
             client-secret: test
-            scope: profile_nickname, profile_image, account_email, birthday
-            redirect-uri: http://localhost:8080/login/oauth2/code/{registrationId}
-            client-authentication-method: POST
-            authorization-grant-type: authorization_code
+            scope: test
+            redirect-uri: test
+            authorization-grant-type: test
         provider:
           kakao:
-            authorization_uri: https://kauth.kakao.com/oauth/authorize
-            token_uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user_name_attribute: id
+            authorization_uri: test
+            token_uri: test
+            user-info-uri: test
+            user_name_attribute: test
 
 jwt:
   issuer: test
