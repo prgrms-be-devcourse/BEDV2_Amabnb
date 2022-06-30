@@ -1,12 +1,15 @@
 package com.prgrms.amabnb.reservation.repository;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,6 +20,7 @@ import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.config.RepositoryTest;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.room.entity.Room;
@@ -45,6 +49,8 @@ class ReservationRepositoryTest extends RepositoryTest {
 
     private Room room;
 
+    private User guest;
+
     private static Stream<Arguments> provideReservationDate() {
         return Stream.of(
             Arguments.of(LocalDate.now(), LocalDate.now().plusDays(3L), true),
@@ -56,7 +62,9 @@ class ReservationRepositoryTest extends RepositoryTest {
     @BeforeEach
     void setUp() {
         room = createRoom();
-        createReservation(createGuest(), new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(5L)));
+        LocalDate now = LocalDate.now();
+        guest = createGuest();
+        createReservation(guest, new ReservationDate(now, now.plusDays(5L)));
         entityManager.flush();
         entityManager.clear();
     }
@@ -73,6 +81,30 @@ class ReservationRepositoryTest extends RepositoryTest {
 
         // then
         assertThat(isExists).isEqualTo(result);
+    }
+
+    @DisplayName("숙소의 예약 불가능 기간을 조회한다.")
+    @Test
+    void findImpossibleReservationDate() {
+        // given
+        LocalDate now = LocalDate.now();
+        createReservation(guest, new ReservationDate(now.plusDays(10L), now.plusDays(15L)));
+        createReservation(guest, new ReservationDate(now.plusMonths(1L).plusDays(3L), now.plusMonths(1L).plusDays(5L)));
+        LocalDate endDate = now.plusMonths(1L);
+
+        // when
+        List<ReservationDateResponse> result = reservationRepository.findImpossibleReservationDate(room.getId(),
+            now, endDate);
+
+        // then
+        assertAll(
+            () -> assertThat(result).hasSize(2),
+            () -> assertThat(result).extracting("checkIn", "checkOut")
+                .containsExactly(
+                    tuple(now.plusDays(10L), now.plusDays(14L)),
+                    tuple(now, now.plusDays(4L))
+                )
+        );
     }
 
     private User createGuest() {
