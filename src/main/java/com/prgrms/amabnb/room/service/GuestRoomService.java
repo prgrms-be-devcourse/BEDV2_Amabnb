@@ -14,7 +14,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class SearchRoomService {
+public class GuestRoomService {
 
     private final RoomRepository roomRepository;
 
