@@ -1,7 +1,5 @@
 package com.prgrms.amabnb.room.dto.request;
 
-import java.util.List;
-
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
@@ -39,7 +37,8 @@ public class ModifyRoomRequest {
 
     @Builder
     public ModifyRoomRequest(String name, int price, String description, int maxGuestNum, int bedCnt, int bedRoomCnt,
-        int bathRoomCnt, List<String> imagePaths) {
+        int bathRoomCnt) {
+        
         this.name = name;
         this.price = price;
         this.description = description;
