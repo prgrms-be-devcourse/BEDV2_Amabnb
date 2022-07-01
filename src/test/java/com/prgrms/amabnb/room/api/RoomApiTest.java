@@ -18,33 +18,41 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.prgrms.amabnb.common.vo.Email;
+import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
+import com.prgrms.amabnb.room.dto.request.ModifyRoomRequest;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.repository.RoomRepository;
-import com.prgrms.amabnb.room.service.CreateRoomService;
-import com.prgrms.amabnb.room.service.SearchRoomService;
+import com.prgrms.amabnb.room.service.GuestRoomService;
+import com.prgrms.amabnb.room.service.HostRoomService;
 import com.prgrms.amabnb.security.oauth.OAuthService;
 import com.prgrms.amabnb.security.oauth.UserProfile;
+import com.prgrms.amabnb.user.entity.User;
+import com.prgrms.amabnb.user.entity.UserRole;
+import com.prgrms.amabnb.user.repository.UserRepository;
 
-class RoomApiControllerTest extends ApiTest {
+class RoomApiTest extends ApiTest {
 
     @Autowired
-    CreateRoomService createRoomService;
+    HostRoomService hostRoomService;
 
     @Autowired
-    SearchRoomService searchRoomService;
+    GuestRoomService guestRoomService;
 
     @Autowired
     RoomRepository roomRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     OAuthService oAuthService;
 
     @Test
-    @WithMockUser
     @DisplayName("숙소 등록 성공 테스트")
     void createRoom() throws Exception {
         String accessToken = 로그인_요청();
@@ -169,8 +177,78 @@ class RoomApiControllerTest extends ApiTest {
 
     }
 
+    @Test
+    @DisplayName("호스트는 자신이 등록한 방 목록을 가져온다")
+    void getHostRooms() throws Exception {
+        //given
+        String accessToken = 로그인_요청();
+        saveRoom(accessToken);
+        saveRoom(accessToken);
+
+        //when, then
+        mockMvc.perform(get("/host/rooms")
+                .header(HttpHeaders.AUTHORIZATION, accessToken))
+            .andExpect(status().isOk())
+            .andDo(print());
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("호스트는 자신이 등록한 숙소를 수정할 수 있다.")
+    void modifyTest() throws Exception {
+        //given
+        User user = createUser();
+        User savedUser = userRepository.save(user);
+        Long userId = savedUser.getId();
+        Long roomId = hostRoomService.createRoom(userId, createCreateRoomRequest());
+
+        ModifyRoomRequest modifyRequest = createModifyRequest();
+
+        //when,then
+        mockMvc.perform(put("/host/rooms/" + roomId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(modifyRequest)))
+            .andExpect(status().isOk())
+            .andDo(print());
+
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("Request 하나라도 값이 없다면 수정이 불가능하다")
+    void name() throws Exception {
+        //given
+        User user = createUser();
+        User savedUser = userRepository.save(user);
+        Long userId = savedUser.getId();
+        Long roomId = hostRoomService.createRoom(userId, createCreateRoomRequest());
+
+        ModifyRoomRequest modifyRequest = ModifyRoomRequest.builder()
+            .bedCnt(11)
+            .bedRoomCnt(11)
+            .bathRoomCnt(11)
+            .description("수정된 방 설명")
+            .price(111111)
+            .maxGuestNum(1111)
+            .build();
+        //when
+        mockMvc.perform(put("/host/rooms/" + roomId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(modifyRequest)))
+            .andExpect(status().isBadRequest());
+        //then
+
+    }
+
     private String 로그인_요청() {
         return "Bearer" + oAuthService.register(createUserProfile()).accessToken();
+    }
+
+    private void saveRoom(String accessToken) throws Exception {
+        mockMvc.perform(post("/rooms")
+            .header(HttpHeaders.AUTHORIZATION, accessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(createCreateRoomRequest())));
     }
 
     private UserProfile createUserProfile() {
@@ -201,4 +279,27 @@ class RoomApiControllerTest extends ApiTest {
             .build();
     }
 
+    private ModifyRoomRequest createModifyRequest() {
+        return ModifyRoomRequest.builder()
+            .name("수정된 이름")
+            .bedCnt(11)
+            .bedRoomCnt(11)
+            .bathRoomCnt(11)
+            .description("수정된 방 설명")
+            .price(111111)
+            .maxGuestNum(1111)
+            .build();
+    }
+
+    private User createUser() {
+        return User.builder()
+            .oauthId("testOauthId")
+            .provider("testProvider")
+            .userRole(UserRole.GUEST)
+            .name("testUser")
+            .email(new Email("asdsadsad@gmail.com"))
+            .phoneNumber(new PhoneNumber("010-2312-1231"))
+            .profileImgUrl("urlurlrurlrurlurlurl")
+            .build();
+    }
 }
