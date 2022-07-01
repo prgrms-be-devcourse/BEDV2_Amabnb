@@ -11,6 +11,7 @@ import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationUserException;
+import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotFoundException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionException;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
@@ -30,17 +31,33 @@ public class ReservationGuestService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
-    private final ReservationValidator reservationValidator;
 
     @Transactional
     public ReservationResponseForGuest createReservation(Long userId, CreateReservationRequest request) {
         Room room = findRoomWithHostById(request.getRoomId());
         User guest = findUserById(userId);
         Reservation reservation = request.toEntity(room, guest);
-        reservationValidator.validate(reservation);
-        isAlreadyReservedRoom(reservation);
-        isAlreadyReservedGuest(reservation);
+        validateReservation(reservation);
         return ReservationResponseForGuest.from(reservationRepository.save(reservation));
+    }
+
+    private void validateReservation(Reservation reservation) {
+        validateRoomPrice(reservation);
+        validateMaxGuest(reservation);
+        validateAlreadyReservedRoom(reservation);
+        validateAlreadyReservedGuest(reservation);
+    }
+
+    private void validateRoomPrice(Reservation reservation) {
+        if (reservation.isNotValidatePrice()) {
+            throw new ReservationInvalidValueException("숙소 가격이 일치하지 않습니다.");
+        }
+    }
+
+    private void validateMaxGuest(Reservation reservation) {
+        if (reservation.isOverMaxGuest()) {
+            throw new ReservationInvalidValueException("숙소의 최대 인원을 넘을 수 없습니다.");
+        }
     }
 
     public ReservationDatesResponse getReservationDates(Long roomId, ReservationDateRequest request) {
@@ -57,13 +74,13 @@ public class ReservationGuestService {
         reservation.changeStatus(ReservationStatus.GUEST_CANCELED);
     }
 
-    private void isAlreadyReservedRoom(Reservation reservation) {
+    private void validateAlreadyReservedRoom(Reservation reservation) {
         if (reservationRepository.existReservation(reservation.getRoom(), reservation.getReservationDate())) {
             throw new AlreadyReservationRoomException();
         }
     }
 
-    private void isAlreadyReservedGuest(Reservation reservation) {
+    private void validateAlreadyReservedGuest(Reservation reservation) {
         if (reservationRepository.existReservationByGuest(reservation.getGuest(), reservation.getReservationDate())) {
             throw new AlreadyReservationUserException();
         }

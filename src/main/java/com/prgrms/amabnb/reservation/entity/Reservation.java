@@ -88,6 +88,14 @@ public class Reservation extends BaseEntity {
         return !getGuest().isSame(user);
     }
 
+    public boolean isNotValidatePrice() {
+        return !getRoom().isValidatePrice(totalPrice, reservationDate.getPeriod());
+    }
+
+    public boolean isOverMaxGuest() {
+        return room.isOverMaxGuestNum(totalGuest);
+    }
+
     public void changeStatus(ReservationStatus status) {
         if (isNotModifiable()) {
             throw new ReservationStatusException();
