@@ -9,6 +9,7 @@ import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
+import com.prgrms.amabnb.reservation.dto.response.ReservationReviewResponse;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
@@ -53,6 +54,12 @@ public class ReservationGuestService {
         Reservation reservation = findReservationWithGuest(reservationId);
         validateGuest(guest, reservation);
         reservation.changeStatus(ReservationStatus.GUEST_CANCELED);
+    }
+
+    public ReservationReviewResponse findById(Long id) {
+        var reservation = reservationRepository.findById(id)
+            .orElseThrow(ReservationNotFoundException::new);
+        return ReservationReviewResponse.from(reservation);
     }
 
     private void validateReservation(Reservation reservation) {
