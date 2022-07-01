@@ -43,6 +43,18 @@ public class ReservationGuestService {
         return ReservationResponseForGuest.from(reservationRepository.save(reservation));
     }
 
+    public List<ReservationDateResponse> getReservationDates(Long roomId, ReservationDateRequest request) {
+        return reservationRepository.findReservationDates(roomId, request.getStartDate(), request.getEndDate());
+    }
+
+    @Transactional
+    public void cancel(Long userId, Long reservationId) {
+        User guest = findUserById(userId);
+        Reservation reservation = findReservationWithGuest(reservationId);
+        validateGuest(guest, reservation);
+        reservation.changeStatus(ReservationStatus.GUEST_CANCELED);
+    }
+
     private void validateReservation(Reservation reservation) {
         validateRoomPrice(reservation);
         validateMaxGuest(reservation);
@@ -60,18 +72,6 @@ public class ReservationGuestService {
         if (reservation.isOverMaxGuest()) {
             throw new ReservationInvalidValueException("숙소의 최대 인원을 넘을 수 없습니다.");
         }
-    }
-
-    public List<ReservationDateResponse> getReservationDates(Long roomId, ReservationDateRequest request) {
-        return reservationRepository.findReservationDates(roomId, request.getStartDate(), request.getEndDate());
-    }
-
-    @Transactional
-    public void cancel(Long userId, Long reservationId) {
-        User guest = findUserById(userId);
-        Reservation reservation = findReservationWithGuest(reservationId);
-        validateGuest(guest, reservation);
-        reservation.changeStatus(ReservationStatus.GUEST_CANCELED);
     }
 
     private void validateAlreadyReservedRoom(Reservation reservation) {
