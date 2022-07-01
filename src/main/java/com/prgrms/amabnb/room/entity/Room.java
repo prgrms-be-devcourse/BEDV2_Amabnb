@@ -180,4 +180,36 @@ public class Room extends BaseEntity {
         }
     }
 
+    public void changeName(String name) {
+        if (!this.name.equals(name)) {
+            validateName(name);
+            this.name = name;
+        }
+    }
+
+    public void changePrice(Money price) {
+        if (!this.price.equals(price)) {
+            this.price = price;
+        }
+    }
+
+    public void changeDescription(String description) {
+        if (!this.description.equals(description)) {
+            validateDescription(description);
+            this.description = description;
+        }
+    }
+
+    public void changeMaxGuestNum(int maxGuestNum) {
+        if (this.maxGuestNum != maxGuestNum) {
+            validateMaxGuestNum(maxGuestNum);
+            this.maxGuestNum = maxGuestNum;
+        }
+    }
+
+    public void changeRoomOption(RoomOption roomOption) {
+        if (!this.roomOption.equals(roomOption)) {
+            this.roomOption = roomOption;
+        }
+    }
 }
