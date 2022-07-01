@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,18 +17,16 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDatesResponse;
-import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
-import com.prgrms.amabnb.reservation.service.ReservationService;
+import com.prgrms.amabnb.reservation.service.ReservationGuestService;
 import com.prgrms.amabnb.security.jwt.JwtAuthentication;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class ReservationApi {
-
-    private final ReservationService reservationService;
+public class ReservationGuestApi {
+    private final ReservationGuestService reservationService;
 
     @PostMapping("/reservations")
     public ResponseEntity<ReservationResponseForGuest> createReservation(
@@ -48,33 +45,15 @@ public class ReservationApi {
         @PathVariable Long roomId,
         ReservationDateRequest request
     ) {
-        return ResponseEntity.ok(reservationService.getImpossibleReservationDates(roomId, request));
-    }
-
-    @PutMapping("hosts/reservations/{reservationId}")
-    public ResponseEntity<ReservationInfoResponse> approveReservation(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @PathVariable Long reservationId
-    ) {
-        return ResponseEntity.ok(reservationService.approve(user.id(), reservationId));
-    }
-
-    @DeleteMapping("hosts/reservations/{reservationId}")
-    public ResponseEntity<Void> cancelByHost(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @PathVariable Long reservationId
-    ) {
-        reservationService.cancelByHost(user.id(), reservationId);
-
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(reservationService.getReservationDates(roomId, request));
     }
 
     @DeleteMapping("/guests/reservations/{reservationId}")
-    public ResponseEntity<Void> cancelByGuest(
+    public ResponseEntity<Void> cancel(
         @AuthenticationPrincipal JwtAuthentication user,
         @PathVariable Long reservationId
     ) {
-        reservationService.cancelByGuest(user.id(), reservationId);
+        reservationService.cancel(user.id(), reservationId);
 
         return ResponseEntity.noContent().build();
     }

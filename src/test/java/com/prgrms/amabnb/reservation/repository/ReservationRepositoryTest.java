@@ -93,7 +93,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         LocalDate endDate = now.plusMonths(1L);
 
         // when
-        List<ReservationDateResponse> result = reservationRepository.findImpossibleReservationDate(room.getId(),
+        List<ReservationDateResponse> result = reservationRepository.findReservationDates(room.getId(),
             now, endDate);
 
         // then

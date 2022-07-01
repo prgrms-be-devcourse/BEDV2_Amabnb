@@ -1,6 +1,5 @@
 package com.prgrms.amabnb.reservation.api;
 
-import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpHeaders.*;
@@ -11,8 +10,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -20,11 +17,9 @@ import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.restdocs.headers.RequestHeadersSnippet;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -33,18 +28,13 @@ import com.prgrms.amabnb.common.exception.ErrorResponse;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDatesResponse;
-import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
-import com.prgrms.amabnb.security.oauth.OAuthService;
 import com.prgrms.amabnb.security.oauth.UserProfile;
 
-class ReservationApiTest extends ApiTest {
-
-    @Autowired
-    private OAuthService oAuthService;
+class ReservationGuestApiTest extends ApiTest {
 
     private Long roomId;
 
@@ -266,67 +256,6 @@ class ReservationApiTest extends ApiTest {
         );
     }
 
-    @DisplayName("호스트가 예약을 승인한다. 200 - OK")
-    @Test
-    void approveReservation() throws Exception {
-        // given
-        MockHttpServletResponse reservationResponse = 예약_요청(로그인_요청(createSpancerProfile()),
-            createReservationRequest(3, 300_000, roomId));
-        Long reservationId = getReservationId(reservationResponse);
-
-        // when
-        MockHttpServletResponse response = mockMvc.perform(put("/hosts/reservations/{reservationId}", reservationId)
-                .header(HttpHeaders.AUTHORIZATION, hostAccessToken)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andDo(print())
-            .andDo(document("reservation-host-approve",
-                tokenRequestHeader(),
-                pathParameters(
-                    parameterWithName("reservationId").description("예약 아이디")
-                ),
-                responseFields(
-                    fieldWithPath("id").type(JsonFieldType.NUMBER).description("예약 아이디"),
-                    fieldWithPath("checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-                    fieldWithPath("checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
-                    fieldWithPath("totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
-                    fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
-                    fieldWithPath("reservationStatus").type(JsonFieldType.STRING).description("예약 상태")
-                )))
-            .andReturn().getResponse();
-
-        // then
-        ReservationInfoResponse result = objectMapper.readValue(response.getContentAsString(),
-            ReservationInfoResponse.class);
-        assertAll(
-            () -> assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value()),
-            () -> assertThat(result.getReservationStatus()).isEqualTo(APPROVED)
-        );
-    }
-
-    @DisplayName("호스트가 예약을 취소한다. 204 - NO CONTENT")
-    @Test
-    void cancelByHost() throws Exception {
-        // given
-        MockHttpServletResponse reservationResponse = 예약_요청(로그인_요청(createSpancerProfile()),
-            createReservationRequest(3, 300_000, roomId));
-        Long reservationId = getReservationId(reservationResponse);
-
-        // when
-        MockHttpServletResponse response = mockMvc.perform(delete("/hosts/reservations/{reservationId}", reservationId)
-                .header(HttpHeaders.AUTHORIZATION, hostAccessToken)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andDo(print())
-            .andDo(document("reservation-host-approve",
-                tokenRequestHeader(),
-                pathParameters(
-                    parameterWithName("reservationId").description("예약 아이디")
-                )))
-            .andReturn().getResponse();
-
-        // then
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
-    }
-
     @DisplayName("게스트가 예약을 취소한다. 204 - NO CONTENT")
     @Test
     void cancelByGuest() throws Exception {
@@ -350,12 +279,6 @@ class ReservationApiTest extends ApiTest {
         assertThat(response.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
     }
 
-    private RequestHeadersSnippet tokenRequestHeader() {
-        return requestHeaders(
-            headerWithName(AUTHORIZATION).description("JWT access 토큰")
-        );
-    }
-
     private Long getReservationId(MockHttpServletResponse response) {
         String[] locations = response.getHeader("Location").split("/");
         return Long.valueOf(locations[locations.length - 1]);
@@ -368,10 +291,6 @@ class ReservationApiTest extends ApiTest {
                 .content(objectMapper.writeValueAsString(request)))
             .andDo(print())
             .andReturn().getResponse();
-    }
-
-    private String 로그인_요청(UserProfile userProfile) {
-        return "Bearer" + oAuthService.register(userProfile).accessToken();
     }
 
     private Long 숙소_등록(String accessToken, CreateRoomRequest request) throws Exception {
@@ -443,9 +362,4 @@ class ReservationApiTest extends ApiTest {
             .build();
     }
 
-    private ErrorResponse extractErrorResponse(MockHttpServletResponse response) throws IOException {
-        return objectMapper.readValue(response.getContentAsString(StandardCharsets.UTF_8), ErrorResponse.class);
-    }
-
 }
-

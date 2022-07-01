@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDatesResponse;
-import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
@@ -27,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class ReservationService {
+public class ReservationGuestService {
     private final ReservationRepository reservationRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
@@ -44,31 +43,14 @@ public class ReservationService {
         return ReservationResponseForGuest.from(reservationRepository.save(reservation));
     }
 
-    public ReservationDatesResponse getImpossibleReservationDates(Long roomId, ReservationDateRequest request) {
+    public ReservationDatesResponse getReservationDates(Long roomId, ReservationDateRequest request) {
         return new ReservationDatesResponse(
-            reservationRepository.findImpossibleReservationDate(roomId, request.getStartDate(), request.getEndDate())
+            reservationRepository.findReservationDates(roomId, request.getStartDate(), request.getEndDate())
         );
     }
 
     @Transactional
-    public ReservationInfoResponse approve(Long userId, Long reservationId) {
-        User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoom(reservationId);
-        validateHost(host, reservation);
-        reservation.changeStatus(ReservationStatus.APPROVED);
-        return ReservationInfoResponse.from(reservation);
-    }
-
-    @Transactional
-    public void cancelByHost(Long userId, Long reservationId) {
-        User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoom(reservationId);
-        validateHost(host, reservation);
-        reservation.changeStatus(ReservationStatus.HOST_CANCELED);
-    }
-
-    @Transactional
-    public void cancelByGuest(Long userId, Long reservationId) {
+    public void cancel(Long userId, Long reservationId) {
         User guest = findUserById(userId);
         Reservation reservation = findReservationWithGuest(reservationId);
         validateGuest(guest, reservation);
@@ -84,12 +66,6 @@ public class ReservationService {
     private void isAlreadyReservedGuest(Reservation reservation) {
         if (reservationRepository.existReservationByGuest(reservation.getGuest(), reservation.getReservationDate())) {
             throw new AlreadyReservationUserException();
-        }
-    }
-
-    private void validateHost(User host, Reservation reservation) {
-        if (reservation.isNotHost(host)) {
-            throw new ReservationNotHavePermissionException("해당 예약의 호스트가 아닙니다.");
         }
     }
 
@@ -111,11 +87,6 @@ public class ReservationService {
 
     private Reservation findReservationWithGuest(Long reservationId) {
         return reservationRepository.findReservationWithGuestById(reservationId)
-            .orElseThrow(ReservationNotFoundException::new);
-    }
-
-    private Reservation findReservationWithRoom(Long reservationId) {
-        return reservationRepository.findReservationWithRoomById(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 

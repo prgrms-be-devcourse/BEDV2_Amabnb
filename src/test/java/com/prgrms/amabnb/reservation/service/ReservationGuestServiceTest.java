@@ -17,14 +17,12 @@ import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDatesResponse;
-import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationUserException;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionException;
-import com.prgrms.amabnb.reservation.exception.ReservationStatusException;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
@@ -38,7 +36,7 @@ import com.prgrms.amabnb.user.entity.UserRole;
 import com.prgrms.amabnb.user.exception.UserNotFoundException;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
-class ReservationServiceTest extends ApiTest {
+class ReservationGuestServiceTest extends ApiTest {
 
     @Autowired
     private RoomRepository roomRepository;
@@ -50,7 +48,7 @@ class ReservationServiceTest extends ApiTest {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private ReservationService reservationService;
+    private ReservationGuestService reservationGuestService;
 
     private Long guestId;
 
@@ -72,7 +70,7 @@ class ReservationServiceTest extends ApiTest {
         CreateReservationRequest request = createReservationRequest(3, 30_000, roomId);
 
         // when
-        ReservationResponseForGuest response = reservationService.createReservation(guestId, request);
+        ReservationResponseForGuest response = reservationGuestService.createReservation(guestId, request);
 
         // then
         assertAll(
@@ -89,7 +87,7 @@ class ReservationServiceTest extends ApiTest {
 
         // when
         // then
-        assertThatThrownBy(() -> reservationService.createReservation(guestId, request))
+        assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
             .isInstanceOf(ReservationInvalidValueException.class)
             .hasMessage("숙소 가격이 일치하지 않습니다.");
     }
@@ -102,7 +100,7 @@ class ReservationServiceTest extends ApiTest {
 
         // when
         // then
-        assertThatThrownBy(() -> reservationService.createReservation(guestId, request))
+        assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
             .isInstanceOf(ReservationInvalidValueException.class)
             .hasMessage("숙소의 최대 인원을 넘을 수 없습니다.");
     }
@@ -112,11 +110,11 @@ class ReservationServiceTest extends ApiTest {
     void create_reservation_already_reserved_room() {
         // given
         CreateReservationRequest request = createReservationRequest(3, 30_000, roomId);
-        reservationService.createReservation(guestId, request);
+        reservationGuestService.createReservation(guestId, request);
 
         // when
         // then
-        assertThatThrownBy(() -> reservationService.createReservation(guestId, request))
+        assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
             .isInstanceOf(AlreadyReservationRoomException.class)
             .hasMessage("해당 숙소가 이미 예약된 기간입니다.");
     }
@@ -125,13 +123,13 @@ class ReservationServiceTest extends ApiTest {
     @Test
     void create_reservation_already_reserved_guest() {
         // given
-        reservationService.createReservation(guestId, createReservationRequest(3, 30_000, roomId));
+        reservationGuestService.createReservation(guestId, createReservationRequest(3, 30_000, roomId));
         Long anotherRoomId = roomRepository.save(createRoom(host)).getId();
         CreateReservationRequest request = createReservationRequest(3, 30_000, anotherRoomId);
 
         // when
         // then
-        assertThatThrownBy(() -> reservationService.createReservation(guestId, request))
+        assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
             .isInstanceOf(AlreadyReservationUserException.class)
             .hasMessage("귀하가 이미 숙소를 예약한 기간입니다.");
     }
@@ -144,7 +142,7 @@ class ReservationServiceTest extends ApiTest {
 
         // when
         // then
-        assertThatThrownBy(() -> reservationService.createReservation(guestId, request))
+        assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
             .isInstanceOf(RoomNotFoundException.class)
             .hasMessage("존재하지 않는 숙소입니다");
     }
@@ -157,7 +155,7 @@ class ReservationServiceTest extends ApiTest {
 
         // when
         // then
-        assertThatThrownBy(() -> reservationService.createReservation(100L, request))
+        assertThatThrownBy(() -> reservationGuestService.createReservation(100L, request))
             .isInstanceOf(UserNotFoundException.class)
             .hasMessage("존재하지 않는 유저입니다");
     }
@@ -166,84 +164,16 @@ class ReservationServiceTest extends ApiTest {
     @Test
     void getImpossibleReservationDates() {
         // given
-        reservationService.createReservation(guestId, createReservationRequest(3, 30_000, roomId));
+        reservationGuestService.createReservation(guestId, createReservationRequest(3, 30_000, roomId));
         ReservationDateRequest request = new ReservationDateRequest(LocalDate.now(), LocalDate.now().plusMonths(1L));
 
         // when
-        ReservationDatesResponse result = reservationService.getImpossibleReservationDates(roomId, request);
+        ReservationDatesResponse result = reservationGuestService.getReservationDates(roomId, request);
 
         // then
         assertThat(result.getReservationDates()).hasSize(1);
         assertThat(result.getReservationDates()).extracting("checkIn", "checkOut")
             .containsExactly(tuple(LocalDate.now(), LocalDate.now().plusDays(2L)));
-    }
-
-    @DisplayName("호스트가 예약을 승인한다.")
-    @Test
-    void approve() {
-        // given
-        Long reservationId = getReservationId();
-
-        // when
-        ReservationInfoResponse response = reservationService.approve(host.getId(), reservationId);
-
-        // then
-        assertThat(response.getReservationStatus()).isEqualTo(APPROVED);
-    }
-
-    @DisplayName("해당하는 호스트의 예약이 아닐 경우 승인할 수 없다.")
-    @Test
-    void approve_is_not_host() {
-        // given
-        Long reservationId = getReservationId();
-
-        // when
-        // then
-        assertThatThrownBy(() -> reservationService.approve(guestId, reservationId))
-            .isInstanceOf(ReservationNotHavePermissionException.class)
-            .hasMessage("해당 예약의 호스트가 아닙니다.");
-    }
-
-    @DisplayName("예약 상태를 변경할 수 없다면 승인할 수 없다.")
-    @Test
-    void approve_status_not_modifiable() {
-        // given
-        Long reservationId = getReservationId();
-        Long hostId = host.getId();
-        reservationService.approve(hostId, reservationId);
-
-        // when
-        // then
-        assertThatThrownBy(() -> reservationService.approve(hostId, reservationId))
-            .isInstanceOf(ReservationStatusException.class)
-            .hasMessage("변경할 수 없는 예약입니다.");
-    }
-
-    @DisplayName("호스트가 예약을 취소한다.")
-    @Test
-    void cancelByHost() {
-        // given
-        Long reservationId = getReservationId();
-
-        // when
-        reservationService.cancelByHost(host.getId(), reservationId);
-
-        // then
-        Reservation findReservation = reservationRepository.findById(reservationId).get();
-        assertThat(findReservation.getReservationStatus()).isEqualTo(HOST_CANCELED);
-    }
-
-    @DisplayName("해당하는 호스트의 예약이 아닐 경우 승인할 수 없다.")
-    @Test
-    void cancelByHost_is_not_host() {
-        // given
-        Long reservationId = getReservationId();
-
-        // when
-        // then
-        assertThatThrownBy(() -> reservationService.cancelByHost(guestId, reservationId))
-            .isInstanceOf(ReservationNotHavePermissionException.class)
-            .hasMessage("해당 예약의 호스트가 아닙니다.");
     }
 
     @DisplayName("게스트가 예약을 취소한다.")
@@ -253,14 +183,14 @@ class ReservationServiceTest extends ApiTest {
         Long reservationId = getReservationId();
 
         // when
-        reservationService.cancelByGuest(guestId, reservationId);
+        reservationGuestService.cancel(guestId, reservationId);
 
         // then
         Reservation findReservation = reservationRepository.findById(reservationId).get();
         assertThat(findReservation.getReservationStatus()).isEqualTo(GUEST_CANCELED);
     }
 
-    @DisplayName("해당하는 게스트의 예약이 아닐 경우 승인할 수 없다.")
+    @DisplayName("해당하는 게스트의 예약이 아닐 경우 취소할 수 없다.")
     @Test
     void cancelByGuest_is_not_guest() {
         // given
@@ -268,7 +198,7 @@ class ReservationServiceTest extends ApiTest {
 
         // when
         // then
-        assertThatThrownBy(() -> reservationService.cancelByGuest(host.getId(), reservationId))
+        assertThatThrownBy(() -> reservationGuestService.cancel(host.getId(), reservationId))
             .isInstanceOf(ReservationNotHavePermissionException.class)
             .hasMessage("해당 예약의 게스트가 아닙니다.");
     }
@@ -324,7 +254,7 @@ class ReservationServiceTest extends ApiTest {
     }
 
     private Long getReservationId() {
-        return reservationService.createReservation(guestId, createReservationRequest(3, 30_000, roomId))
+        return reservationGuestService.createReservation(guestId, createReservationRequest(3, 30_000, roomId))
             .getReservation()
             .getId();
     }
