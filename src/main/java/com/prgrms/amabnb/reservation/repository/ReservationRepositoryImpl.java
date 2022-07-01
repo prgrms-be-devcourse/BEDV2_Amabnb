@@ -55,7 +55,7 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
     }
 
     @Override
-    public List<ReservationDateResponse> findImpossibleReservationDate(
+    public List<ReservationDateResponse> findReservationDates(
         Long roomId,
         LocalDate startDate,
         LocalDate endDate

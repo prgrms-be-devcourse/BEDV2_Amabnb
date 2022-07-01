@@ -132,6 +132,10 @@ public class Room extends BaseEntity {
         isPresentRoomScope(roomScope);
     }
 
+    public boolean isHost(User user) {
+        return getHost().isSame(user);
+    }
+
     private void validateName(String name) {
         if (Objects.isNull(name) || name.isBlank() || name.length() > MAX_NAME_LENGTH) {
             throw new RoomInvalidValueException("숙소 이름 입력값이 잘못됐습니다");

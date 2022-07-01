@@ -14,5 +14,5 @@ public interface ReservationRepositoryCustom {
 
     boolean existReservationByGuest(User guest, ReservationDate reservationDate);
 
-    List<ReservationDateResponse> findImpossibleReservationDate(Long roomId, LocalDate startDate, LocalDate endDate);
+    List<ReservationDateResponse> findReservationDates(Long roomId, LocalDate startDate, LocalDate endDate);
 }
