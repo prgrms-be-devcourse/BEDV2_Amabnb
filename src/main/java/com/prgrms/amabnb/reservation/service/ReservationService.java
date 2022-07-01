@@ -60,21 +60,19 @@ public class ReservationService {
     }
 
     @Transactional
-    public ReservationInfoResponse cancelByHost(Long userId, Long reservationId) {
+    public void cancelByHost(Long userId, Long reservationId) {
         User host = findUserById(userId);
         Reservation reservation = findReservationWithRoom(reservationId);
         validateHost(host, reservation);
         reservation.changeStatus(ReservationStatus.HOST_CANCELED);
-        return ReservationInfoResponse.from(reservation);
     }
 
     @Transactional
-    public ReservationInfoResponse cancelByGuest(Long userId, Long reservationId) {
+    public void cancelByGuest(Long userId, Long reservationId) {
         User guest = findUserById(userId);
         Reservation reservation = findReservationWithGuest(reservationId);
         validateGuest(guest, reservation);
         reservation.changeStatus(ReservationStatus.GUEST_CANCELED);
-        return ReservationInfoResponse.from(reservation);
     }
 
     private void isAlreadyReservedRoom(Reservation reservation) {

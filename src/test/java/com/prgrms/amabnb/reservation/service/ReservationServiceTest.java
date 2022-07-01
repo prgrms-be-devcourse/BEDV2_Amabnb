@@ -19,11 +19,13 @@ import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDatesResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
+import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationUserException;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionException;
 import com.prgrms.amabnb.reservation.exception.ReservationStatusException;
+import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
@@ -43,6 +45,9 @@ class ReservationServiceTest extends ApiTest {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     @Autowired
     private ReservationService reservationService;
@@ -221,10 +226,11 @@ class ReservationServiceTest extends ApiTest {
         Long reservationId = getReservationId();
 
         // when
-        ReservationInfoResponse response = reservationService.cancelByHost(host.getId(), reservationId);
+        reservationService.cancelByHost(host.getId(), reservationId);
 
         // then
-        assertThat(response.getReservationStatus()).isEqualTo(HOST_CANCELED);
+        Reservation findReservation = reservationRepository.findById(reservationId).get();
+        assertThat(findReservation.getReservationStatus()).isEqualTo(HOST_CANCELED);
     }
 
     @DisplayName("해당하는 호스트의 예약이 아닐 경우 승인할 수 없다.")
@@ -247,8 +253,11 @@ class ReservationServiceTest extends ApiTest {
         Long reservationId = getReservationId();
 
         // when
+        reservationService.cancelByGuest(guestId, reservationId);
+
         // then
-        assertDoesNotThrow(() -> reservationService.cancelByGuest(guestId, reservationId));
+        Reservation findReservation = reservationRepository.findById(reservationId).get();
+        assertThat(findReservation.getReservationStatus()).isEqualTo(GUEST_CANCELED);
     }
 
     @DisplayName("해당하는 게스트의 예약이 아닐 경우 승인할 수 없다.")
