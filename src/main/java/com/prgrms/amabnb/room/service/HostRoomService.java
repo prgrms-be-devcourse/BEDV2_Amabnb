@@ -13,6 +13,7 @@ import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.room.exception.RoomNotFoundException;
 import com.prgrms.amabnb.room.repository.RoomRepository;
+import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.exception.UserNotFoundException;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
@@ -27,23 +28,22 @@ public class HostRoomService {
     private final UserRepository userRepository;
 
     @Transactional
-    public Long createRoom(Long id, CreateRoomRequest createRoomRequest) {
-        Room room = createRoomRequest.toRoom();
-        room.addRoomImages(createRoomRequest.toRoomImages());
-        room.setHost(userRepository.findById(id).orElseThrow(UserNotFoundException::new));
+    public Long createRoom(Long hostId, CreateRoomRequest createRoomRequest) {
+        User user = userRepository.findById(hostId).orElseThrow(UserNotFoundException::new);
+        Room room = createRoomRequest.toRoom(user);
         return roomRepository.save(room).getId();
     }
 
     @Transactional
-    public void modifyRoom(Long roomId, ModifyRoomRequest modifyRoomRequest) {
-        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+    public void modifyRoom(Long hostId, Long roomId, ModifyRoomRequest modifyRoomRequest) {
+        Room room = roomRepository.findRoomByIdAndHostId(roomId, hostId).orElseThrow(RoomNotFoundException::new);
         changeRoomData(modifyRoomRequest, room);
     }
 
     public List<RoomResponse> searchRoomsForHost(Long hostId) {
         isExistUser(hostId);
 
-        return roomRepository.findRoomsByUserIdForHost(hostId)
+        return roomRepository.findRoomsByHostId(hostId)
             .stream()
             .map(RoomResponse::from)
             .toList();
