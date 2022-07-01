@@ -103,7 +103,7 @@ class ReviewApiTest extends ApiTest {
 
     @Nested
     @DisplayName("게스트는 예약했던 숙소에 리뷰를 작성할 수 있다 #68")
-    class PostReview {
+    class CreateReview {
         User givenGuest;
         User givenHost;
         Room givenRoom;
