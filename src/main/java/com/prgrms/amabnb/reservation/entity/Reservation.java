@@ -17,6 +17,7 @@ import com.prgrms.amabnb.common.model.BaseEntity;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
+import com.prgrms.amabnb.reservation.exception.ReservationStatusException;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.user.entity.User;
@@ -79,6 +80,25 @@ public class Reservation extends BaseEntity {
         reservationStatus = ReservationStatus.PENDING;
     }
 
+    public boolean isNotHost(User user) {
+        return !getRoom().isHost(user);
+    }
+
+    public boolean isNotGuest(User user) {
+        return !getGuest().isSame(user);
+    }
+
+    public void changeStatus(ReservationStatus status) {
+        if (isNotModifiable()) {
+            throw new ReservationStatusException();
+        }
+        this.reservationStatus = status;
+    }
+
+    private boolean isNotModifiable() {
+        return this.reservationStatus != ReservationStatus.PENDING;
+    }
+
     public void setReservationDate(ReservationDate reservationDate) {
         if (reservationDate == null) {
             throw new ReservationInvalidValueException("예약 날짜는 비어있을 수 없습니다.");
@@ -113,5 +133,4 @@ public class Reservation extends BaseEntity {
         }
         this.guest = guest;
     }
-
 }
