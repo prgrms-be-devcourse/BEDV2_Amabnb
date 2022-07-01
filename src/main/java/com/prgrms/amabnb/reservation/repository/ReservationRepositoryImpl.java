@@ -3,11 +3,14 @@ package com.prgrms.amabnb.reservation.repository;
 import static com.prgrms.amabnb.reservation.entity.QReservation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.user.entity.User;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -49,6 +52,22 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
             .fetchFirst();
 
         return fetchOne != null;
+    }
+
+    @Override
+    public List<ReservationDateResponse> findImpossibleReservationDate(
+        Long roomId,
+        LocalDate startDate,
+        LocalDate endDate
+    ) {
+        return queryFactory.select(Projections.constructor(ReservationDateResponse.class,
+                reservation.reservationDate.checkIn,
+                reservation.reservationDate.checkOut))
+            .from(reservation)
+            .where(reservation.room.id.eq(roomId),
+                notInCanceled(),
+                reservation.reservationDate.checkIn.between(startDate, endDate))
+            .fetch();
     }
 
     private BooleanExpression notInCanceled() {

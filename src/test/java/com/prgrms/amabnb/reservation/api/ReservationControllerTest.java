@@ -5,8 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
 import java.io.IOException;
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,11 +23,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import com.prgrms.amabnb.common.exception.ErrorResponse;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDatesResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.entity.RoomScope;
@@ -209,6 +215,53 @@ class ReservationControllerTest extends ApiTest {
         assertAll(
             () -> assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value()),
             () -> assertThat(errorResponse.getMessage()).isEqualTo("존재하지 않는 숙소입니다")
+        );
+    }
+
+    @DisplayName("예약 불가능한 날짜를 조회한다. 200 - OK")
+    @Test
+    void getReservationDates() throws Exception {
+        // given
+        String accessToken = 로그인_요청(createSpancerProfile());
+        LocalDate now = LocalDate.now();
+        예약_요청(accessToken, createReservationRequest(3, 300_000, roomId));
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("startDate", now.toString());
+        params.add("endDate", now.plusMonths(1L).toString());
+
+        // when
+        MockHttpServletResponse response = mockMvc.perform(
+                RestDocumentationRequestBuilders.get("/reservations/dates/{roomId}", roomId)
+                    .header(HttpHeaders.AUTHORIZATION, accessToken)
+                    .params(params)
+                    .contentType(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andDo(document("reservation-date",
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("JWT access 토큰")
+                ),
+                pathParameters(
+                    parameterWithName("roomId").description("숙소 아이디")
+                ),
+                requestParameters(
+                    parameterWithName("startDate").description("조회 시작 날짜"),
+                    parameterWithName("endDate").description("조회 끝 날짜")
+                ),
+                responseFields(
+                    fieldWithPath("reservationDates[].checkIn").description("예약 체크인 날짜"),
+                    fieldWithPath("reservationDates[].checkOut").description("예약 체크아웃 날짜")
+                )))
+            .andReturn().getResponse();
+
+        // then
+        ReservationDatesResponse result = objectMapper.readValue(response.getContentAsString(),
+            ReservationDatesResponse.class);
+        assertAll(
+            () -> assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value()),
+            () -> assertThat(result.getReservationDates()).extracting("checkIn", "checkOut")
+                .containsExactly(
+                    tuple(now, now.plusDays(2L))
+                )
         );
     }
 
