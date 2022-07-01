@@ -19,7 +19,7 @@ public class ReservationHostApi {
 
     private final ReservationHostService reservationHostService;
 
-    @PutMapping("hosts/reservations/{reservationId}")
+    @PutMapping("host/reservations/{reservationId}")
     public ResponseEntity<ReservationInfoResponse> approveReservation(
         @AuthenticationPrincipal JwtAuthentication user,
         @PathVariable Long reservationId
@@ -27,7 +27,7 @@ public class ReservationHostApi {
         return ResponseEntity.ok(reservationHostService.approve(user.id(), reservationId));
     }
 
-    @DeleteMapping("hosts/reservations/{reservationId}")
+    @DeleteMapping("host/reservations/{reservationId}")
     public ResponseEntity<Void> cancelByHost(
         @AuthenticationPrincipal JwtAuthentication user,
         @PathVariable Long reservationId

@@ -264,7 +264,7 @@ class ReservationGuestApiTest extends ApiTest {
         Long reservationId = getReservationId(reservationResponse);
 
         // when
-        MockHttpServletResponse response = mockMvc.perform(delete("/guests/reservations/{reservationId}", reservationId)
+        MockHttpServletResponse response = mockMvc.perform(delete("/guest/reservations/{reservationId}", reservationId)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())

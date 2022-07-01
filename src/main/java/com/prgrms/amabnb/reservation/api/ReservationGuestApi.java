@@ -48,7 +48,7 @@ public class ReservationGuestApi {
         return ResponseEntity.ok(reservationService.getReservationDates(roomId, request));
     }
 
-    @DeleteMapping("/guests/reservations/{reservationId}")
+    @DeleteMapping("/guest/reservations/{reservationId}")
     public ResponseEntity<Void> cancel(
         @AuthenticationPrincipal JwtAuthentication user,
         @PathVariable Long reservationId
