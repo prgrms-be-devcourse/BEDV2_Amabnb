@@ -58,7 +58,7 @@ class RoomApiTest extends ApiTest {
         String accessToken = 로그인_요청();
         CreateRoomRequest createRoomRequest = createCreateRoomRequest();
 
-        mockMvc.perform(post("/rooms")
+        mockMvc.perform(post("/host/rooms")
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createRoomRequest)))
@@ -102,8 +102,8 @@ class RoomApiTest extends ApiTest {
     void filterSearchTest() throws Exception {
         //given
         CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-        Room room = createRoomRequest.toRoom();
-        room.addRoomImages(createRoomRequest.toRoomImages());
+        User user = userRepository.save(createUser());
+        Room room = createRoomRequest.toRoom(user);
         roomRepository.save(room);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -150,7 +150,7 @@ class RoomApiTest extends ApiTest {
     void getRoomDetail() throws Exception {
         //given
         CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-        Room room = createRoomRequest.toRoom();
+        Room room = createRoomRequest.toRoom(createUser());
         room.addRoomImages(createRoomRequest.toRoomImages());
         Room savedRoom = roomRepository.save(room);
 
@@ -197,15 +197,13 @@ class RoomApiTest extends ApiTest {
     @DisplayName("호스트는 자신이 등록한 숙소를 수정할 수 있다.")
     void modifyTest() throws Exception {
         //given
-        User user = createUser();
-        User savedUser = userRepository.save(user);
-        Long userId = savedUser.getId();
-        Long roomId = hostRoomService.createRoom(userId, createCreateRoomRequest());
-
         ModifyRoomRequest modifyRequest = createModifyRequest();
+        String accessToken = 로그인_요청();
+        Long roomId = saveRoom(accessToken);
 
-        //when,then
+        // when,then
         mockMvc.perform(put("/host/rooms/" + roomId)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(modifyRequest)))
             .andExpect(status().isOk())
@@ -244,11 +242,15 @@ class RoomApiTest extends ApiTest {
         return "Bearer" + oAuthService.register(createUserProfile()).accessToken();
     }
 
-    private void saveRoom(String accessToken) throws Exception {
-        mockMvc.perform(post("/rooms")
-            .header(HttpHeaders.AUTHORIZATION, accessToken)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(createCreateRoomRequest())));
+    private Long saveRoom(String accessToken) throws Exception {
+        String location = mockMvc.perform(post("/host/rooms")
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(createCreateRoomRequest())))
+            .andReturn().getResponse().getHeader("Location");
+
+        String saveRoomId = location.replaceAll("[^0-9]", "");
+        return Long.valueOf(saveRoomId);
     }
 
     private UserProfile createUserProfile() {
