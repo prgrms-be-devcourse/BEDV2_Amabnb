@@ -46,6 +46,13 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
 
     }
 
+    @Override
+    public List<Room> findRoomsByUserIdForHost(Long userId) {
+        return jpaQueryFactory.selectFrom(room)
+            .where(room.host.id.eq(userId))
+            .fetch();
+    }
+
     private BooleanExpression roomScopesEq(List<RoomScope> roomScopes) {
         return Objects.isNull(roomScopes) ? null : room.roomScope.in(roomScopes);
     }

@@ -11,4 +11,6 @@ public interface QueryRoomRepository {
 
     List<Room> findRoomsByFilterCondition(SearchRoomFilterCondition searchRoomFilterCondition, Pageable pageable);
 
+    List<Room> findRoomsByUserIdForHost(Long userId);
+
 }
