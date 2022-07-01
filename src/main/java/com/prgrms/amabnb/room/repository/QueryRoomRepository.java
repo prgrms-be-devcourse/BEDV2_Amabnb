@@ -1,6 +1,7 @@
 package com.prgrms.amabnb.room.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 
@@ -11,6 +12,7 @@ public interface QueryRoomRepository {
 
     List<Room> findRoomsByFilterCondition(SearchRoomFilterCondition searchRoomFilterCondition, Pageable pageable);
 
-    List<Room> findRoomsByUserIdForHost(Long userId);
+    List<Room> findRoomsByHostId(Long userId);
 
+    Optional<Room> findRoomByIdAndHostId(Long roomId, Long hostId);
 }

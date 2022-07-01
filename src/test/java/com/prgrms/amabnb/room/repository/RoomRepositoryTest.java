@@ -68,7 +68,7 @@ class RoomRepositoryTest extends RepositoryTest {
 
     @Test
     @DisplayName("필터 조건이 없어으면 모든 숙소정보를 가져온다.")
-    void name() {
+    void noFilterTest() {
         //given
         SearchRoomFilterCondition nullFilter = createNullFilter();
         Room room1 = createRoom();
@@ -103,20 +103,46 @@ class RoomRepositoryTest extends RepositoryTest {
 
         Long hostId = host.getId();
         //when
-        List<Room> rooms = roomRepository.findRoomsByUserIdForHost(hostId);
+        List<Room> rooms = roomRepository.findRoomsByHostId(hostId);
         //then
         assertThat(rooms.size()).isEqualTo(2);
     }
 
+    @Test
+    @DisplayName("호스트가 등록한 특정 숙소를 가져온다.")
+    void findByIdAndHostId() {
+        //given
+        User host = createUser();
+        userRepository.save(host);
+
+        Room room = createRoom();
+        room.setHost(host);
+
+        roomRepository.save(room);
+
+        //when
+        Room foundRoom = roomRepository.findRoomByIdAndHostId(room.getId(), host.getId()).get();
+
+        //then
+        assertThat(foundRoom).usingRecursiveComparison().ignoringFieldsOfTypes(LocalDateTime.class)
+            .isEqualTo(room);
+
+    }
+
     private SearchRoomFilterCondition createFullFilter() {
-        return new SearchRoomFilterCondition(1, 1, 1, 2000, 50000, List.of(RoomType.APARTMENT),
-            List.of(RoomScope.PRIVATE));
+        return SearchRoomFilterCondition.builder()
+            .minBeds(1)
+            .minBedrooms(1)
+            .minBathrooms(1)
+            .minPrice(2000)
+            .maxPrice(5000)
+            .roomTypes(List.of(RoomType.APARTMENT))
+            .roomScopes(List.of(RoomScope.PRIVATE))
+            .build();
     }
 
     private SearchRoomFilterCondition createNullFilter() {
-        return new SearchRoomFilterCondition(
-            null, null, null, null, null, null, null
-        );
+        return SearchRoomFilterCondition.builder().build();
     }
 
     private User createUser() {

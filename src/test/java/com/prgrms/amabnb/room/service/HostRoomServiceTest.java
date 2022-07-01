@@ -77,20 +77,20 @@ class HostRoomServiceTest {
     void modifyRoomTest() {
         //given
         Room room = createRoom();
-        given(roomRepository.findById(anyLong())).willReturn(Optional.of(room));
+        given(roomRepository.findRoomByIdAndHostId(anyLong(), anyLong())).willReturn(Optional.of(room));
         //when
-        hostRoomService.modifyRoom(1L, createModifyRoomRequest());
+        hostRoomService.modifyRoom(1L, 1L, createModifyRoomRequest());
         //then
-        then(roomRepository).should(times(1)).findById(anyLong());
+        then(roomRepository).should(times(1)).findRoomByIdAndHostId(anyLong(), anyLong());
     }
 
     @Test
     @DisplayName("등록된 방이 아니면 수정할 수 없다.")
     void modifyFailTest() {
         //given
-        given(roomRepository.findById(anyLong())).willThrow(RoomNotFoundException.class);
+        given(roomRepository.findRoomByIdAndHostId(anyLong(), anyLong())).willThrow(RoomNotFoundException.class);
         //when, then
-        assertThatThrownBy(() -> hostRoomService.modifyRoom(anyLong(), createModifyRoomRequest()))
+        assertThatThrownBy(() -> hostRoomService.modifyRoom(anyLong(), anyLong(), createModifyRoomRequest()))
             .isInstanceOf(RoomNotFoundException.class);
     }
 
@@ -99,12 +99,12 @@ class HostRoomServiceTest {
     void searchRoomsForHostTest() {
         //given
         given(userRepository.existsById(anyLong())).willReturn(true);
-        given(roomRepository.findRoomsByUserIdForHost(anyLong())).willReturn(List.of(createRoom()));
+        given(roomRepository.findRoomsByHostId(anyLong())).willReturn(List.of(createRoom()));
         //when
         hostRoomService.searchRoomsForHost(1L);
         //then
         then(userRepository).should(times(1)).existsById(anyLong());
-        then(roomRepository).should(times(1)).findRoomsByUserIdForHost(anyLong());
+        then(roomRepository).should(times(1)).findRoomsByHostId(anyLong());
     }
 
     @Test
