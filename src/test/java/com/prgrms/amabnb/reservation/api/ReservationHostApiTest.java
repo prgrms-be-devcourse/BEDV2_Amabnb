@@ -22,6 +22,8 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.restdocs.payload.JsonFieldType;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
@@ -61,21 +63,22 @@ class ReservationHostApiTest extends ApiTest {
                     parameterWithName("reservationId").description("예약 아이디")
                 ),
                 responseFields(
-                    fieldWithPath("id").type(JsonFieldType.NUMBER).description("예약 아이디"),
-                    fieldWithPath("checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-                    fieldWithPath("checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
-                    fieldWithPath("totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
-                    fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
-                    fieldWithPath("reservationStatus").type(JsonFieldType.STRING).description("예약 상태")
+                    fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("예약 아이디"),
+                    fieldWithPath("data.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
+                    fieldWithPath("data.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+                    fieldWithPath("data.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
+                    fieldWithPath("data.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
+                    fieldWithPath("data.reservationStatus").type(JsonFieldType.STRING).description("예약 상태")
                 )))
             .andReturn().getResponse();
 
         // then
-        ReservationInfoResponse result = objectMapper.readValue(response.getContentAsString(),
-            ReservationInfoResponse.class);
+        ApiResponse<ReservationInfoResponse> apiResponse = objectMapper.readValue(response.getContentAsString(),
+            new TypeReference<>() {
+            });
         assertAll(
             () -> assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value()),
-            () -> assertThat(result.getReservationStatus()).isEqualTo(APPROVED)
+            () -> assertThat(apiResponse.data().getReservationStatus()).isEqualTo(APPROVED)
         );
     }
 

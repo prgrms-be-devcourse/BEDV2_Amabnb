@@ -16,6 +16,7 @@ import org.springframework.restdocs.headers.RequestHeadersSnippet;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.prgrms.amabnb.common.exception.ErrorResponse;
 import com.prgrms.amabnb.security.oauth.OAuthService;
@@ -53,6 +54,10 @@ public abstract class ApiTest {
 
     protected ErrorResponse extractErrorResponse(MockHttpServletResponse response) throws IOException {
         return objectMapper.readValue(response.getContentAsString(StandardCharsets.UTF_8), ErrorResponse.class);
+    }
+
+    protected String toJson(Object object) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(object);
     }
 
 }

@@ -24,10 +24,12 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.prgrms.amabnb.common.exception.ErrorResponse;
+import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
-import com.prgrms.amabnb.reservation.dto.response.ReservationDatesResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.entity.RoomScope;
@@ -72,31 +74,32 @@ class ReservationGuestApiTest extends ApiTest {
                     headerWithName("Location").description("예약 리소스 주소")
                 ),
                 responseFields(
-                    fieldWithPath("reservation.id").type(JsonFieldType.NUMBER).description("아이디"),
-                    fieldWithPath("reservation.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-                    fieldWithPath("reservation.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
-                    fieldWithPath("reservation.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
-                    fieldWithPath("reservation.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
-                    fieldWithPath("reservation.reservationStatus").type(JsonFieldType.STRING).description("예약 상태"),
-                    fieldWithPath("room.roomId").type(JsonFieldType.NUMBER).description("숙소 아이디"),
-                    fieldWithPath("room.roomAddress.zipcode").type(JsonFieldType.STRING)
+                    fieldWithPath("data.reservation.id").type(JsonFieldType.NUMBER).description("아이디"),
+                    fieldWithPath("data.reservation.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
+                    fieldWithPath("data.reservation.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+                    fieldWithPath("data.reservation.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
+                    fieldWithPath("data.reservation.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
+                    fieldWithPath("data.reservation.reservationStatus").type(JsonFieldType.STRING).description("예약 상태"),
+                    fieldWithPath("data.room.roomId").type(JsonFieldType.NUMBER).description("숙소 아이디"),
+                    fieldWithPath("data.room.roomAddress.zipcode").type(JsonFieldType.STRING)
                         .description("숙소 우편번호"),
-                    fieldWithPath("room.roomAddress.address").type(JsonFieldType.STRING)
+                    fieldWithPath("data.room.roomAddress.address").type(JsonFieldType.STRING)
                         .description("숙소 주소"),
-                    fieldWithPath("room.roomAddress.detailAddress").type(JsonFieldType.STRING)
+                    fieldWithPath("data.room.roomAddress.detailAddress").type(JsonFieldType.STRING)
                         .description("숙소 상세주소"),
-                    fieldWithPath("host.hostId").type(JsonFieldType.NUMBER).description("호스트 아이디"),
-                    fieldWithPath("host.name").type(JsonFieldType.STRING).description("호스트 이름"),
-                    fieldWithPath("host.email").type(JsonFieldType.STRING).description("호스트 이메일")
+                    fieldWithPath("data.host.hostId").type(JsonFieldType.NUMBER).description("호스트 아이디"),
+                    fieldWithPath("data.host.name").type(JsonFieldType.STRING).description("호스트 이름"),
+                    fieldWithPath("data.host.email").type(JsonFieldType.STRING).description("호스트 이메일")
                 )))
             .andReturn().getResponse();
 
         // then
-        ReservationResponseForGuest reservationResponseForGuest = objectMapper.readValue(response.getContentAsString(),
-            ReservationResponseForGuest.class);
+        ApiResponse<ReservationResponseForGuest> apiResponse = objectMapper.readValue(response.getContentAsString(),
+            new TypeReference<>() {
+            });
         assertAll(
             () -> assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value()),
-            () -> assertThat(reservationResponseForGuest.getReservation().getId()).isPositive()
+            () -> assertThat(apiResponse.data().getReservation().getId()).isPositive()
         );
 
     }
@@ -239,20 +242,19 @@ class ReservationGuestApiTest extends ApiTest {
                     parameterWithName("endDate").description("조회 끝 날짜")
                 ),
                 responseFields(
-                    fieldWithPath("reservationDates[].checkIn").description("예약 체크인 날짜"),
-                    fieldWithPath("reservationDates[].checkOut").description("예약 체크아웃 날짜")
+                    fieldWithPath("data[].checkIn").description("예약 체크인 날짜"),
+                    fieldWithPath("data[].checkOut").description("예약 체크아웃 날짜")
                 )))
             .andReturn().getResponse();
 
         // then
-        ReservationDatesResponse result = objectMapper.readValue(response.getContentAsString(),
-            ReservationDatesResponse.class);
+        ApiResponse<List<ReservationDateResponse>> apiResponse = objectMapper.readValue(response.getContentAsString(),
+            new TypeReference<>() {
+            });
         assertAll(
             () -> assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value()),
-            () -> assertThat(result.getReservationDates()).extracting("checkIn", "checkOut")
-                .containsExactly(
-                    tuple(now, now.plusDays(2L))
-                )
+            () -> assertThat(apiResponse.data()).extracting("checkIn", "checkOut")
+                .containsExactly(tuple(now, now.plusDays(2L)))
         );
     }
 

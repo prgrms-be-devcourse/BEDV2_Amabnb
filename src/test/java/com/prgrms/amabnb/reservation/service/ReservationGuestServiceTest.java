@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,7 +17,7 @@ import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
-import com.prgrms.amabnb.reservation.dto.response.ReservationDatesResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
@@ -168,12 +169,14 @@ class ReservationGuestServiceTest extends ApiTest {
         ReservationDateRequest request = new ReservationDateRequest(LocalDate.now(), LocalDate.now().plusMonths(1L));
 
         // when
-        ReservationDatesResponse result = reservationGuestService.getReservationDates(roomId, request);
+        List<ReservationDateResponse> reservationDates = reservationGuestService.getReservationDates(roomId, request);
 
         // then
-        assertThat(result.getReservationDates()).hasSize(1);
-        assertThat(result.getReservationDates()).extracting("checkIn", "checkOut")
-            .containsExactly(tuple(LocalDate.now(), LocalDate.now().plusDays(2L)));
+        assertAll(
+            () -> assertThat(reservationDates).hasSize(1),
+            () -> assertThat(reservationDates).extracting("checkIn", "checkOut")
+                .containsExactly(tuple(LocalDate.now(), LocalDate.now().plusDays(2L)))
+        );
     }
 
     @DisplayName("게스트가 예약을 취소한다.")

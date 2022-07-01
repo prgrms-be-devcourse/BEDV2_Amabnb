@@ -1,6 +1,7 @@
 package com.prgrms.amabnb.reservation.api;
 
 import java.net.URI;
+import java.util.List;
 
 import javax.validation.Valid;
 
@@ -14,9 +15,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
-import com.prgrms.amabnb.reservation.dto.response.ReservationDatesResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.service.ReservationGuestService;
 import com.prgrms.amabnb.security.jwt.JwtAuthentication;
@@ -29,7 +31,7 @@ public class ReservationGuestApi {
     private final ReservationGuestService reservationService;
 
     @PostMapping("/reservations")
-    public ResponseEntity<ReservationResponseForGuest> createReservation(
+    public ResponseEntity<ApiResponse<ReservationResponseForGuest>> createReservation(
         @Valid @RequestBody CreateReservationRequest request,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
@@ -37,15 +39,15 @@ public class ReservationGuestApi {
         URI uri = generateUri(response);
         return ResponseEntity
             .created(uri)
-            .body(response);
+            .body(new ApiResponse<>(response));
     }
 
     @GetMapping("/rooms/{roomId}/reservations-date")
-    public ResponseEntity<ReservationDatesResponse> getReservationDates(
+    public ResponseEntity<ApiResponse<List<ReservationDateResponse>>> getReservationDates(
         @PathVariable Long roomId,
         ReservationDateRequest request
     ) {
-        return ResponseEntity.ok(reservationService.getReservationDates(roomId, request));
+        return ResponseEntity.ok(new ApiResponse<>(reservationService.getReservationDates(roomId, request)));
     }
 
     @DeleteMapping("/guest/reservations/{reservationId}")

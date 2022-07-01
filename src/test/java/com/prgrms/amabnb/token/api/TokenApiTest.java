@@ -15,7 +15,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.token.dto.RefreshTokenRequest;
 import com.prgrms.amabnb.token.dto.TokenResponse;
@@ -34,10 +33,6 @@ class TokenApiTest extends ApiTest {
         givenToken = tokenService.createToken(new UserRegisterResponse(1L, "ROLE_GUEST"));
     }
 
-    String toJson(Object object) throws JsonProcessingException {
-        return objectMapper.writeValueAsString(object);
-    }
-
     @Nested
     @DisplayName("유저가 가지고 있는 refresh 토큰과 일치하면, access 토큰을 재발급 할 수 있다")
     class refreshAccessToken {
@@ -51,7 +46,7 @@ class TokenApiTest extends ApiTest {
                     .contentType(MediaType.APPLICATION_JSON).content(toJson(givenToken.refreshToken())))
                 .andExpect(handler().methodName("refreshAccessToken"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("accessToken").exists())
+                .andExpect(jsonPath("data.accessToken").exists())
                 .andDo(print());
         }
 
@@ -76,11 +71,8 @@ class TokenApiTest extends ApiTest {
             mockMvc.perform(post("/tokens")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenToken.accessToken())
                     .contentType(MediaType.APPLICATION_JSON).content(toJson(request)))
-
                 .andExpect(handler().methodName("refreshAccessToken"))
-                // TODO : handler 지정하기
-                // .andExpect(status().isBadRequest())
-                //.methodArgumentException - expected
+                .andExpect(status().isBadRequest())
                 .andDo(print());
         }
     }

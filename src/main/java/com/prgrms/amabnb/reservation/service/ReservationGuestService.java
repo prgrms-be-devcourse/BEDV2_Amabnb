@@ -1,11 +1,13 @@
 package com.prgrms.amabnb.reservation.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
-import com.prgrms.amabnb.reservation.dto.response.ReservationDatesResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
@@ -60,10 +62,8 @@ public class ReservationGuestService {
         }
     }
 
-    public ReservationDatesResponse getReservationDates(Long roomId, ReservationDateRequest request) {
-        return new ReservationDatesResponse(
-            reservationRepository.findReservationDates(roomId, request.getStartDate(), request.getEndDate())
-        );
+    public List<ReservationDateResponse> getReservationDates(Long roomId, ReservationDateRequest request) {
+        return reservationRepository.findReservationDates(roomId, request.getStartDate(), request.getEndDate());
     }
 
     @Transactional

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
 import com.prgrms.amabnb.reservation.service.ReservationHostService;
 import com.prgrms.amabnb.security.jwt.JwtAuthentication;
@@ -20,11 +21,11 @@ public class ReservationHostApi {
     private final ReservationHostService reservationHostService;
 
     @PutMapping("host/reservations/{reservationId}")
-    public ResponseEntity<ReservationInfoResponse> approveReservation(
+    public ResponseEntity<ApiResponse<ReservationInfoResponse>> approveReservation(
         @AuthenticationPrincipal JwtAuthentication user,
         @PathVariable Long reservationId
     ) {
-        return ResponseEntity.ok(reservationHostService.approve(user.id(), reservationId));
+        return ResponseEntity.ok(new ApiResponse<>(reservationHostService.approve(user.id(), reservationId)));
     }
 
     @DeleteMapping("host/reservations/{reservationId}")
