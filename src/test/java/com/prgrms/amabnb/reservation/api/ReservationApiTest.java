@@ -41,7 +41,7 @@ import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.security.oauth.OAuthService;
 import com.prgrms.amabnb.security.oauth.UserProfile;
 
-class ReservationControllerTest extends ApiTest {
+class ReservationApiTest extends ApiTest {
 
     @Autowired
     private OAuthService oAuthService;

@@ -27,7 +27,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class ReservationController {
+public class ReservationApi {
 
     private final ReservationService reservationService;
 
