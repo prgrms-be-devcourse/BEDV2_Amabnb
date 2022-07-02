@@ -1,10 +1,10 @@
 package com.prgrms.amabnb.reservation.service;
 
 import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
+import static java.time.LocalDate.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,10 +16,12 @@ import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
+import com.prgrms.amabnb.reservation.dto.request.PageReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
+import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationUserException;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
@@ -166,7 +168,7 @@ class ReservationGuestServiceTest extends ApiTest {
     void getImpossibleReservationDates() {
         // given
         reservationGuestService.createReservation(guestId, createReservationRequest(3, 30_000, roomId));
-        ReservationDateRequest request = new ReservationDateRequest(LocalDate.now(), LocalDate.now().plusMonths(1L));
+        ReservationDateRequest request = new ReservationDateRequest(now(), now().plusMonths(1L));
 
         // when
         List<ReservationDateResponse> reservationDates = reservationGuestService.getReservationDates(roomId, request);
@@ -175,7 +177,7 @@ class ReservationGuestServiceTest extends ApiTest {
         assertAll(
             () -> assertThat(reservationDates).hasSize(1),
             () -> assertThat(reservationDates).extracting("checkIn", "checkOut")
-                .containsExactly(tuple(LocalDate.now(), LocalDate.now().plusDays(2L)))
+                .containsExactly(tuple(now(), now().plusDays(2L)))
         );
     }
 
@@ -183,7 +185,9 @@ class ReservationGuestServiceTest extends ApiTest {
     @Test
     void cancelByGuest() {
         // given
-        Long reservationId = getReservationId();
+        Long reservationId = reservationGuestService.createReservation(guestId, createReservationByDay(11))
+            .getReservation()
+            .getId();
 
         // when
         reservationGuestService.cancel(guestId, reservationId);
@@ -197,7 +201,9 @@ class ReservationGuestServiceTest extends ApiTest {
     @Test
     void cancelByGuest_is_not_guest() {
         // given
-        Long reservationId = getReservationId();
+        Long reservationId = reservationGuestService.createReservation(guestId, createReservationByDay(11))
+            .getReservation()
+            .getId();
 
         // when
         // then
@@ -206,10 +212,52 @@ class ReservationGuestServiceTest extends ApiTest {
             .hasMessage("해당 예약의 게스트가 아닙니다.");
     }
 
+    @DisplayName("예약정보를 단건 조회한다.")
+    @Test
+    void getReservation() {
+        // given
+        Long reservationId = reservationGuestService.createReservation(guestId, createReservationByDay(11))
+            .getReservation()
+            .getId();
+
+        // when
+        ReservationResponseForGuest reservation = reservationGuestService.getReservation(guestId, reservationId);
+
+        // then
+        assertThat(reservation.getReservation().getId()).isEqualTo(reservationId);
+    }
+
+    @DisplayName("예약 정보들을 조회한다.")
+    @Test
+    void getReservations() {
+        // given
+        for (int i = 0; i < 10; i++) {
+            reservationGuestService.createReservation(guestId, createReservationByDay(i));
+        }
+        Long lastReservationId = reservationGuestService.createReservation(guestId, createReservationByDay(11))
+            .getReservation()
+            .getId();
+        int pageSize = 10;
+        ReservationStatus status = PENDING;
+        PageReservationRequest request = new PageReservationRequest(pageSize, status, lastReservationId);
+
+        // when
+        List<ReservationResponseForGuest> reservations = reservationGuestService.getReservations(guestId, request);
+
+        // then
+        assertAll(
+            () -> assertThat(reservations).hasSize(request.getPageSize()),
+            () -> assertThat(reservations.get(0).getReservation().getId()).isEqualTo(lastReservationId - 1),
+            () -> assertThat(reservations).extracting("reservation")
+                .extracting("reservationStatus")
+                .containsOnly(status)
+        );
+    }
+
     private CreateReservationRequest createReservationRequest(int totalGuest, int totalPrice, Long roomId) {
         return CreateReservationRequest.builder()
-            .checkIn(LocalDate.now())
-            .checkOut(LocalDate.now().plusDays(3L))
+            .checkIn(now())
+            .checkOut(now().plusDays(3L))
             .totalGuest(totalGuest)
             .totalPrice(totalPrice)
             .roomId(roomId)
@@ -256,10 +304,14 @@ class ReservationGuestServiceTest extends ApiTest {
         return room;
     }
 
-    private Long getReservationId() {
-        return reservationGuestService.createReservation(guestId, createReservationRequest(3, 30_000, roomId))
-            .getReservation()
-            .getId();
+    private CreateReservationRequest createReservationByDay(int day) {
+        return CreateReservationRequest.builder()
+            .checkIn(now().plusDays(day))
+            .checkOut(now().plusDays(day + 1))
+            .totalGuest(3)
+            .totalPrice(10_000)
+            .roomId(roomId)
+            .build();
     }
 
 }

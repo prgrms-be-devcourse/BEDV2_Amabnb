@@ -1,9 +1,13 @@
 package com.prgrms.amabnb.reservation.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.prgrms.amabnb.reservation.dto.request.PageReservationRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForHost;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.ReservationNotFoundException;
@@ -39,6 +43,22 @@ public class ReservationHostService {
         reservation.changeStatus(ReservationStatus.HOST_CANCELED);
     }
 
+    public ReservationResponseForHost getReservation(Long userId, Long reservationId) {
+        User host = findUserById(userId);
+        Reservation reservation = findReservationWithRoomAndHGuestAndGuest(reservationId);
+        validateHost(host, reservation);
+        return ReservationResponseForHost.from(reservation);
+    }
+
+    public List<ReservationResponseForHost> getReservations(Long userId, PageReservationRequest request) {
+        User host = findUserById(userId);
+        return reservationRepository.findReservationByHostAndStatus(request.getLastReservationId(),
+                request.getPageSize(), host, request.getStatus())
+            .stream()
+            .map(ReservationResponseForHost::from)
+            .toList();
+    }
+
     private void validateHost(User host, Reservation reservation) {
         if (reservation.isNotHost(host)) {
             throw new ReservationNotHavePermissionException("해당 예약의 호스트가 아닙니다.");
@@ -52,6 +72,11 @@ public class ReservationHostService {
 
     private Reservation findReservationWithRoomAndHost(Long reservationId) {
         return reservationRepository.findReservationWithRoomAndHostById(reservationId)
+            .orElseThrow(ReservationNotFoundException::new);
+    }
+
+    private Reservation findReservationWithRoomAndHGuestAndGuest(Long reservationId) {
+        return reservationRepository.findReservationWithRoomAndHostAndGuestById(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 

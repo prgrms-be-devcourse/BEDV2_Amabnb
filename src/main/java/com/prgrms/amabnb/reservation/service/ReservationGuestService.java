@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
+import com.prgrms.amabnb.reservation.dto.request.PageReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
@@ -43,16 +44,32 @@ public class ReservationGuestService {
         return ReservationResponseForGuest.from(reservationRepository.save(reservation));
     }
 
-    public List<ReservationDateResponse> getReservationDates(Long roomId, ReservationDateRequest request) {
-        return reservationRepository.findReservationDates(roomId, request.getStartDate(), request.getEndDate());
-    }
-
     @Transactional
     public void cancel(Long userId, Long reservationId) {
         User guest = findUserById(userId);
         Reservation reservation = findReservationWithGuest(reservationId);
         validateGuest(guest, reservation);
         reservation.changeStatus(ReservationStatus.GUEST_CANCELED);
+    }
+
+    public List<ReservationDateResponse> getReservationDates(Long roomId, ReservationDateRequest request) {
+        return reservationRepository.findReservationDates(roomId, request.getStartDate(), request.getEndDate());
+    }
+
+    public ReservationResponseForGuest getReservation(Long userId, Long reservationId) {
+        User guest = findUserById(userId);
+        Reservation reservation = findReservationWithRoomAndHostAndGuest(reservationId);
+        validateGuest(guest, reservation);
+        return ReservationResponseForGuest.from(reservation);
+    }
+
+    public List<ReservationResponseForGuest> getReservations(Long userId, PageReservationRequest request) {
+        User guest = findUserById(userId);
+        return reservationRepository.findReservationByGuestAndStatus(request.getLastReservationId(),
+                request.getPageSize(), guest, request.getStatus())
+            .stream()
+            .map(ReservationResponseForGuest::from)
+            .toList();
     }
 
     private void validateReservation(Reservation reservation) {
@@ -75,7 +92,7 @@ public class ReservationGuestService {
     }
 
     private void validateAlreadyReservedRoom(Reservation reservation) {
-        if (reservationRepository.existReservation(reservation.getRoom(), reservation.getReservationDate())) {
+        if (reservationRepository.existReservationByRoom(reservation.getRoom(), reservation.getReservationDate())) {
             throw new AlreadyReservationRoomException();
         }
     }
@@ -104,6 +121,11 @@ public class ReservationGuestService {
 
     private Reservation findReservationWithGuest(Long reservationId) {
         return reservationRepository.findReservationWithGuestById(reservationId)
+            .orElseThrow(ReservationNotFoundException::new);
+    }
+
+    private Reservation findReservationWithRoomAndHostAndGuest(Long reservationId) {
+        return reservationRepository.findReservationWithRoomAndHostAndGuestById(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 
