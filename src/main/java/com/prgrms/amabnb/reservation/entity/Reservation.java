@@ -81,11 +81,11 @@ public class Reservation extends BaseEntity {
     }
 
     public boolean isNotHost(User user) {
-        return !getRoom().isHost(user);
+        return !this.room.isHost(user);
     }
 
     public boolean isNotGuest(User user) {
-        return !getGuest().isSame(user);
+        return !this.guest.isSame(user);
     }
 
     public boolean isNotValidatePrice() {

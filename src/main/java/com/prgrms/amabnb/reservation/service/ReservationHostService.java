@@ -25,7 +25,7 @@ public class ReservationHostService {
     @Transactional
     public ReservationInfoResponse approve(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoom(reservationId);
+        Reservation reservation = findReservationWithRoomAndHost(reservationId);
         validateHost(host, reservation);
         reservation.changeStatus(ReservationStatus.APPROVED);
         return ReservationInfoResponse.from(reservation);
@@ -34,7 +34,7 @@ public class ReservationHostService {
     @Transactional
     public void cancelByHost(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoom(reservationId);
+        Reservation reservation = findReservationWithRoomAndHost(reservationId);
         validateHost(host, reservation);
         reservation.changeStatus(ReservationStatus.HOST_CANCELED);
     }
@@ -50,8 +50,8 @@ public class ReservationHostService {
             .orElseThrow(UserNotFoundException::new);
     }
 
-    private Reservation findReservationWithRoom(Long reservationId) {
-        return reservationRepository.findReservationWithRoomById(reservationId)
+    private Reservation findReservationWithRoomAndHost(Long reservationId) {
+        return reservationRepository.findReservationWithRoomAndHostById(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 
