@@ -10,17 +10,17 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class ReservationResponseForGuest {
+public class ReservationResponseForHost {
 
     private ReservationInfoResponse reservation;
     private RoomInfoResponse room;
-    private UserInfoResponse host;
+    private UserInfoResponse guest;
 
-    public static ReservationResponseForGuest from(Reservation reservation) {
-        return new ReservationResponseForGuest(
+    public static ReservationResponseForHost from(Reservation reservation) {
+        return new ReservationResponseForHost(
             ReservationInfoResponse.from(reservation),
             RoomInfoResponse.from(reservation.getRoom()),
-            UserInfoResponse.from(reservation.getRoom().getHost())
+            UserInfoResponse.from(reservation.getGuest())
         );
     }
 
