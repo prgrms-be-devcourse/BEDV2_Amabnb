@@ -14,8 +14,6 @@ public interface ReservationRepositoryCustom {
 
     boolean existReservationByRoom(Room room, ReservationDate reservationDate);
 
-    boolean existReservationByGuest(User guest, ReservationDate reservationDate);
-
     List<ReservationDateResponse> findReservationDates(Long roomId, LocalDate startDate, LocalDate endDate);
 
     List<ReservationDto> findReservationsByGuestAndStatus(

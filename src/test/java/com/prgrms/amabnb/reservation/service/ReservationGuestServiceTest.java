@@ -23,7 +23,6 @@ import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
-import com.prgrms.amabnb.reservation.exception.AlreadyReservationUserException;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionException;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
@@ -120,21 +119,6 @@ class ReservationGuestServiceTest extends ApiTest {
         assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
             .isInstanceOf(AlreadyReservationRoomException.class)
             .hasMessage("해당 숙소가 이미 예약된 기간입니다.");
-    }
-
-    @DisplayName("예약 기간에 게스트가 이미 예약한 숙소가 있다면 예외를 발생한다.")
-    @Test
-    void create_reservation_already_reserved_guest() {
-        // given
-        reservationGuestService.createReservation(guestId, createReservationRequest(3, 30_000, roomId));
-        Long anotherRoomId = roomRepository.save(createRoom(host)).getId();
-        CreateReservationRequest request = createReservationRequest(3, 30_000, anotherRoomId);
-
-        // when
-        // then
-        assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
-            .isInstanceOf(AlreadyReservationUserException.class)
-            .hasMessage("귀하가 이미 숙소를 예약한 기간입니다.");
     }
 
     @DisplayName("숙소가 존재하지 않다면 예외를 발생한다.")

@@ -44,23 +44,6 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
     }
 
     @Override
-    public boolean existReservationByGuest(User guest, ReservationDate reservationDate) {
-        LocalDate checkIn = reservationDate.getCheckIn();
-        LocalDate checkOut = reservationDate.getCheckOut();
-
-        Integer fetchOne = queryFactory.selectOne()
-            .from(reservation)
-            .where(
-                eqGuest(guest)
-                    .and(notInCanceled())
-                    .and(betweenCheckIn(checkIn, checkOut).or(betweenCheckOut(checkIn, checkOut)))
-            )
-            .fetchFirst();
-
-        return fetchOne != null;
-    }
-
-    @Override
     public List<ReservationDateResponse> findReservationDates(
         Long roomId,
         LocalDate startDate,

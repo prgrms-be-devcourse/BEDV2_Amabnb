@@ -14,7 +14,6 @@ import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
-import com.prgrms.amabnb.reservation.exception.AlreadyReservationUserException;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotFoundException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionException;
@@ -81,7 +80,6 @@ public class ReservationGuestService {
         validateRoomPrice(reservation);
         validateMaxGuest(reservation);
         validateAlreadyReservedRoom(reservation);
-        validateAlreadyReservedGuest(reservation);
     }
 
     private void validateRoomPrice(Reservation reservation) {
@@ -99,12 +97,6 @@ public class ReservationGuestService {
     private void validateAlreadyReservedRoom(Reservation reservation) {
         if (reservationRepository.existReservationByRoom(reservation.getRoom(), reservation.getReservationDate())) {
             throw new AlreadyReservationRoomException();
-        }
-    }
-
-    private void validateAlreadyReservedGuest(Reservation reservation) {
-        if (reservationRepository.existReservationByGuest(reservation.getGuest(), reservation.getReservationDate())) {
-            throw new AlreadyReservationUserException();
         }
     }
 

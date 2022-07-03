@@ -180,27 +180,6 @@ class ReservationGuestApiTest extends ApiTest {
         );
     }
 
-    @DisplayName("예약 기간에 다른 예약을 한 유저는 예약할 수 없다. 400 - BAD REQUEST")
-    @Test
-    void create_reservation_already_reserved_user() throws Exception {
-        // given
-        String accessToken = 로그인_요청(createUserProfile());
-        예약_요청(accessToken, createReservationRequest(3, 300_000, roomId));
-
-        Long anotherRoomId = 숙소_등록(hostAccessToken, createRoomRequest("검은밤"));
-
-        // when
-        CreateReservationRequest invalidRequest = createReservationRequest(3, 300_000, anotherRoomId);
-        MockHttpServletResponse response = 예약_요청(accessToken, invalidRequest);
-
-        // then
-        ErrorResponse errorResponse = extractErrorResponse(response);
-        assertAll(
-            () -> assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value()),
-            () -> assertThat(errorResponse.getMessage()).isEqualTo("귀하가 이미 숙소를 예약한 기간입니다.")
-        );
-    }
-
     @DisplayName("존재하지 않는 숙소를 예약할 수 없다. 404 - NOT FOUND")
     @Test
     void create_reservation_room_not_found() throws Exception {
