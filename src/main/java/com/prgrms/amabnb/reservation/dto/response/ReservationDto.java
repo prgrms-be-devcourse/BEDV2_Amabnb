@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.reservation.repository;
+package com.prgrms.amabnb.reservation.dto.response;
 
 import java.time.LocalDate;
 

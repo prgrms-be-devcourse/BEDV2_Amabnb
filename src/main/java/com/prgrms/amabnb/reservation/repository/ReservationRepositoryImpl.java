@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDto;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.room.entity.Room;

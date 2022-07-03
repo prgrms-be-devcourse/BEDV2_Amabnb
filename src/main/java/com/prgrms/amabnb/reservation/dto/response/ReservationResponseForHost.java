@@ -1,7 +1,6 @@
 package com.prgrms.amabnb.reservation.dto.response;
 
 import com.prgrms.amabnb.reservation.entity.Reservation;
-import com.prgrms.amabnb.reservation.repository.ReservationDto;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 
 import lombok.AccessLevel;
@@ -15,14 +14,14 @@ import lombok.NoArgsConstructor;
 public class ReservationResponseForHost {
 
     private ReservationInfoResponse reservation;
-    private RoomInfoResponse room;
-    private UserInfoResponse guest;
+    private ReservationRoomInfoResponse room;
+    private ReservationUserInfoResponse guest;
 
     public static ReservationResponseForHost from(Reservation reservation) {
         return new ReservationResponseForHost(
             ReservationInfoResponse.from(reservation),
-            RoomInfoResponse.from(reservation.getRoom()),
-            UserInfoResponse.from(reservation.getGuest())
+            ReservationRoomInfoResponse.from(reservation.getRoom()),
+            ReservationUserInfoResponse.from(reservation.getGuest())
         );
     }
 
@@ -36,13 +35,13 @@ public class ReservationResponseForHost {
                 reservationDto.getTotalPrice(),
                 reservationDto.getReservationStatus()
             ),
-            new RoomInfoResponse(
+            new ReservationRoomInfoResponse(
                 reservationDto.getRoomId(),
                 reservationDto.getName(),
                 new RoomAddress(reservationDto.getZipcode(), reservationDto.getAddress(),
                     reservationDto.getDetailAddress())
             ),
-            new UserInfoResponse(
+            new ReservationUserInfoResponse(
                 reservationDto.getId(),
                 reservationDto.getName(),
                 reservationDto.getEmail())

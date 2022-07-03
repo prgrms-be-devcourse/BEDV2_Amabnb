@@ -22,6 +22,7 @@ import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDto;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.room.entity.Room;
