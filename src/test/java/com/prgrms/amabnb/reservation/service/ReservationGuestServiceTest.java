@@ -16,8 +16,8 @@ import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
-import com.prgrms.amabnb.reservation.dto.request.PageReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
+import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
@@ -239,7 +239,7 @@ class ReservationGuestServiceTest extends ApiTest {
             .getId();
         int pageSize = 10;
         ReservationStatus status = PENDING;
-        PageReservationRequest request = new PageReservationRequest(pageSize, status, lastReservationId);
+        SearchReservationsRequest request = new SearchReservationsRequest(pageSize, status, lastReservationId);
 
         // when
         List<ReservationResponseForGuest> reservations = reservationGuestService.getReservations(guestId, request);

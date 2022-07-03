@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.prgrms.amabnb.reservation.dto.request.PageReservationRequest;
+import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDto;
 import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForHost;
@@ -51,7 +51,7 @@ public class ReservationHostService {
         return ReservationResponseForHost.from(reservation);
     }
 
-    public List<ReservationResponseForHost> getReservations(Long userId, PageReservationRequest request) {
+    public List<ReservationResponseForHost> getReservations(Long userId, SearchReservationsRequest request) {
         User host = findUserById(userId);
         List<ReservationDto> reservations = reservationRepository.findReservationsByHostAndStatus(
             request.getLastReservationId(),

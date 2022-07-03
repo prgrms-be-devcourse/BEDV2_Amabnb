@@ -17,8 +17,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
-import com.prgrms.amabnb.reservation.dto.request.PageReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
+import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.service.ReservationGuestService;
@@ -62,7 +62,7 @@ public class ReservationGuestApi {
     @GetMapping("/guest/reservations")
     public ResponseEntity<ApiResponse<List<ReservationResponseForGuest>>> getReservations(
         @AuthenticationPrincipal JwtAuthentication user,
-        PageReservationRequest request
+        SearchReservationsRequest request
     ) {
         return ResponseEntity.ok(new ApiResponse<>(reservationGuestService.getReservations(user.id(), request)));
     }

@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prgrms.amabnb.common.model.ApiResponse;
-import com.prgrms.amabnb.reservation.dto.request.PageReservationRequest;
+import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForHost;
 import com.prgrms.amabnb.reservation.service.ReservationHostService;
@@ -36,7 +36,7 @@ public class ReservationHostApi {
     @GetMapping("/host/reservations")
     public ResponseEntity<ApiResponse<List<ReservationResponseForHost>>> getReservations(
         @AuthenticationPrincipal JwtAuthentication user,
-        PageReservationRequest request
+        SearchReservationsRequest request
     ) {
         return ResponseEntity.ok(new ApiResponse<>(reservationHostService.getReservations(user.id(), request)));
     }

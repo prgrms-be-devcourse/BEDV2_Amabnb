@@ -5,7 +5,7 @@ import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import lombok.Getter;
 
 @Getter
-public class PageReservationRequest {
+public class SearchReservationsRequest {
 
     private static final int DEFAULT_SIZE = 10;
     private static final int MIN_SIZE = 1;
@@ -15,7 +15,7 @@ public class PageReservationRequest {
     private ReservationStatus status;
     private Long lastReservationId;
 
-    public PageReservationRequest(int pageSize, ReservationStatus status, Long lastReservationId) {
+    public SearchReservationsRequest(int pageSize, ReservationStatus status, Long lastReservationId) {
         this.pageSize = checkSize(pageSize);
         this.status = status;
         this.lastReservationId = lastReservationId;
