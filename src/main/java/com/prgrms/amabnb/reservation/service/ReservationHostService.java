@@ -30,7 +30,7 @@ public class ReservationHostService {
     @Transactional
     public ReservationInfoResponse approve(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoomAndHost(reservationId);
+        Reservation reservation = findReservationWithRoomAndHostById(reservationId);
         validateHost(host, reservation);
         reservation.changeStatus(ReservationStatus.APPROVED);
         return ReservationInfoResponse.from(reservation);
@@ -39,14 +39,14 @@ public class ReservationHostService {
     @Transactional
     public void cancelByHost(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoomAndHost(reservationId);
+        Reservation reservation = findReservationWithRoomAndHostById(reservationId);
         validateHost(host, reservation);
         reservation.changeStatus(ReservationStatus.HOST_CANCELED);
     }
 
     public ReservationResponseForHost getReservation(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoomAndHGuestAndGuest(reservationId);
+        Reservation reservation = findReservationWithRoomAndHGuestAndGuestById(reservationId);
         validateHost(host, reservation);
         return ReservationResponseForHost.from(reservation);
     }
@@ -75,12 +75,12 @@ public class ReservationHostService {
             .orElseThrow(UserNotFoundException::new);
     }
 
-    private Reservation findReservationWithRoomAndHost(Long reservationId) {
+    private Reservation findReservationWithRoomAndHostById(Long reservationId) {
         return reservationRepository.findReservationWithRoomAndHostById(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 
-    private Reservation findReservationWithRoomAndHGuestAndGuest(Long reservationId) {
+    private Reservation findReservationWithRoomAndHGuestAndGuestById(Long reservationId) {
         return reservationRepository.findReservationWithRoomAndHostAndGuestById(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
