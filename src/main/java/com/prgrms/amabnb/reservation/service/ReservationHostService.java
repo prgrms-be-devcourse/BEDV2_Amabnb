@@ -12,6 +12,7 @@ import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.ReservationNotFoundException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionException;
+import com.prgrms.amabnb.reservation.repository.ReservationDto;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.exception.UserNotFoundException;
@@ -52,9 +53,13 @@ public class ReservationHostService {
 
     public List<ReservationResponseForHost> getReservations(Long userId, PageReservationRequest request) {
         User host = findUserById(userId);
-        return reservationRepository.findReservationByHostAndStatus(request.getLastReservationId(),
-                request.getPageSize(), host, request.getStatus())
-            .stream()
+        List<ReservationDto> reservations = reservationRepository.findReservationsByHostAndStatus(
+            request.getLastReservationId(),
+            request.getPageSize(),
+            host,
+            request.getStatus()
+        );
+        return reservations.stream()
             .map(ReservationResponseForHost::from)
             .toList();
     }

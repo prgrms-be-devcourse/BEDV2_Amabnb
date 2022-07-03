@@ -17,14 +17,14 @@ public interface ReservationRepositoryCustom {
 
     List<ReservationDateResponse> findReservationDates(Long roomId, LocalDate startDate, LocalDate endDate);
 
-    List<ReservationDto> findReservationByGuestAndStatus(
+    List<ReservationDto> findReservationsByGuestAndStatus(
         Long lastReservationId,
         int pageSize,
         User guest,
         ReservationStatus status
     );
 
-    List<ReservationDto> findReservationByHostAndStatus(
+    List<ReservationDto> findReservationsByHostAndStatus(
         Long lastReservationId,
         int pageSize,
         User host,

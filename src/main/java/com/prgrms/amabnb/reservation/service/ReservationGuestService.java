@@ -17,6 +17,7 @@ import com.prgrms.amabnb.reservation.exception.AlreadyReservationUserException;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotFoundException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionException;
+import com.prgrms.amabnb.reservation.repository.ReservationDto;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.exception.RoomNotFoundException;
@@ -65,9 +66,13 @@ public class ReservationGuestService {
 
     public List<ReservationResponseForGuest> getReservations(Long userId, PageReservationRequest request) {
         User guest = findUserById(userId);
-        return reservationRepository.findReservationByGuestAndStatus(request.getLastReservationId(),
-                request.getPageSize(), guest, request.getStatus())
-            .stream()
+        List<ReservationDto> reservations = reservationRepository.findReservationsByGuestAndStatus(
+            request.getLastReservationId(),
+            request.getPageSize(),
+            guest,
+            request.getStatus()
+        );
+        return reservations.stream()
             .map(ReservationResponseForGuest::from)
             .toList();
     }

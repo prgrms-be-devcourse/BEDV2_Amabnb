@@ -116,7 +116,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         int pageSize = 10;
 
         // when
-        List<ReservationDto> reservations = reservationRepository.findReservationByGuestAndStatus(
+        List<ReservationDto> reservations = reservationRepository.findReservationsByGuestAndStatus(
             lastReservationId, pageSize, guest, PENDING);
 
         // then
@@ -138,7 +138,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         int pageSize = 10;
 
         // when
-        List<ReservationDto> reservations = reservationRepository.findReservationByHostAndStatus(
+        List<ReservationDto> reservations = reservationRepository.findReservationsByHostAndStatus(
             lastReservationId, pageSize, host, null);
 
         // then

@@ -76,7 +76,7 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
     }
 
     @Override
-    public List<ReservationDto> findReservationByGuestAndStatus(
+    public List<ReservationDto> findReservationsByGuestAndStatus(
         Long lastReservationId,
         int pageSize,
         User guest,
@@ -95,7 +95,7 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
     }
 
     @Override
-    public List<ReservationDto> findReservationByHostAndStatus(
+    public List<ReservationDto> findReservationsByHostAndStatus(
         Long reservationId,
         int pageSize,
         User host,
