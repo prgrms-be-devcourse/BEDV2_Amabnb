@@ -6,9 +6,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
+import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
+import com.prgrms.amabnb.review.dto.response.EditedReviewResponse;
 import com.prgrms.amabnb.review.service.ReviewService;
 import com.prgrms.amabnb.security.jwt.JwtAuthentication;
 
@@ -28,5 +31,15 @@ public class ReviewApi {
     ) {
         var createdReviewId = reviewService.createReview(user.id(), reservationId, review);
         return ResponseEntity.created(URI.create("/reviews/" + createdReviewId)).build();
+    }
+
+    @PutMapping("/reviews/{reviewId}")
+    public ResponseEntity<EditedReviewResponse> createReview(
+        @AuthenticationPrincipal JwtAuthentication user,
+        @PathVariable Long reviewId,
+        EditReviewRequest editReviewDto
+    ) {
+        var editedReview = reviewService.editReview(user.id(), reviewId, editReviewDto);
+        return ResponseEntity.ok(editedReview);
     }
 }

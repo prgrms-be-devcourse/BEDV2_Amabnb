@@ -24,11 +24,14 @@ public class ReviewCacheService {
 
     @PostConstruct
     public void postConstruct() {
+        // userId로 찾아와서
         cache = reviewRepository.findAll().stream()
             .map(Review::getReservation)
             .map(Reservation::getId)
             .collect(Collectors.toSet());
     }
+    // 인스턴스가 여러개일때 Repository에서 가져온 값들이 다 달라진다. 새로운 데이터가 추가될 수 있어서 안맞을수있다
+    // 2시간주기로 refresh 해오면
 
     public boolean existReservation(Long reservationId) {
         return cache.contains(reservationId);
