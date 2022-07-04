@@ -27,7 +27,7 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public boolean existReservationByRoom(Room room, ReservationDate reservationDate) {
+    public boolean existReservationByRoom(Room room, Long reservationId, ReservationDate reservationDate) {
         LocalDate checkIn = reservationDate.getCheckIn();
         LocalDate checkOut = reservationDate.getCheckOut();
 
@@ -35,8 +35,9 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
             .from(reservation)
             .where(
                 eqRoom(room)
-                    .and(notInCanceled())
-                    .and(betweenCheckIn(checkIn, checkOut).or(betweenCheckOut(checkIn, checkOut)))
+                , notEqReservationId(reservationId)
+                , notInCanceled()
+                , betweenCheckIn(checkIn, checkOut).or(betweenCheckOut(checkIn, checkOut))
             )
             .fetchFirst();
 
@@ -160,6 +161,13 @@ public class ReservationRepositoryImpl implements ReservationRepositoryCustom {
         }
 
         return Expressions.asEnum(status).as(reservation.reservationStatus);
+    }
+
+    private BooleanExpression notEqReservationId(Long id) {
+        if (id == null) {
+            return null;
+        }
+        return reservation.id.ne(id);
     }
 
 }
