@@ -19,10 +19,14 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import com.prgrms.amabnb.common.vo.Email;
+import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
+import com.prgrms.amabnb.user.entity.User;
+import com.prgrms.amabnb.user.entity.UserRole;
 
 class CreateRoomRequestTest {
 
@@ -189,7 +193,7 @@ class CreateRoomRequestTest {
     @DisplayName("toRoom 테스트")
     void toRoomTest() {
         //then
-        assertThat(createRoomRequest.toRoom()).isInstanceOf(Room.class);
+        assertThat(createRoomRequest.toRoom(createUser())).isInstanceOf(Room.class);
     }
 
     @Test
@@ -203,5 +207,17 @@ class CreateRoomRequestTest {
         //then
         assertThat(roomImage.getImagePath()).isEqualTo("aaa");
         assertThat(roomImagesSize).isEqualTo(2);
+    }
+
+    private User createUser() {
+        return User.builder()
+            .oauthId("testOauthId")
+            .provider("testProvider")
+            .userRole(UserRole.GUEST)
+            .name("testUser")
+            .email(new Email("asdsadsad@gmail.com"))
+            .phoneNumber(new PhoneNumber("010-2312-1231"))
+            .profileImgUrl("urlurlrurlrurlurlurl")
+            .build();
     }
 }

@@ -8,23 +8,23 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class HostInfoResponse {
+public class ReservationUserInfoResponse {
 
-    private Long hostId;
+    private Long id;
     private String name;
     private String email;
 
-    public HostInfoResponse(Long hostId, String name, String email) {
-        this.hostId = hostId;
+    public ReservationUserInfoResponse(Long id, String name, String email) {
+        this.id = id;
         this.name = name;
         this.email = email;
     }
 
-    public static HostInfoResponse from(User host) {
-        return new HostInfoResponse(
-            host.getId(),
-            host.getName(),
-            host.getEmail().getValue()
+    public static ReservationUserInfoResponse from(User user) {
+        return new ReservationUserInfoResponse(
+            user.getId(),
+            user.getName(),
+            user.getEmail().getValue()
         );
     }
 

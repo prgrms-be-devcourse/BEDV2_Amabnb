@@ -1,5 +1,7 @@
 package com.prgrms.amabnb.reservation.repository;
 
+import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
+import static java.time.LocalDate.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -20,6 +22,7 @@ import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDto;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.room.entity.Room;
@@ -47,20 +50,21 @@ class ReservationRepositoryTest extends RepositoryTest {
 
     private User guest;
 
+    private User host;
+
     private static Stream<Arguments> provideReservationDate() {
         return Stream.of(
-            Arguments.of(LocalDate.now(), LocalDate.now().plusDays(3L), true),
-            Arguments.of(LocalDate.now().plusDays(5L), LocalDate.now().plusDays(10L), false),
-            Arguments.of(LocalDate.now().plusDays(5L), LocalDate.now().plusDays(10L), false)
+            Arguments.of(now(), now().plusDays(3L), true),
+            Arguments.of(now().plusDays(5L), now().plusDays(10L), false),
+            Arguments.of(now().plusDays(5L), now().plusDays(10L), false)
         );
     }
 
     @BeforeEach
     void setUp() {
         room = createRoom();
-        LocalDate now = LocalDate.now();
         guest = createGuest();
-        createReservation(guest, new ReservationDate(now, now.plusDays(5L)));
+        createReservation(guest, new ReservationDate(now(), now().plusDays(5L)));
     }
 
     @DisplayName("숙소가 해당 기간에 이미 예약이 되었는지 확인한다.")
@@ -71,7 +75,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         ReservationDate reservationDate = new ReservationDate(checkIn, checkOut);
 
         // when
-        boolean isExists = reservationRepository.existReservation(room, reservationDate);
+        boolean isExists = reservationRepository.existReservationByRoom(room, null, reservationDate);
 
         // then
         assertThat(isExists).isEqualTo(result);
@@ -81,7 +85,7 @@ class ReservationRepositoryTest extends RepositoryTest {
     @Test
     void findImpossibleReservationDate() {
         // given
-        LocalDate now = LocalDate.now();
+        LocalDate now = now();
         createReservation(guest, new ReservationDate(now.plusDays(10L), now.plusDays(15L)));
         createReservation(guest, new ReservationDate(now.plusMonths(1L).plusDays(3L), now.plusMonths(1L).plusDays(5L)));
         LocalDate endDate = now.plusMonths(1L);
@@ -101,6 +105,47 @@ class ReservationRepositoryTest extends RepositoryTest {
         );
     }
 
+    @DisplayName("게스트가 예약 정보들을 조회한다.")
+    @Test
+    void findReservationByGuestAndStatus() {
+        // give
+        for (int i = 0; i < 100; i++) {
+            reservationRepository.save(
+                createReservation(guest, new ReservationDate(now().plusDays(i), now().plusDays(i + 1))));
+        }
+        Long lastReservationId = null;
+        int pageSize = 10;
+
+        // when
+        List<ReservationDto> reservations = reservationRepository.findReservationsByGuestAndStatus(
+            lastReservationId, pageSize, guest, PENDING);
+
+        // then
+        assertAll(
+            () -> assertThat(reservations).hasSize(pageSize),
+            () -> assertThat(reservations).extracting("reservationStatus").containsOnly(PENDING)
+        );
+    }
+
+    @DisplayName("호스트가 예약 정보들을 조회한다.")
+    @Test
+    void findReservationByHostAndStatus() {
+        // give
+        for (int i = 0; i < 100; i++) {
+            reservationRepository.save(
+                createReservation(guest, new ReservationDate(now().plusDays(i), now().plusDays(i + 1))));
+        }
+        Long lastReservationId = null;
+        int pageSize = 10;
+
+        // when
+        List<ReservationDto> reservations = reservationRepository.findReservationsByHostAndStatus(
+            lastReservationId, pageSize, host, null);
+
+        // then
+        assertThat(reservations).hasSize(pageSize);
+    }
+
     private User createGuest() {
         User user = User.builder()
             .oauthId("testOauthId")
@@ -116,9 +161,19 @@ class ReservationRepositoryTest extends RepositoryTest {
     }
 
     private Room createRoom() {
+        host = User.builder()
+            .oauthId("testOauth")
+            .provider("testProvider")
+            .userRole(UserRole.GUEST)
+            .name("testUser")
+            .email(new Email("asdsadsasdad@gmail.com"))
+            .profileImgUrl("urlurlrurlrurlurlurl")
+            .build();
+        userRepository.save(host);
         Room room = Room.builder()
             .name("별이 빛나는 밤")
             .maxGuestNum(1)
+            .host(host)
             .description("방 설명 입니다")
             .address(new RoomAddress("00000", "창원", "의창구"))
             .price(new Money(10_000))
@@ -126,7 +181,7 @@ class ReservationRepositoryTest extends RepositoryTest {
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
             .build();
-
+        
         return roomRepository.save(room);
     }
 

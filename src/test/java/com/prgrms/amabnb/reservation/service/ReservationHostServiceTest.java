@@ -3,6 +3,9 @@ package com.prgrms.amabnb.reservation.service;
 import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static java.time.LocalDate.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.config.ApiTest;
+import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForHost;
 import com.prgrms.amabnb.reservation.entity.Reservation;
+import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionException;
 import com.prgrms.amabnb.reservation.exception.ReservationStatusException;
@@ -42,22 +48,16 @@ class ReservationHostServiceTest extends ApiTest {
     @Autowired
     private ReservationHostService reservationHostService;
 
-    private Long guestId;
-
-    private Long roomId;
-
-    private Long hostId;
-
+    private User guest;
+    private User host;
+    private Room room;
     private Long reservationId;
 
     @BeforeEach
     void setUp() {
-        User guest = createUser();
-        guestId = userRepository.save(guest).getId();
-        User host = createHost();
-        hostId = host.getId();
-        Room room = createRoom(host);
-        roomId = roomRepository.save(room).getId();
+        guest = userRepository.save(createGuest());
+        host = userRepository.save(createHost());
+        room = roomRepository.save(createRoom(host));
         reservationId = reservationRepository.save(createReservation(room, guest)).getId();
     }
 
@@ -66,7 +66,7 @@ class ReservationHostServiceTest extends ApiTest {
     void approve() {
         // given
         // when
-        ReservationInfoResponse response = reservationHostService.approve(hostId, reservationId);
+        ReservationInfoResponse response = reservationHostService.approve(host.getId(), reservationId);
 
         // then
         assertThat(response.getReservationStatus()).isEqualTo(APPROVED);
@@ -75,7 +75,7 @@ class ReservationHostServiceTest extends ApiTest {
     @DisplayName("해당하는 호스트의 예약이 아닐 경우 승인할 수 없다.")
     @Test
     void approve_is_not_host() {
-        assertThatThrownBy(() -> reservationHostService.approve(guestId, reservationId))
+        assertThatThrownBy(() -> reservationHostService.approve(guest.getId(), reservationId))
             .isInstanceOf(ReservationNotHavePermissionException.class)
             .hasMessage("해당 예약의 호스트가 아닙니다.");
     }
@@ -84,11 +84,11 @@ class ReservationHostServiceTest extends ApiTest {
     @Test
     void approve_status_not_modifiable() {
         // given
-        reservationHostService.approve(hostId, reservationId);
+        reservationHostService.approve(host.getId(), reservationId);
 
         // when
         // then
-        assertThatThrownBy(() -> reservationHostService.approve(hostId, reservationId))
+        assertThatThrownBy(() -> reservationHostService.approve(host.getId(), reservationId))
             .isInstanceOf(ReservationStatusException.class)
             .hasMessage("변경할 수 없는 예약입니다.");
     }
@@ -98,7 +98,7 @@ class ReservationHostServiceTest extends ApiTest {
     void cancelByHost() {
         // given
         // when
-        reservationHostService.cancelByHost(hostId, reservationId);
+        reservationHostService.cancelByHost(host.getId(), reservationId);
 
         // then
         Reservation findReservation = reservationRepository.findById(reservationId).get();
@@ -108,9 +108,45 @@ class ReservationHostServiceTest extends ApiTest {
     @DisplayName("해당하는 호스트의 예약이 아닐 경우 승인할 수 없다.")
     @Test
     void cancelByHost_is_not_host() {
-        assertThatThrownBy(() -> reservationHostService.cancelByHost(guestId, reservationId))
+        assertThatThrownBy(() -> reservationHostService.cancelByHost(guest.getId(), reservationId))
             .isInstanceOf(ReservationNotHavePermissionException.class)
             .hasMessage("해당 예약의 호스트가 아닙니다.");
+    }
+
+    @DisplayName("예약정보를 단건 조회한다.")
+    @Test
+    void getReservation() {
+        // given
+        // when
+        ReservationResponseForHost reservation = reservationHostService.getReservation(host.getId(), reservationId);
+
+        // then
+        assertThat(reservation.getReservation().getId()).isEqualTo(reservationId);
+    }
+
+    @DisplayName("예약 정보들을 조회한다.")
+    @Test
+    void getReservations() {
+        // given
+        for (int i = 1; i < 11; i++) {
+            reservationRepository.save(createReservationByDay(i));
+        }
+        Long lastReservationId = reservationRepository.save(createReservationByDay(12)).getId();
+        int pageSize = 10;
+        ReservationStatus status = PENDING;
+        SearchReservationsRequest request = new SearchReservationsRequest(pageSize, status, null);
+
+        // when
+        List<ReservationResponseForHost> reservations = reservationHostService.getReservations(host.getId(), request);
+
+        // then
+        assertAll(
+            () -> assertThat(reservations).hasSize(request.getPageSize()),
+            () -> assertThat(reservations.get(0).getReservation().getId()).isEqualTo(lastReservationId),
+            () -> assertThat(reservations).extracting("reservation")
+                .extracting("reservationStatus")
+                .containsOnly(status)
+        );
     }
 
     private Reservation createReservation(Room room, User guest) {
@@ -123,7 +159,17 @@ class ReservationHostServiceTest extends ApiTest {
             .build();
     }
 
-    private User createUser() {
+    private Reservation createReservationByDay(int day) {
+        return Reservation.builder()
+            .room(room)
+            .guest(guest)
+            .totalPrice(new Money(20_000))
+            .totalGuest(1)
+            .reservationDate(new ReservationDate(now().plusDays(day), now().plusDays(day + 1)))
+            .build();
+    }
+
+    private User createGuest() {
         return User.builder()
             .oauthId("1")
             .provider("kakao")
@@ -135,7 +181,7 @@ class ReservationHostServiceTest extends ApiTest {
     }
 
     private User createHost() {
-        User user = User.builder()
+        return User.builder()
             .oauthId("host")
             .provider("host")
             .userRole(UserRole.HOST)
@@ -143,8 +189,6 @@ class ReservationHostServiceTest extends ApiTest {
             .email(new Email("host@gmail.com"))
             .profileImgUrl("urlurlrurlrurlurlurl")
             .build();
-
-        return userRepository.save(user);
     }
 
     private Room createRoom(User host) {
@@ -157,9 +201,9 @@ class ReservationHostServiceTest extends ApiTest {
             .roomOption(new RoomOption(1, 1, 1))
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .host(host)
             .build();
 
-        room.setHost(host);
         return room;
     }
 
