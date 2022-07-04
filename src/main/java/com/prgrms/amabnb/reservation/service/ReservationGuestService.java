@@ -7,12 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
+import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationDto;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
-import com.prgrms.amabnb.reservation.exception.AlreadyReservationUserException;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotFoundException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionException;
@@ -43,23 +44,46 @@ public class ReservationGuestService {
         return ReservationResponseForGuest.from(reservationRepository.save(reservation));
     }
 
+    @Transactional
+    public void cancel(Long userId, Long reservationId) {
+        User guest = findUserById(userId);
+        Reservation reservation = findReservationByIdWithGuest(reservationId);
+        validateGuest(guest, reservation);
+        reservation.changeStatus(ReservationStatus.GUEST_CANCELED);
+    }
+
     public List<ReservationDateResponse> getReservationDates(Long roomId, ReservationDateRequest request) {
         return reservationRepository.findReservationDates(roomId, request.getStartDate(), request.getEndDate());
     }
 
-    @Transactional
-    public void cancel(Long userId, Long reservationId) {
+    public ReservationResponseForGuest getReservation(Long userId, Long reservationId) {
         User guest = findUserById(userId);
-        Reservation reservation = findReservationWithGuest(reservationId);
+        Reservation reservation = findReservationByIdWithRoomAndGuest(reservationId);
         validateGuest(guest, reservation);
-        reservation.changeStatus(ReservationStatus.GUEST_CANCELED);
+        return ReservationResponseForGuest.from(reservation);
+    }
+
+    public List<ReservationResponseForGuest> getReservations(Long userId, SearchReservationsRequest request) {
+        User guest = findUserById(userId);
+        List<ReservationDto> reservations = searchReservationPageByStatus(request, guest);
+        return reservations.stream()
+            .map(ReservationResponseForGuest::from)
+            .toList();
+    }
+
+    private List<ReservationDto> searchReservationPageByStatus(SearchReservationsRequest request, User guest) {
+        return reservationRepository.findReservationsByGuestAndStatus(
+            request.getLastReservationId(),
+            request.getPageSize(),
+            guest,
+            request.getStatus()
+        );
     }
 
     private void validateReservation(Reservation reservation) {
         validateRoomPrice(reservation);
         validateMaxGuest(reservation);
         validateAlreadyReservedRoom(reservation);
-        validateAlreadyReservedGuest(reservation);
     }
 
     private void validateRoomPrice(Reservation reservation) {
@@ -75,14 +99,8 @@ public class ReservationGuestService {
     }
 
     private void validateAlreadyReservedRoom(Reservation reservation) {
-        if (reservationRepository.existReservation(reservation.getRoom(), reservation.getReservationDate())) {
+        if (reservationRepository.existReservationByRoom(reservation.getRoom(), reservation.getReservationDate())) {
             throw new AlreadyReservationRoomException();
-        }
-    }
-
-    private void validateAlreadyReservedGuest(Reservation reservation) {
-        if (reservationRepository.existReservationByGuest(reservation.getGuest(), reservation.getReservationDate())) {
-            throw new AlreadyReservationUserException();
         }
     }
 
@@ -102,8 +120,13 @@ public class ReservationGuestService {
             .orElseThrow(UserNotFoundException::new);
     }
 
-    private Reservation findReservationWithGuest(Long reservationId) {
-        return reservationRepository.findReservationWithGuestById(reservationId)
+    private Reservation findReservationByIdWithGuest(Long reservationId) {
+        return reservationRepository.findReservationByIdWithGuest(reservationId)
+            .orElseThrow(ReservationNotFoundException::new);
+    }
+
+    private Reservation findReservationByIdWithRoomAndGuest(Long reservationId) {
+        return reservationRepository.findReservationByIdWithRoomAndGuest(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 

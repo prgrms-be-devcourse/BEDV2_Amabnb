@@ -132,7 +132,7 @@ public class Room extends BaseEntity {
     }
 
     public boolean isHost(User user) {
-        return getHost().isSame(user);
+        return this.host.isSame(user);
     }
 
     private void validateName(String name) {

@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
+import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.service.ReservationGuestService;
@@ -28,14 +29,14 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequiredArgsConstructor
 public class ReservationGuestApi {
-    private final ReservationGuestService reservationService;
+    private final ReservationGuestService reservationGuestService;
 
     @PostMapping("/reservations")
     public ResponseEntity<ApiResponse<ReservationResponseForGuest>> createReservation(
         @Valid @RequestBody CreateReservationRequest request,
         @AuthenticationPrincipal JwtAuthentication user
     ) {
-        ReservationResponseForGuest response = reservationService.createReservation(user.id(), request);
+        ReservationResponseForGuest response = reservationGuestService.createReservation(user.id(), request);
         URI uri = generateUri(response);
         return ResponseEntity
             .created(uri)
@@ -47,7 +48,23 @@ public class ReservationGuestApi {
         @PathVariable Long roomId,
         ReservationDateRequest request
     ) {
-        return ResponseEntity.ok(new ApiResponse<>(reservationService.getReservationDates(roomId, request)));
+        return ResponseEntity.ok(new ApiResponse<>(reservationGuestService.getReservationDates(roomId, request)));
+    }
+
+    @GetMapping("/guest/reservations/{reservationId}")
+    public ResponseEntity<ApiResponse<ReservationResponseForGuest>> getReservation(
+        @AuthenticationPrincipal JwtAuthentication user,
+        @PathVariable Long reservationId
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(reservationGuestService.getReservation(user.id(), reservationId)));
+    }
+
+    @GetMapping("/guest/reservations")
+    public ResponseEntity<ApiResponse<List<ReservationResponseForGuest>>> getReservations(
+        @AuthenticationPrincipal JwtAuthentication user,
+        SearchReservationsRequest request
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(reservationGuestService.getReservations(user.id(), request)));
     }
 
     @DeleteMapping("/guest/reservations/{reservationId}")
@@ -55,7 +72,7 @@ public class ReservationGuestApi {
         @AuthenticationPrincipal JwtAuthentication user,
         @PathVariable Long reservationId
     ) {
-        reservationService.cancel(user.id(), reservationId);
+        reservationGuestService.cancel(user.id(), reservationId);
 
         return ResponseEntity.noContent().build();
     }
