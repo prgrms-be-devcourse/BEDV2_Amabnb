@@ -191,7 +191,6 @@ class RoomApiTest extends ApiTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("호스트는 자신이 등록한 숙소를 수정할 수 있다.")
     void modifyTest() throws Exception {
         //given
@@ -210,14 +209,11 @@ class RoomApiTest extends ApiTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("Request 하나라도 값이 없다면 수정이 불가능하다")
     void name() throws Exception {
         //given
-        User user = createUser();
-        User savedUser = userRepository.save(user);
-        Long userId = savedUser.getId();
-        Long roomId = hostRoomService.createRoom(userId, createCreateRoomRequest());
+        String accessToken = 로그인_요청();
+        Long roomId = saveRoom(accessToken);
 
         ModifyRoomRequest modifyRequest = ModifyRoomRequest.builder()
             .bedCnt(11)
@@ -229,6 +225,7 @@ class RoomApiTest extends ApiTest {
             .build();
         //when
         mockMvc.perform(put("/host/rooms/" + roomId)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(modifyRequest)))
             .andExpect(status().isBadRequest());
