@@ -250,9 +250,9 @@ class ReservationGuestServiceTest extends ApiTest {
             .roomOption(new RoomOption(1, 1, 1))
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .host(host)
             .build();
 
-        room.setHost(host);
         return room;
     }
 

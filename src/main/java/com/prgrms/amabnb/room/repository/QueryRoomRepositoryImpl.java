@@ -5,6 +5,7 @@ import static com.prgrms.amabnb.room.entity.QRoomImage.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -44,6 +45,40 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
             .orderBy(room.id.desc())
             .fetch();
 
+    }
+
+    @Override
+    public List<Room> findRoomsByHostId(Long userId) {
+        return jpaQueryFactory.selectFrom(room)
+            .leftJoin(room.roomImages, roomImage)
+            .fetchJoin()
+            .where(room.host.id.eq(userId))
+            .fetch();
+    }
+
+    @Override
+    public Optional<Room> findRoomByIdAndHostId(Long roomId, Long hostId) {
+        return Optional.ofNullable(jpaQueryFactory
+            .selectFrom(room)
+            .leftJoin(room.roomImages, roomImage)
+            .fetchJoin()
+            .where(
+                room.id.eq(roomId),
+                room.host.id.eq(hostId)
+            )
+            .fetchOne());
+    }
+
+    @Override
+    public Optional<Room> findRoomById(Long roomId) {
+        return Optional.ofNullable(jpaQueryFactory
+            .selectFrom(room)
+            .leftJoin(room.roomImages, roomImage)
+            .fetchJoin()
+            .where(
+                room.id.eq(roomId)
+            )
+            .fetchOne());
     }
 
     private BooleanExpression roomScopesEq(List<RoomScope> roomScopes) {

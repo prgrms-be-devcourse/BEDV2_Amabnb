@@ -5,6 +5,7 @@ import java.util.List;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
@@ -18,6 +19,7 @@ public class SearchRoomFilterCondition {
     private List<RoomType> roomTypes;
     private List<RoomScope> roomScopes;
 
+    @Builder
     public SearchRoomFilterCondition(Integer minBeds, Integer minBedrooms, Integer minBathrooms, Integer minPrice,
         Integer maxPrice, List<RoomType> roomTypes, List<RoomScope> roomScopes) {
         this.minBeds = minBeds;

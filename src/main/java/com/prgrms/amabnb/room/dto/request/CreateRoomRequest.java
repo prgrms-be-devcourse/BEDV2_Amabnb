@@ -16,6 +16,7 @@ import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
+import com.prgrms.amabnb.user.entity.User;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -85,8 +86,8 @@ public class CreateRoomRequest {
         this.imagePaths = imagePaths;
     }
 
-    public Room toRoom() {
-        return Room.builder()
+    public Room toRoom(User host) {
+        Room room = Room.builder()
             .name(name)
             .price(new Money(price))
             .description(description)
@@ -95,7 +96,10 @@ public class CreateRoomRequest {
             .roomOption(new RoomOption(bedCnt, bedRoomCnt, bathRoomCnt))
             .roomType(roomType)
             .roomScope(roomScope)
+            .host(host)
+            .roomImages(toRoomImages())
             .build();
+        return room;
     }
 
     public List<RoomImage> toRoomImages() {

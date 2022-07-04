@@ -83,7 +83,8 @@ public class Room extends BaseEntity {
 
     @Builder
     public Room(Long id, String name, Money price, String description, int maxGuestNum,
-        RoomAddress address, RoomOption roomOption, RoomType roomType, RoomScope roomScope) {
+        RoomAddress address, RoomOption roomOption, RoomType roomType, RoomScope roomScope,
+        User host, List<RoomImage> roomImages) {
         validateRoom(name, price, maxGuestNum, description, address, roomOption, roomType, roomScope);
         this.id = id;
         this.name = name;
@@ -94,6 +95,8 @@ public class Room extends BaseEntity {
         this.roomOption = roomOption;
         this.roomType = roomType;
         this.roomScope = roomScope;
+        this.host = host;
+        this.roomImages = roomImages;
     }
 
     public void addRoomImages(List<RoomImage> roomImages) {
@@ -106,10 +109,6 @@ public class Room extends BaseEntity {
         }
 
         this.getRoomImages().add(roomImage);
-    }
-
-    public void setHost(User user) {
-        this.host = user;
     }
 
     public boolean isValidatePrice(Money totalPrice, int period) {
@@ -184,4 +183,36 @@ public class Room extends BaseEntity {
         }
     }
 
+    public void changeName(String name) {
+        if (!this.name.equals(name)) {
+            validateName(name);
+            this.name = name;
+        }
+    }
+
+    public void changePrice(Money price) {
+        if (!this.price.equals(price)) {
+            this.price = price;
+        }
+    }
+
+    public void changeDescription(String description) {
+        if (!this.description.equals(description)) {
+            validateDescription(description);
+            this.description = description;
+        }
+    }
+
+    public void changeMaxGuestNum(int maxGuestNum) {
+        if (this.maxGuestNum != maxGuestNum) {
+            validateMaxGuestNum(maxGuestNum);
+            this.maxGuestNum = maxGuestNum;
+        }
+    }
+
+    public void changeRoomOption(RoomOption roomOption) {
+        if (!this.roomOption.equals(roomOption)) {
+            this.roomOption = roomOption;
+        }
+    }
 }
