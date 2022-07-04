@@ -6,10 +6,13 @@ import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -92,6 +95,7 @@ class ReviewServiceTest {
         Reservation givenReservation = createReservation(givenGuest, createRoom(givenHost));
 
         @Test
+        @DisplayName("리뷰를 작성한다")
         void createUserReview() {
             givenReservation.changeStatus(ReservationStatus.COMPLETED);
             var givenReservationDto = ReservationReviewResponse.from(givenReservation);
@@ -108,10 +112,6 @@ class ReviewServiceTest {
             then(reviewRepository).should(times(1)).save(any(Review.class));
             assertThat(result).isEqualTo(givenReview.getId());
         }
-
-
-
-
     }
 
 }
