@@ -6,4 +6,5 @@ import com.prgrms.amabnb.review.entity.Review;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
+    boolean existsByReservationId(Long reservationId);
 }
