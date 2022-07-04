@@ -17,8 +17,10 @@ import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
+import com.prgrms.amabnb.reservation.dto.request.ReservationUpdateRequest;
 import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
+import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
@@ -52,27 +54,27 @@ class ReservationGuestServiceTest extends ApiTest {
     @Autowired
     private ReservationGuestService reservationGuestService;
 
-    private Long guestId;
+    private User guest;
 
-    private Long roomId;
+    private Room room;
 
     private User host;
 
     @BeforeEach
     void setUp() {
-        guestId = userRepository.save(createUser()).getId();
+        guest = userRepository.save(createUser());
         host = createHost();
-        roomId = roomRepository.save(createRoom(host)).getId();
+        room = roomRepository.save(createRoom(host));
     }
 
     @DisplayName("예약을 생성한다.")
     @Test
     void create_reservation() {
         // given
-        CreateReservationRequest request = createReservationRequest(3, 30_000, roomId);
+        CreateReservationRequest request = createReservationRequest(3, 30_000, room.getId());
 
         // when
-        ReservationResponseForGuest response = reservationGuestService.createReservation(guestId, request);
+        ReservationResponseForGuest response = reservationGuestService.createReservation(guest.getId(), request);
 
         // then
         assertAll(
@@ -85,11 +87,11 @@ class ReservationGuestServiceTest extends ApiTest {
     @Test
     void create_reservation_invalid_price() {
         // given
-        CreateReservationRequest request = createReservationRequest(3, 40_000, roomId);
+        CreateReservationRequest request = createReservationRequest(3, 40_000, room.getId());
 
         // when
         // then
-        assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
+        assertThatThrownBy(() -> reservationGuestService.createReservation(guest.getId(), request))
             .isInstanceOf(ReservationInvalidValueException.class)
             .hasMessage("숙소 가격이 일치하지 않습니다.");
     }
@@ -98,11 +100,11 @@ class ReservationGuestServiceTest extends ApiTest {
     @Test
     void create_reservation_over_max_guest() {
         // given
-        CreateReservationRequest request = createReservationRequest(20, 30_000, roomId);
+        CreateReservationRequest request = createReservationRequest(20, 30_000, room.getId());
 
         // when
         // then
-        assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
+        assertThatThrownBy(() -> reservationGuestService.createReservation(guest.getId(), request))
             .isInstanceOf(ReservationInvalidValueException.class)
             .hasMessage("숙소의 최대 인원을 넘을 수 없습니다.");
     }
@@ -111,12 +113,12 @@ class ReservationGuestServiceTest extends ApiTest {
     @Test
     void create_reservation_already_reserved_room() {
         // given
-        CreateReservationRequest request = createReservationRequest(3, 30_000, roomId);
-        reservationGuestService.createReservation(guestId, request);
+        CreateReservationRequest request = createReservationRequest(3, 30_000, room.getId());
+        reservationGuestService.createReservation(guest.getId(), request);
 
         // when
         // then
-        assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
+        assertThatThrownBy(() -> reservationGuestService.createReservation(guest.getId(), request))
             .isInstanceOf(AlreadyReservationRoomException.class)
             .hasMessage("해당 숙소가 이미 예약된 기간입니다.");
     }
@@ -129,7 +131,7 @@ class ReservationGuestServiceTest extends ApiTest {
 
         // when
         // then
-        assertThatThrownBy(() -> reservationGuestService.createReservation(guestId, request))
+        assertThatThrownBy(() -> reservationGuestService.createReservation(guest.getId(), request))
             .isInstanceOf(RoomNotFoundException.class)
             .hasMessage("존재하지 않는 숙소입니다");
     }
@@ -138,7 +140,7 @@ class ReservationGuestServiceTest extends ApiTest {
     @Test
     void create_reservation_not_found_guest() {
         // given
-        CreateReservationRequest request = createReservationRequest(3, 30_000, roomId);
+        CreateReservationRequest request = createReservationRequest(3, 30_000, room.getId());
 
         // when
         // then
@@ -147,15 +149,36 @@ class ReservationGuestServiceTest extends ApiTest {
             .hasMessage("존재하지 않는 유저입니다");
     }
 
+    @DisplayName("게스트가 예약을 수정한다.")
+    @Test
+    void modify() {
+        // given
+        CreateReservationRequest request = createReservationRequest(3, 30_000, room.getId());
+        Long reservationId = reservationGuestService.createReservation(guest.getId(), request).getReservation().getId();
+        ReservationUpdateRequest updateRequest = new ReservationUpdateRequest(now().plusDays(5L), 5, 20_000);
+
+        // when
+        ReservationInfoResponse reservation = reservationGuestService.modify(guest.getId(), reservationId,
+            updateRequest).getReservation();
+
+        // then
+        assertAll(
+            () -> assertThat(reservation.getTotalPrice()).isEqualTo(50_000),
+            () -> assertThat(reservation.getTotalGuest()).isEqualTo(5),
+            () -> assertThat(reservation.getCheckOut()).isEqualTo(now().plusDays(5L))
+        );
+    }
+
     @DisplayName("예약 불가능한 날짜를 조회한다.")
     @Test
     void getImpossibleReservationDates() {
         // given
-        reservationGuestService.createReservation(guestId, createReservationRequest(3, 30_000, roomId));
+        reservationGuestService.createReservation(guest.getId(), createReservationRequest(3, 30_000, room.getId()));
         ReservationDateRequest request = new ReservationDateRequest(now(), now().plusMonths(1L));
 
         // when
-        List<ReservationDateResponse> reservationDates = reservationGuestService.getReservationDates(roomId, request);
+        List<ReservationDateResponse> reservationDates = reservationGuestService.getReservationDates(room.getId(),
+            request);
 
         // then
         assertAll(
@@ -169,12 +192,12 @@ class ReservationGuestServiceTest extends ApiTest {
     @Test
     void cancelByGuest() {
         // given
-        Long reservationId = reservationGuestService.createReservation(guestId, createReservationByDay(11))
+        Long reservationId = reservationGuestService.createReservation(guest.getId(), createReservationByDay(11))
             .getReservation()
             .getId();
 
         // when
-        reservationGuestService.cancel(guestId, reservationId);
+        reservationGuestService.cancel(guest.getId(), reservationId);
 
         // then
         Reservation findReservation = reservationRepository.findById(reservationId).get();
@@ -185,7 +208,7 @@ class ReservationGuestServiceTest extends ApiTest {
     @Test
     void cancelByGuest_is_not_guest() {
         // given
-        Long reservationId = reservationGuestService.createReservation(guestId, createReservationByDay(11))
+        Long reservationId = reservationGuestService.createReservation(guest.getId(), createReservationByDay(11))
             .getReservation()
             .getId();
 
@@ -200,12 +223,12 @@ class ReservationGuestServiceTest extends ApiTest {
     @Test
     void getReservation() {
         // given
-        Long reservationId = reservationGuestService.createReservation(guestId, createReservationByDay(11))
+        Long reservationId = reservationGuestService.createReservation(guest.getId(), createReservationByDay(11))
             .getReservation()
             .getId();
 
         // when
-        ReservationResponseForGuest reservation = reservationGuestService.getReservation(guestId, reservationId);
+        ReservationResponseForGuest reservation = reservationGuestService.getReservation(guest.getId(), reservationId);
 
         // then
         assertThat(reservation.getReservation().getId()).isEqualTo(reservationId);
@@ -216,9 +239,9 @@ class ReservationGuestServiceTest extends ApiTest {
     void getReservations() {
         // given
         for (int i = 0; i < 10; i++) {
-            reservationGuestService.createReservation(guestId, createReservationByDay(i));
+            reservationGuestService.createReservation(guest.getId(), createReservationByDay(i));
         }
-        Long lastReservationId = reservationGuestService.createReservation(guestId, createReservationByDay(11))
+        Long lastReservationId = reservationGuestService.createReservation(guest.getId(), createReservationByDay(11))
             .getReservation()
             .getId();
         int pageSize = 10;
@@ -226,7 +249,8 @@ class ReservationGuestServiceTest extends ApiTest {
         SearchReservationsRequest request = new SearchReservationsRequest(pageSize, status, lastReservationId);
 
         // when
-        List<ReservationResponseForGuest> reservations = reservationGuestService.getReservations(guestId, request);
+        List<ReservationResponseForGuest> reservations = reservationGuestService.getReservations(guest.getId(),
+            request);
 
         // then
         assertAll(
@@ -294,7 +318,7 @@ class ReservationGuestServiceTest extends ApiTest {
             .checkOut(now().plusDays(day + 1))
             .totalGuest(3)
             .totalPrice(10_000)
-            .roomId(roomId)
+            .roomId(room.getId())
             .build();
     }
 
