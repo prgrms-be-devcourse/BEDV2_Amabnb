@@ -41,8 +41,6 @@ class ReviewServiceTest {
     private ReviewRepository reviewRepository;
     @Mock
     private ReservationGuestService reservationGuestService;
-    @Mock
-    private ReviewCacheService reviewCacheService;
 
     static class Fixture {
         public static User createUser(String name) {
@@ -101,15 +99,19 @@ class ReviewServiceTest {
             var givenRequestDto = new CreateReviewRequest("content", 2);
             when(reservationGuestService.findById(anyLong())).thenReturn(givenReservationDto);
             when(reviewRepository.save(any(Review.class))).thenReturn(givenReview);
-            when(reviewCacheService.existReservation(anyLong())).thenReturn(false);
+            when(reviewRepository.existsByReservationId(anyLong())).thenReturn(false);
 
             var result = reviewService.createReview(givenGuest.getId(), givenReservation.getId(), givenRequestDto);
 
+            then(reservationGuestService).should(times(1)).findById(anyLong());
+            then(reviewRepository).should(times(1)).existsByReservationId(anyLong());
             then(reviewRepository).should(times(1)).save(any(Review.class));
-            then(reviewCacheService).should(times(1)).existReservation(anyLong());
-            then(reviewCacheService).should(times(1)).addReview(anyLong());
             assertThat(result).isEqualTo(givenReview.getId());
         }
+
+
+
+
     }
 
 }

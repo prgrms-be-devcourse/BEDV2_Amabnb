@@ -33,13 +33,4 @@ public class ReviewApi {
         return ResponseEntity.created(URI.create("/reviews/" + createdReviewId)).build();
     }
 
-    @PutMapping("/reviews/{reviewId}")
-    public ResponseEntity<EditedReviewResponse> createReview(
-        @AuthenticationPrincipal JwtAuthentication user,
-        @PathVariable Long reviewId,
-        EditReviewRequest editReviewDto
-    ) {
-        var editedReview = reviewService.editReview(user.id(), reviewId, editReviewDto);
-        return ResponseEntity.ok(editedReview);
-    }
 }
