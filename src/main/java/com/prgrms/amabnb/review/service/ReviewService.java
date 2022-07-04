@@ -61,8 +61,8 @@ public class ReviewService {
         }
     }
 
-    private void validateUserPermission(Long expectedUserId, Long userId) {
-        if (!userId.equals(expectedUserId)) {
+    private void validateUserPermission(Long guestId, Long userId) {
+        if (!userId.equals(guestId)) {
             throw new ReviewNoPermissionException();
         }
     }
