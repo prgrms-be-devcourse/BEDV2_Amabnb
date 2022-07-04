@@ -5,8 +5,10 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
+import com.prgrms.amabnb.reservation.dto.request.ReservationUpdateRequest;
 import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDto;
@@ -43,6 +45,16 @@ public class ReservationGuestService {
         Reservation reservation = request.toEntity(room, guest);
         validateReservation(reservation);
         return ReservationResponseForGuest.from(reservationRepository.save(reservation));
+    }
+
+    @Transactional
+    public ReservationResponseForGuest modify(Long userId, Long reservationId, ReservationUpdateRequest request) {
+        User guest = findUserById(userId);
+        Reservation reservation = findReservationByIdWithRoomAndGuest(reservationId);
+        validateGuest(guest, reservation);
+        reservation.modify(request.getCheckOut(), request.getTotalGuest(), new Money(request.getPaymentPrice()));
+        validateReservation(reservation);
+        return ReservationResponseForGuest.from(reservation);
     }
 
     @Transactional
@@ -106,7 +118,7 @@ public class ReservationGuestService {
     }
 
     private void validateAlreadyReservedRoom(Reservation reservation) {
-        if (reservationRepository.existReservationByRoom(reservation.getRoom(), reservation.getReservationDate())) {
+        if (isAlreadyReservedRoom(reservation)) {
             throw new AlreadyReservationRoomException();
         }
     }
@@ -135,6 +147,14 @@ public class ReservationGuestService {
     private Reservation findReservationByIdWithRoomAndGuest(Long reservationId) {
         return reservationRepository.findReservationByIdWithRoomAndGuest(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
+    }
+
+    private boolean isAlreadyReservedRoom(Reservation reservation) {
+        return reservationRepository.existReservationByRoom(
+            reservation.getRoom(),
+            reservation.getId(),
+            reservation.getReservationDate()
+        );
     }
 
 }

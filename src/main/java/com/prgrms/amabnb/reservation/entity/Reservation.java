@@ -1,5 +1,7 @@
 package com.prgrms.amabnb.reservation.entity;
 
+import java.time.LocalDate;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -78,6 +80,15 @@ public class Reservation extends BaseEntity {
         this.id = id;
     }
 
+    public void modify(LocalDate checkOut, int totalGuest, Money payment) {
+        if (isNotModifiable()) {
+            throw new ReservationStatusException();
+        }
+        this.reservationDate = this.reservationDate.changeCheckOut(checkOut);
+        this.totalGuest = totalGuest;
+        this.totalPrice = this.totalPrice.add(payment);
+    }
+
     public boolean isNotHost(User user) {
         return !this.room.isHost(user);
     }
@@ -87,11 +98,11 @@ public class Reservation extends BaseEntity {
     }
 
     public boolean isNotValidatePrice() {
-        return !getRoom().isValidatePrice(totalPrice, reservationDate.getPeriod());
+        return !this.room.isValidatePrice(totalPrice, reservationDate.getPeriod());
     }
 
     public boolean isOverMaxGuest() {
-        return room.isOverMaxGuestNum(totalGuest);
+        return this.room.isOverMaxGuestNum(totalGuest);
     }
 
     public void changeStatus(ReservationStatus status) {
@@ -105,7 +116,7 @@ public class Reservation extends BaseEntity {
         return this.reservationStatus != ReservationStatus.PENDING;
     }
 
-    public void setReservationDate(ReservationDate reservationDate) {
+    private void setReservationDate(ReservationDate reservationDate) {
         if (reservationDate == null) {
             throw new ReservationInvalidValueException("예약 날짜는 비어있을 수 없습니다.");
         }

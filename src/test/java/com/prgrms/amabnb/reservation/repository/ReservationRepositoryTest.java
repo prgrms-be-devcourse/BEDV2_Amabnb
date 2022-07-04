@@ -1,5 +1,22 @@
 package com.prgrms.amabnb.reservation.repository;
 
+import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
+import static java.time.LocalDate.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.common.vo.PhoneNumber;
@@ -17,23 +34,6 @@ import com.prgrms.amabnb.room.repository.RoomRepository;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;
 import com.prgrms.amabnb.user.repository.UserRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Stream;
-
-import static com.prgrms.amabnb.reservation.entity.ReservationStatus.PENDING;
-import static java.time.LocalDate.now;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.assertAll;
 
 class ReservationRepositoryTest extends RepositoryTest {
 
@@ -54,9 +54,9 @@ class ReservationRepositoryTest extends RepositoryTest {
 
     private static Stream<Arguments> provideReservationDate() {
         return Stream.of(
-                Arguments.of(now(), now().plusDays(3L), true),
-                Arguments.of(now().plusDays(5L), now().plusDays(10L), false),
-                Arguments.of(now().plusDays(5L), now().plusDays(10L), false)
+            Arguments.of(now(), now().plusDays(3L), true),
+            Arguments.of(now().plusDays(5L), now().plusDays(10L), false),
+            Arguments.of(now().plusDays(5L), now().plusDays(10L), false)
         );
     }
 
@@ -75,7 +75,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         ReservationDate reservationDate = new ReservationDate(checkIn, checkOut);
 
         // when
-        boolean isExists = reservationRepository.existReservationByRoom(room, reservationDate);
+        boolean isExists = reservationRepository.existReservationByRoom(room, null, reservationDate);
 
         // then
         assertThat(isExists).isEqualTo(result);
@@ -92,16 +92,16 @@ class ReservationRepositoryTest extends RepositoryTest {
 
         // when
         List<ReservationDateResponse> result = reservationRepository.findReservationDates(room.getId(),
-                now, endDate);
+            now, endDate);
 
         // then
         assertAll(
-                () -> assertThat(result).hasSize(2),
-                () -> assertThat(result).extracting("checkIn", "checkOut")
-                        .containsExactly(
-                                tuple(now, now.plusDays(4L)),
-                                tuple(now.plusDays(10L), now.plusDays(14L))
-                        )
+            () -> assertThat(result).hasSize(2),
+            () -> assertThat(result).extracting("checkIn", "checkOut")
+                .containsExactly(
+                    tuple(now, now.plusDays(4L)),
+                    tuple(now.plusDays(10L), now.plusDays(14L))
+                )
         );
     }
 
@@ -111,19 +111,19 @@ class ReservationRepositoryTest extends RepositoryTest {
         // give
         for (int i = 0; i < 100; i++) {
             reservationRepository.save(
-                    createReservation(guest, new ReservationDate(now().plusDays(i), now().plusDays(i + 1))));
+                createReservation(guest, new ReservationDate(now().plusDays(i), now().plusDays(i + 1))));
         }
         Long lastReservationId = null;
         int pageSize = 10;
 
         // when
         List<ReservationDto> reservations = reservationRepository.findReservationsByGuestAndStatus(
-                lastReservationId, pageSize, guest, PENDING);
+            lastReservationId, pageSize, guest, PENDING);
 
         // then
         assertAll(
-                () -> assertThat(reservations).hasSize(pageSize),
-                () -> assertThat(reservations).extracting("reservationStatus").containsOnly(PENDING)
+            () -> assertThat(reservations).hasSize(pageSize),
+            () -> assertThat(reservations).extracting("reservationStatus").containsOnly(PENDING)
         );
     }
 
@@ -133,14 +133,14 @@ class ReservationRepositoryTest extends RepositoryTest {
         // give
         for (int i = 0; i < 100; i++) {
             reservationRepository.save(
-                    createReservation(guest, new ReservationDate(now().plusDays(i), now().plusDays(i + 1))));
+                createReservation(guest, new ReservationDate(now().plusDays(i), now().plusDays(i + 1))));
         }
         Long lastReservationId = null;
         int pageSize = 10;
 
         // when
         List<ReservationDto> reservations = reservationRepository.findReservationsByHostAndStatus(
-                lastReservationId, pageSize, host, null);
+            lastReservationId, pageSize, host, null);
 
         // then
         assertThat(reservations).hasSize(pageSize);
@@ -148,51 +148,51 @@ class ReservationRepositoryTest extends RepositoryTest {
 
     private User createGuest() {
         User user = User.builder()
-                .oauthId("testOauthId")
-                .provider("testProvider")
-                .userRole(UserRole.GUEST)
-                .name("testUser")
-                .email(new Email("asdsadsad@gmail.com"))
-                .phoneNumber(new PhoneNumber("010-2312-1231"))
-                .profileImgUrl("urlurlrurlrurlurlurl")
-                .build();
+            .oauthId("testOauthId")
+            .provider("testProvider")
+            .userRole(UserRole.GUEST)
+            .name("testUser")
+            .email(new Email("asdsadsad@gmail.com"))
+            .phoneNumber(new PhoneNumber("010-2312-1231"))
+            .profileImgUrl("urlurlrurlrurlurlurl")
+            .build();
 
         return userRepository.save(user);
     }
 
     private Room createRoom() {
         host = User.builder()
-                .oauthId("testOauth")
-                .provider("testProvider")
-                .userRole(UserRole.GUEST)
-                .name("testUser")
-                .email(new Email("asdsadsasdad@gmail.com"))
-                .profileImgUrl("urlurlrurlrurlurlurl")
-                .build();
+            .oauthId("testOauth")
+            .provider("testProvider")
+            .userRole(UserRole.GUEST)
+            .name("testUser")
+            .email(new Email("asdsadsasdad@gmail.com"))
+            .profileImgUrl("urlurlrurlrurlurlurl")
+            .build();
         userRepository.save(host);
         Room room = Room.builder()
-                .name("별이 빛나는 밤")
-                .maxGuestNum(1)
-                .host(host)
-                .description("방 설명 입니다")
-                .address(new RoomAddress("00000", "창원", "의창구"))
-                .price(new Money(10_000))
-                .roomOption(new RoomOption(1, 1, 1))
-                .roomType(RoomType.APARTMENT)
-                .roomScope(RoomScope.PRIVATE)
-                .build();
+            .name("별이 빛나는 밤")
+            .maxGuestNum(1)
+            .host(host)
+            .description("방 설명 입니다")
+            .address(new RoomAddress("00000", "창원", "의창구"))
+            .price(new Money(10_000))
+            .roomOption(new RoomOption(1, 1, 1))
+            .roomType(RoomType.APARTMENT)
+            .roomScope(RoomScope.PRIVATE)
+            .build();
 
         return roomRepository.save(room);
     }
 
     private Reservation createReservation(User guest, ReservationDate reservationDate) {
         Reservation reservation = Reservation.builder()
-                .reservationDate(reservationDate)
-                .totalGuest(3)
-                .totalPrice(new Money(100_000))
-                .room(room)
-                .guest(guest)
-                .build();
+            .reservationDate(reservationDate)
+            .totalGuest(3)
+            .totalPrice(new Money(100_000))
+            .room(room)
+            .guest(guest)
+            .build();
 
         return reservationRepository.save(reservation);
     }

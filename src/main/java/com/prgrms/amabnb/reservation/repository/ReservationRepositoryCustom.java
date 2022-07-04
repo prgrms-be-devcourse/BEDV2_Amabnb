@@ -12,7 +12,7 @@ import com.prgrms.amabnb.user.entity.User;
 
 public interface ReservationRepositoryCustom {
 
-    boolean existReservationByRoom(Room room, ReservationDate reservationDate);
+    boolean existReservationByRoom(Room room, Long reservationId, ReservationDate reservationDate);
 
     List<ReservationDateResponse> findReservationDates(Long roomId, LocalDate startDate, LocalDate endDate);
 
