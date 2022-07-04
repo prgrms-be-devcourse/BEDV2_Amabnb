@@ -37,9 +37,7 @@ public class Review extends BaseEntity {
     }
 
     public Review(String content, int score, Reservation reservation) {
-        this.content = content;
-        this.score = score;
-        this.reservation = reservation;
+        this(null, content, score, reservation);
     }
 
 }
