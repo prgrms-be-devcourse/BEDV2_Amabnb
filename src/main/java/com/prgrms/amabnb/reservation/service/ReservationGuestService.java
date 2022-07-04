@@ -47,7 +47,7 @@ public class ReservationGuestService {
     @Transactional
     public void cancel(Long userId, Long reservationId) {
         User guest = findUserById(userId);
-        Reservation reservation = findReservationWithGuestByReservationId(reservationId);
+        Reservation reservation = findReservationByIdWithGuest(reservationId);
         validateGuest(guest, reservation);
         reservation.changeStatus(ReservationStatus.GUEST_CANCELED);
     }
@@ -58,7 +58,7 @@ public class ReservationGuestService {
 
     public ReservationResponseForGuest getReservation(Long userId, Long reservationId) {
         User guest = findUserById(userId);
-        Reservation reservation = findReservationWithRoomAndGuestByReservationId(reservationId);
+        Reservation reservation = findReservationByIdWithRoomAndGuest(reservationId);
         validateGuest(guest, reservation);
         return ReservationResponseForGuest.from(reservation);
     }
@@ -120,13 +120,13 @@ public class ReservationGuestService {
             .orElseThrow(UserNotFoundException::new);
     }
 
-    private Reservation findReservationWithGuestByReservationId(Long reservationId) {
-        return reservationRepository.findReservationWithGuestById(reservationId)
+    private Reservation findReservationByIdWithGuest(Long reservationId) {
+        return reservationRepository.findReservationByIdWithGuest(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 
-    private Reservation findReservationWithRoomAndGuestByReservationId(Long reservationId) {
-        return reservationRepository.findReservationWithRoomAndHostAndGuestById(reservationId)
+    private Reservation findReservationByIdWithRoomAndGuest(Long reservationId) {
+        return reservationRepository.findReservationByIdWithRoomAndGuest(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 

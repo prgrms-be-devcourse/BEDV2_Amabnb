@@ -30,7 +30,7 @@ public class ReservationHostService {
     @Transactional
     public ReservationInfoResponse approve(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoomByReservationId(reservationId);
+        Reservation reservation = findReservationByIdWithRoom(reservationId);
         validateHost(host, reservation);
         reservation.changeStatus(ReservationStatus.APPROVED);
         return ReservationInfoResponse.from(reservation);
@@ -39,14 +39,14 @@ public class ReservationHostService {
     @Transactional
     public void cancelByHost(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoomByReservationId(reservationId);
+        Reservation reservation = findReservationByIdWithRoom(reservationId);
         validateHost(host, reservation);
         reservation.changeStatus(ReservationStatus.HOST_CANCELED);
     }
 
     public ReservationResponseForHost getReservation(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoomAndGuestByReservationId(reservationId);
+        Reservation reservation = findReservationByIdWithRoomAndGuest(reservationId);
         validateHost(host, reservation);
         return ReservationResponseForHost.from(reservation);
     }
@@ -79,13 +79,13 @@ public class ReservationHostService {
             .orElseThrow(UserNotFoundException::new);
     }
 
-    private Reservation findReservationWithRoomByReservationId(Long reservationId) {
-        return reservationRepository.findReservationWithRoomAndHostById(reservationId)
+    private Reservation findReservationByIdWithRoom(Long reservationId) {
+        return reservationRepository.findReservationByIdWithRoomAndHost(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 
-    private Reservation findReservationWithRoomAndGuestByReservationId(Long reservationId) {
-        return reservationRepository.findReservationWithRoomAndHostAndGuestById(reservationId)
+    private Reservation findReservationByIdWithRoomAndGuest(Long reservationId) {
+        return reservationRepository.findReservationByIdWithRoomAndGuest(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 
