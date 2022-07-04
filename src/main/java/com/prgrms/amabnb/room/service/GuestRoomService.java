@@ -29,7 +29,7 @@ public class GuestRoomService {
     }
 
     public RoomResponse searchRoomDetail(Long roomId) {
-        return RoomResponse.from(roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new));
+        return RoomResponse.from(roomRepository.findRoomById(roomId).orElseThrow(RoomNotFoundException::new));
     }
 
 }
