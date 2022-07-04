@@ -68,6 +68,10 @@ public class User extends BaseEntity {
         this.userRole = userRole;
     }
 
+    public boolean isSame(User user) {
+        return this.id.equals(user.id);
+    }
+
     private void setProfileImgUrl(String imageUrl) {
         if (Objects.isNull(imageUrl) || imageUrl.isBlank()) {
             throw new UserInvalidValueException("이미지 URL은 비어있을 수 없습니다.");

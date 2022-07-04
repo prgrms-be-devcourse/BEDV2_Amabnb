@@ -9,13 +9,14 @@ import java.time.LocalDate;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
-import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
+import com.prgrms.amabnb.reservation.exception.ReservationStatusException;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
@@ -34,7 +35,7 @@ class ReservationTest {
         Money totalPrice = new Money(10_000);
         ReservationDate reservationDate = new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L));
         Room room = createRoom();
-        User guest = createUser();
+        User guest = createUser("guest");
 
         // when
         Reservation reservation = Reservation.builder()
@@ -103,9 +104,38 @@ class ReservationTest {
             .hasMessage("예약 날짜는 비어있을 수 없습니다.");
     }
 
+    @DisplayName("예약 상태가 PENDING이면 예약 상태 변경이 가능하다.")
+    @ParameterizedTest
+    @CsvSource(value = {"APPROVED", "HOST_CANCELED", "GUEST_CANCELED"})
+    void changeStatus_PENDING(ReservationStatus status) {
+        // given
+        Reservation reservation = createReservationBuilder().build();
+
+        // when
+        reservation.changeStatus(status);
+
+        // then
+        assertThat(reservation.getReservationStatus()).isEqualTo(status);
+    }
+
+    @DisplayName("예약 상태가 PENDING이 아니라면 예약 상태 변경 불가능하다.")
+    @ParameterizedTest
+    @CsvSource(value = {"APPROVED", "HOST_CANCELED", "GUEST_CANCELED"})
+    void changeStatus_not_PENDING(ReservationStatus status) {
+        // given
+        Reservation reservation = createReservationBuilder().build();
+        reservation.changeStatus(APPROVED);
+
+        // when
+        // then
+        assertThatThrownBy(() -> reservation.changeStatus(status))
+            .isInstanceOf(ReservationStatusException.class)
+            .hasMessage("변경할 수 없는 예약입니다.");
+    }
+
     private Reservation.ReservationBuilder createReservationBuilder() {
         Room room = createRoom();
-        User user = createUser();
+        User user = createUser("guest");
 
         return Reservation.builder()
             .totalGuest(5)
@@ -117,7 +147,6 @@ class ReservationTest {
 
     private Room createRoom() {
         return Room.builder()
-            .id(1L)
             .name("별이 빛나는 밤")
             .maxGuestNum(1)
             .description("방 설명 입니다")
@@ -129,14 +158,13 @@ class ReservationTest {
             .build();
     }
 
-    private User createUser() {
+    private User createUser(String name) {
         return User.builder()
-            .oauthId("testOauthId")
-            .provider("testProvider")
+            .oauthId(name)
+            .provider(name)
             .userRole(UserRole.GUEST)
-            .name("testUser")
-            .email(new Email("asdsadsad@gmail.com"))
-            .phoneNumber(new PhoneNumber("010-2312-1231"))
+            .name(name)
+            .email(new Email(name + "@gmail.com"))
             .profileImgUrl("urlurlrurlrurlurlurl")
             .build();
     }

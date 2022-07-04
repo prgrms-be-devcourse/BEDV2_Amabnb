@@ -14,7 +14,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
@@ -44,9 +43,6 @@ class ReservationRepositoryTest extends RepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private TestEntityManager entityManager;
-
     private Room room;
 
     private User guest;
@@ -65,8 +61,6 @@ class ReservationRepositoryTest extends RepositoryTest {
         LocalDate now = LocalDate.now();
         guest = createGuest();
         createReservation(guest, new ReservationDate(now, now.plusDays(5L)));
-        entityManager.flush();
-        entityManager.clear();
     }
 
     @DisplayName("숙소가 해당 기간에 이미 예약이 되었는지 확인한다.")
@@ -93,7 +87,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         LocalDate endDate = now.plusMonths(1L);
 
         // when
-        List<ReservationDateResponse> result = reservationRepository.findImpossibleReservationDate(room.getId(),
+        List<ReservationDateResponse> result = reservationRepository.findReservationDates(room.getId(),
             now, endDate);
 
         // then

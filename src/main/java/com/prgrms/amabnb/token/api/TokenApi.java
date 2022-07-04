@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.security.jwt.JwtAuthentication;
 import com.prgrms.amabnb.security.util.AuthorizationExtractor;
 import com.prgrms.amabnb.token.dto.AccessTokenResponse;
@@ -27,12 +28,12 @@ public class TokenApi {
     private final TokenService tokenService;
 
     @PostMapping("/tokens")
-    public ResponseEntity<AccessTokenResponse> refreshAccessToken(
+    public ResponseEntity<ApiResponse<AccessTokenResponse>> refreshAccessToken(
         HttpServletRequest httpServletRequest,
         @Valid @RequestBody RefreshTokenRequest refreshToken
     ) {
         String accessToken = AuthorizationExtractor.extract(httpServletRequest);
-        return ResponseEntity.ok(tokenService.refreshAccessToken(accessToken, refreshToken));
+        return ResponseEntity.ok(new ApiResponse<>(tokenService.refreshAccessToken(accessToken, refreshToken)));
     }
 
     @DeleteMapping("/tokens")
