@@ -7,6 +7,7 @@ import javax.persistence.AccessType;
 import javax.persistence.Embeddable;
 
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
+import com.prgrms.amabnb.reservation.exception.ReservationReduceDateException;
 
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
@@ -34,6 +35,13 @@ public class ReservationDate {
 
     public int getPeriod() {
         return checkIn.until(checkOut).getDays();
+    }
+
+    public ReservationDate changeCheckOut(LocalDate checkOut) {
+        if (this.checkOut.isAfter(checkOut)) {
+            throw new ReservationReduceDateException();
+        }
+        return new ReservationDate(this.checkIn, checkOut);
     }
 
     private void validateNull(LocalDate checkIn, LocalDate checkOut) {
