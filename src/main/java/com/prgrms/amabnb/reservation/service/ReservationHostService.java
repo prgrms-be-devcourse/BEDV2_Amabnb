@@ -30,7 +30,7 @@ public class ReservationHostService {
     @Transactional
     public ReservationInfoResponse approve(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoomAndHostById(reservationId);
+        Reservation reservation = findReservationWithRoomByReservationId(reservationId);
         validateHost(host, reservation);
         reservation.changeStatus(ReservationStatus.APPROVED);
         return ReservationInfoResponse.from(reservation);
@@ -39,29 +39,33 @@ public class ReservationHostService {
     @Transactional
     public void cancelByHost(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoomAndHostById(reservationId);
+        Reservation reservation = findReservationWithRoomByReservationId(reservationId);
         validateHost(host, reservation);
         reservation.changeStatus(ReservationStatus.HOST_CANCELED);
     }
 
     public ReservationResponseForHost getReservation(Long userId, Long reservationId) {
         User host = findUserById(userId);
-        Reservation reservation = findReservationWithRoomAndHGuestAndGuestById(reservationId);
+        Reservation reservation = findReservationWithRoomAndGuestByReservationId(reservationId);
         validateHost(host, reservation);
         return ReservationResponseForHost.from(reservation);
     }
 
     public List<ReservationResponseForHost> getReservations(Long userId, SearchReservationsRequest request) {
         User host = findUserById(userId);
-        List<ReservationDto> reservations = reservationRepository.findReservationsByHostAndStatus(
+        List<ReservationDto> reservations = searchReservationPageByStatus(request, host);
+        return reservations.stream()
+            .map(ReservationResponseForHost::from)
+            .toList();
+    }
+
+    private List<ReservationDto> searchReservationPageByStatus(SearchReservationsRequest request, User host) {
+        return reservationRepository.findReservationsByHostAndStatus(
             request.getLastReservationId(),
             request.getPageSize(),
             host,
             request.getStatus()
         );
-        return reservations.stream()
-            .map(ReservationResponseForHost::from)
-            .toList();
     }
 
     private void validateHost(User host, Reservation reservation) {
@@ -75,12 +79,12 @@ public class ReservationHostService {
             .orElseThrow(UserNotFoundException::new);
     }
 
-    private Reservation findReservationWithRoomAndHostById(Long reservationId) {
+    private Reservation findReservationWithRoomByReservationId(Long reservationId) {
         return reservationRepository.findReservationWithRoomAndHostById(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
 
-    private Reservation findReservationWithRoomAndHGuestAndGuestById(Long reservationId) {
+    private Reservation findReservationWithRoomAndGuestByReservationId(Long reservationId) {
         return reservationRepository.findReservationWithRoomAndHostAndGuestById(reservationId)
             .orElseThrow(ReservationNotFoundException::new);
     }
