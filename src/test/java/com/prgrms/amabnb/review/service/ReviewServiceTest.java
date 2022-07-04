@@ -1,22 +1,5 @@
 package com.prgrms.amabnb.review.service;
 
-import static com.prgrms.amabnb.review.service.ReviewServiceTest.Fixture.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.BDDMockito.*;
-
-import java.time.LocalDate;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.dto.response.ReservationReviewResponse;
@@ -34,6 +17,19 @@ import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+
+import static com.prgrms.amabnb.review.service.ReviewServiceTest.Fixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -48,41 +44,41 @@ class ReviewServiceTest {
     static class Fixture {
         public static User createUser(String name) {
             return User.builder()
-                .id(1L)
-                .name(name)
-                .userRole(UserRole.GUEST)
-                .provider("kakao")
-                .oauthId("oauthId")
-                .email(new Email("kimziou77@naver.com"))
-                .profileImgUrl("something url")
-                .build();
+                    .id(1L)
+                    .name(name)
+                    .userRole(UserRole.GUEST)
+                    .provider("kakao")
+                    .oauthId("oauthId")
+                    .email(new Email("kimziou77@naver.com"))
+                    .profileImgUrl("something url")
+                    .build();
 
         }
 
         public static Reservation createReservation(User guest, Room room) {
             return Reservation.builder()
-                .id(1L)
-                .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
-                .totalGuest(1)
-                .totalPrice(new Money(1000))
-                .room(room)
-                .guest(guest)
-                .build();
+                    .id(1L)
+                    .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
+                    .totalGuest(1)
+                    .totalPrice(new Money(1000))
+                    .room(room)
+                    .guest(guest)
+                    .build();
         }
 
         public static Room createRoom(User user) {
             var room = Room.builder()
-                .id(1L)
-                .name("방이름")
-                .price(new Money(1000))
-                .description("방설명")
-                .maxGuestNum(10)
-                .address(new RoomAddress("12345", "address", "detailAddress"))
-                .roomOption(new RoomOption(1, 1, 1))
-                .roomType(RoomType.HOUSE)
-                .roomScope(RoomScope.PUBLIC)
-                .build();
-            room.setHost(user);
+                    .id(1L)
+                    .name("방이름")
+                    .price(new Money(1000))
+                    .description("방설명")
+                    .maxGuestNum(10)
+                    .host(user)
+                    .address(new RoomAddress("12345", "address", "detailAddress"))
+                    .roomOption(new RoomOption(1, 1, 1))
+                    .roomType(RoomType.HOUSE)
+                    .roomScope(RoomScope.PUBLIC)
+                    .build();
             return room;
         }
     }

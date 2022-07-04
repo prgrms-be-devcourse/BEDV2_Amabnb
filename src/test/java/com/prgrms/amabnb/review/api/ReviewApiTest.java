@@ -1,25 +1,5 @@
 package com.prgrms.amabnb.review.api;
 
-import static com.prgrms.amabnb.review.api.ReviewApiTest.Fixture.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.time.LocalDate;
-import java.util.UUID;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.EnumSource;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.config.ApiTest;
@@ -40,6 +20,25 @@ import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;
 import com.prgrms.amabnb.user.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.UUID;
+
+import static com.prgrms.amabnb.review.api.ReviewApiTest.Fixture.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class ReviewApiTest extends ApiTest {
 
@@ -56,46 +55,46 @@ class ReviewApiTest extends ApiTest {
 
     public String createToken(User user) {
         return "Bearer " + tokenService.createToken(
-            new UserRegisterResponse(user.getId(), "ROLE_GUEST")).accessToken();
+                new UserRegisterResponse(user.getId(), "ROLE_GUEST")).accessToken();
     }
 
     static class Fixture {
         static User createUser(String name) {
             return User.builder()
-                .name(name)
-                .userRole(UserRole.GUEST)
-                .provider("kakao")
-                .oauthId("oauthId")
-                .email(new Email(UUID.randomUUID() + "@naver.com"))
-                .profileImgUrl("something url")
-                .build();
+                    .name(name)
+                    .userRole(UserRole.GUEST)
+                    .provider("kakao")
+                    .oauthId("oauthId")
+                    .email(new Email(UUID.randomUUID() + "@naver.com"))
+                    .profileImgUrl("something url")
+                    .build();
         }
 
         static Reservation createReservation(User guest, Room room) {
             var reservation = Reservation.builder()
-                .id(1L)
-                .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
-                .totalGuest(1)
-                .totalPrice(new Money(1000))
-                .room(room)
-                .guest(guest)
-                .build();
+                    .id(1L)
+                    .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
+                    .totalGuest(1)
+                    .totalPrice(new Money(1000))
+                    .room(room)
+                    .guest(guest)
+                    .build();
             return reservation;
         }
 
         static Room createRoom(User user) {
             var room = Room.builder()
-                .id(1L)
-                .name("방이름")
-                .price(new Money(1000))
-                .description("방설명")
-                .maxGuestNum(10)
-                .address(new RoomAddress("12345", "address", "detailAddress"))
-                .roomOption(new RoomOption(1, 1, 1))
-                .roomType(RoomType.HOUSE)
-                .roomScope(RoomScope.PUBLIC)
-                .build();
-            room.setHost(user);
+                    .id(1L)
+                    .name("방이름")
+                    .price(new Money(1000))
+                    .description("방설명")
+                    .maxGuestNum(10)
+                    .address(new RoomAddress("12345", "address", "detailAddress"))
+                    .roomOption(new RoomOption(1, 1, 1))
+                    .roomType(RoomType.HOUSE)
+                    .roomScope(RoomScope.PUBLIC)
+                    .host(user)
+                    .build();
             return room;
         }
 
@@ -131,11 +130,11 @@ class ReviewApiTest extends ApiTest {
             reservationRepository.saveAndFlush(givenReservation);
 
             mockMvc.perform(post("/reservations/{reservationId}/reviews", givenReservation.getId())
-                    .header(HttpHeaders.AUTHORIZATION, givenAccessToken)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(toJson(givenReviewRequest)))
-                .andExpect(status().isCreated())
-                .andDo(print());
+                            .header(HttpHeaders.AUTHORIZATION, givenAccessToken)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(toJson(givenReviewRequest)))
+                    .andExpect(status().isCreated())
+                    .andDo(print());
             assertThat(reviewRepository.count()).isOne();
         }
 
@@ -147,11 +146,11 @@ class ReviewApiTest extends ApiTest {
             illegalReservation.changeStatus(status);
 
             mockMvc.perform(post("/reservations/{reservationId}/reviews", illegalReservation.getId())
-                    .header(HttpHeaders.AUTHORIZATION, givenAccessToken)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(toJson(givenReviewRequest)))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
+                            .header(HttpHeaders.AUTHORIZATION, givenAccessToken)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(toJson(givenReviewRequest)))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print());
         }
 
         @Test
@@ -161,17 +160,17 @@ class ReviewApiTest extends ApiTest {
             reservationRepository.saveAndFlush(givenReservation);
 
             mockMvc.perform(post("/reservations/{reservationId}/reviews", givenReservation.getId())
-                    .header(HttpHeaders.AUTHORIZATION, givenAccessToken)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(toJson(givenReviewRequest)))
-                .andExpect(status().isCreated());
+                            .header(HttpHeaders.AUTHORIZATION, givenAccessToken)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(toJson(givenReviewRequest)))
+                    .andExpect(status().isCreated());
 
             mockMvc.perform(post("/reservations/{reservationId}/reviews", givenReservation.getId())
-                    .header(HttpHeaders.AUTHORIZATION, givenAccessToken)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(toJson(givenReviewRequest)))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
+                            .header(HttpHeaders.AUTHORIZATION, givenAccessToken)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(toJson(givenReviewRequest)))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print());
         }
 
         @Test
@@ -182,11 +181,11 @@ class ReviewApiTest extends ApiTest {
             var illegalUser = userRepository.saveAndFlush(createUser("illegal"));
             var illegalToken = createToken(illegalUser);
             mockMvc.perform(post("/reservations/{reservationId}/reviews", givenReservation.getId())
-                    .header(HttpHeaders.AUTHORIZATION, illegalToken)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(givenReviewRequest)))
-                .andExpect(status().isBadRequest())
-                .andDo(print());
+                            .header(HttpHeaders.AUTHORIZATION, illegalToken)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(givenReviewRequest)))
+                    .andExpect(status().isBadRequest())
+                    .andDo(print());
         }
     }
 }
