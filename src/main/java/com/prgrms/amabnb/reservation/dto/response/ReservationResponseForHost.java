@@ -11,22 +11,22 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
-public class ReservationResponseForGuest {
+public class ReservationResponseForHost {
 
     private ReservationInfoResponse reservation;
     private ReservationRoomInfoResponse room;
-    private ReservationUserInfoResponse host;
+    private ReservationUserInfoResponse guest;
 
-    public static ReservationResponseForGuest from(Reservation reservation) {
-        return new ReservationResponseForGuest(
+    public static ReservationResponseForHost from(Reservation reservation) {
+        return new ReservationResponseForHost(
             ReservationInfoResponse.from(reservation),
             ReservationRoomInfoResponse.from(reservation.getRoom()),
-            ReservationUserInfoResponse.from(reservation.getRoom().getHost())
+            ReservationUserInfoResponse.from(reservation.getGuest())
         );
     }
 
-    public static ReservationResponseForGuest from(ReservationDto reservationDto) {
-        return new ReservationResponseForGuest(
+    public static ReservationResponseForHost from(ReservationDto reservationDto) {
+        return new ReservationResponseForHost(
             new ReservationInfoResponse(
                 reservationDto.getId(),
                 reservationDto.getCheckIn(),
@@ -38,11 +38,8 @@ public class ReservationResponseForGuest {
             new ReservationRoomInfoResponse(
                 reservationDto.getRoomId(),
                 reservationDto.getName(),
-                new RoomAddress(
-                    reservationDto.getZipcode(),
-                    reservationDto.getAddress(),
-                    reservationDto.getDetailAddress()
-                )
+                new RoomAddress(reservationDto.getZipcode(), reservationDto.getAddress(),
+                    reservationDto.getDetailAddress())
             ),
             new ReservationUserInfoResponse(
                 reservationDto.getId(),
