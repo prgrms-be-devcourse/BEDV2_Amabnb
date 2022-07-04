@@ -11,6 +11,7 @@ import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDto;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
+import com.prgrms.amabnb.reservation.dto.response.ReservationReviewResponse;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.exception.AlreadyReservationRoomException;
@@ -78,6 +79,12 @@ public class ReservationGuestService {
             guest,
             request.getStatus()
         );
+    }
+
+    public ReservationReviewResponse findById(Long id) {
+        var reservation = reservationRepository.findById(id)
+            .orElseThrow(ReservationNotFoundException::new);
+        return ReservationReviewResponse.from(reservation);
     }
 
     private void validateReservation(Reservation reservation) {
