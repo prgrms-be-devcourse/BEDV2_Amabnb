@@ -50,19 +50,23 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
     @Override
     public List<Room> findRoomsByHostId(Long userId) {
         return jpaQueryFactory.selectFrom(room)
+            .leftJoin(room.roomImages, roomImage)
+            .fetchJoin()
             .where(room.host.id.eq(userId))
             .fetch();
     }
 
     @Override
     public Optional<Room> findRoomByIdAndHostId(Long roomId, Long hostId) {
-        return jpaQueryFactory.selectFrom(room)
+        return Optional.ofNullable(jpaQueryFactory
+            .selectFrom(room)
+            .leftJoin(room.roomImages, roomImage)
+            .fetchJoin()
             .where(
                 room.id.eq(roomId),
                 room.host.id.eq(hostId)
             )
-            .stream()
-            .findFirst();
+            .fetchOne());
     }
 
     private BooleanExpression roomScopesEq(List<RoomScope> roomScopes) {
