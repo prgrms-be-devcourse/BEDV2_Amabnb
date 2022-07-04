@@ -228,7 +228,7 @@ class ReservationHostApiTest extends ApiTest {
     }
 
     private Long 숙소_등록(String accessToken, CreateRoomRequest request) throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(post("/rooms")
+        MockHttpServletResponse response = mockMvc.perform(post("/host/rooms")
                 .header(AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))

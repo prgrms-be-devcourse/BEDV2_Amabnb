@@ -146,7 +146,7 @@ class ReservationGuestApiTest extends ApiTest {
 
     @DisplayName("숙소 가격이 일치하지 않으면 예약할 수 없다. 400 - BAD REQUEST")
     @Test
-    void create_reservation_invalid_price() throws Exception {
+    void xcreate_reservation_invalid_price() throws Exception {
         String accessToken = 로그인_요청(createUserProfile());
         CreateReservationRequest request = createReservationRequest(1, 200_000, roomId);
 
@@ -381,7 +381,7 @@ class ReservationGuestApiTest extends ApiTest {
     }
 
     private Long 숙소_등록(String accessToken, CreateRoomRequest request) throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(post("/rooms")
+        MockHttpServletResponse response = mockMvc.perform(post("/host/rooms")
                 .header(AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))

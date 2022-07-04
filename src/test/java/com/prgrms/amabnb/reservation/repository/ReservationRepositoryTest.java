@@ -75,7 +75,7 @@ class ReservationRepositoryTest extends RepositoryTest {
         ReservationDate reservationDate = new ReservationDate(checkIn, checkOut);
 
         // when
-        boolean isExists = reservationRepository.existReservationByRoom(room, reservationDate);
+        boolean isExists = reservationRepository.existReservationByRoom(room, null, reservationDate);
 
         // then
         assertThat(isExists).isEqualTo(result);
@@ -161,16 +161,6 @@ class ReservationRepositoryTest extends RepositoryTest {
     }
 
     private Room createRoom() {
-        Room room = Room.builder()
-            .name("별이 빛나는 밤")
-            .maxGuestNum(1)
-            .description("방 설명 입니다")
-            .address(new RoomAddress("00000", "창원", "의창구"))
-            .price(new Money(10_000))
-            .roomOption(new RoomOption(1, 1, 1))
-            .roomType(RoomType.APARTMENT)
-            .roomScope(RoomScope.PRIVATE)
-            .build();
         host = User.builder()
             .oauthId("testOauth")
             .provider("testProvider")
@@ -179,9 +169,19 @@ class ReservationRepositoryTest extends RepositoryTest {
             .email(new Email("asdsadsasdad@gmail.com"))
             .profileImgUrl("urlurlrurlrurlurlurl")
             .build();
-
         userRepository.save(host);
-        room.setHost(host);
+        Room room = Room.builder()
+            .name("별이 빛나는 밤")
+            .maxGuestNum(1)
+            .host(host)
+            .description("방 설명 입니다")
+            .address(new RoomAddress("00000", "창원", "의창구"))
+            .price(new Money(10_000))
+            .roomOption(new RoomOption(1, 1, 1))
+            .roomType(RoomType.APARTMENT)
+            .roomScope(RoomScope.PRIVATE)
+            .build();
+        
         return roomRepository.save(room);
     }
 
