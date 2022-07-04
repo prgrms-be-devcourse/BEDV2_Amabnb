@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CreateReviewRequest {
     @NotBlank
-    @Range(min = 5, max = 200)
     String content;
 
     @NotNull
