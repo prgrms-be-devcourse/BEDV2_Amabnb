@@ -3,7 +3,6 @@ package com.prgrms.amabnb.config;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -20,14 +19,15 @@ public class InfraConfig {
     }
 
     static class MockImageUploader implements ImageUploader {
+        String baseS3Path = "https://s3.amand.com/";
 
         @Override
         public List<String> uploadImage(List<MultipartFile> images) throws IOException {
 
             List<String> mock = new ArrayList<>();
 
-            for (int i = 1; i < images.size(); i++) {
-                mock.add(UUID.randomUUID().toString());
+            for (int i = 0; i < images.size(); i++) {
+                mock.add(baseS3Path + i);
             }
 
             return mock;
