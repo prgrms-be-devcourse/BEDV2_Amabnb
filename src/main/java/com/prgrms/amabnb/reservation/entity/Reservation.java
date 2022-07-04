@@ -1,5 +1,7 @@
 package com.prgrms.amabnb.reservation.entity;
 
+import java.time.LocalDate;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -11,14 +13,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationStatusException;
-import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.user.entity.User;
 
@@ -58,10 +58,6 @@ public class Reservation extends BaseEntity {
     @JoinColumn(name = "users_id")
     private User guest;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
-    private Review review;
-
     @Builder
     public Reservation(
         Long id,
@@ -80,6 +76,19 @@ public class Reservation extends BaseEntity {
         reservationStatus = ReservationStatus.PENDING;
     }
 
+    public Reservation(Long id) {
+        this.id = id;
+    }
+
+    public void modify(LocalDate checkOut, int totalGuest, Money payment) {
+        if (isNotModifiable()) {
+            throw new ReservationStatusException();
+        }
+        this.reservationDate = this.reservationDate.changeCheckOut(checkOut);
+        this.totalGuest = totalGuest;
+        this.totalPrice = this.totalPrice.add(payment);
+    }
+
     public boolean isNotHost(User user) {
         return !this.room.isHost(user);
     }
@@ -89,11 +98,11 @@ public class Reservation extends BaseEntity {
     }
 
     public boolean isNotValidatePrice() {
-        return !getRoom().isValidatePrice(totalPrice, reservationDate.getPeriod());
+        return !this.room.isValidatePrice(totalPrice, reservationDate.getPeriod());
     }
 
     public boolean isOverMaxGuest() {
-        return room.isOverMaxGuestNum(totalGuest);
+        return this.room.isOverMaxGuestNum(totalGuest);
     }
 
     public void changeStatus(ReservationStatus status) {
@@ -107,7 +116,7 @@ public class Reservation extends BaseEntity {
         return this.reservationStatus != ReservationStatus.PENDING;
     }
 
-    public void setReservationDate(ReservationDate reservationDate) {
+    private void setReservationDate(ReservationDate reservationDate) {
         if (reservationDate == null) {
             throw new ReservationInvalidValueException("예약 날짜는 비어있을 수 없습니다.");
         }

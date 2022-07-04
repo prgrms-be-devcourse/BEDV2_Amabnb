@@ -181,7 +181,7 @@ class ReservationRepositoryTest extends RepositoryTest {
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
             .build();
-        
+
         return roomRepository.save(room);
     }
 
