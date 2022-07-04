@@ -14,7 +14,6 @@ public class ReservationReviewResponse {
     private ReservationStatus status;
     private Long guestId;
 
-    @Builder
     public ReservationReviewResponse(Long reservationId, ReservationStatus status, Long guestId) {
         this.reservationId = reservationId;
         this.status = status;
@@ -22,10 +21,10 @@ public class ReservationReviewResponse {
     }
 
     public static ReservationReviewResponse from(Reservation reservation) {
-        return ReservationReviewResponse.builder()
-            .reservationId(reservation.getId())
-            .status(reservation.getReservationStatus())
-            .guestId(reservation.getGuest().getId())
-            .build();
+        return new ReservationReviewResponse(
+                reservation.getId(),
+                reservation.getReservationStatus(),
+                reservation.getGuest().getId()
+        );
     }
 }
