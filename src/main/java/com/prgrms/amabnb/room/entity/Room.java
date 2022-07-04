@@ -83,7 +83,8 @@ public class Room extends BaseEntity {
 
     @Builder
     public Room(Long id, String name, Money price, String description, int maxGuestNum,
-        RoomAddress address, RoomOption roomOption, RoomType roomType, RoomScope roomScope) {
+        RoomAddress address, RoomOption roomOption, RoomType roomType, RoomScope roomScope,
+        User host, List<RoomImage> roomImages) {
         validateRoom(name, price, maxGuestNum, description, address, roomOption, roomType, roomScope);
         this.id = id;
         this.name = name;
@@ -94,6 +95,8 @@ public class Room extends BaseEntity {
         this.roomOption = roomOption;
         this.roomType = roomType;
         this.roomScope = roomScope;
+        this.host = host;
+        this.roomImages = roomImages;
     }
 
     public void addRoomImages(List<RoomImage> roomImages) {
@@ -106,10 +109,6 @@ public class Room extends BaseEntity {
         }
 
         this.getRoomImages().add(roomImage);
-    }
-
-    public void setHost(User user) {
-        this.host = user;
     }
 
     public boolean isValidatePrice(Money totalPrice, int period) {

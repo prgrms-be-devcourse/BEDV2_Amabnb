@@ -96,9 +96,9 @@ public class CreateRoomRequest {
             .roomOption(new RoomOption(bedCnt, bedRoomCnt, bathRoomCnt))
             .roomType(roomType)
             .roomScope(roomScope)
+            .host(host)
+            .roomImages(toRoomImages())
             .build();
-        room.addRoomImages(toRoomImages());
-        room.setHost(host);
         return room;
     }
 

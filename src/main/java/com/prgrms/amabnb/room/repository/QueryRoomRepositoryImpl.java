@@ -69,6 +69,18 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
             .fetchOne());
     }
 
+    @Override
+    public Optional<Room> findRoomById(Long roomId) {
+        return Optional.ofNullable(jpaQueryFactory
+            .selectFrom(room)
+            .leftJoin(room.roomImages, roomImage)
+            .fetchJoin()
+            .where(
+                room.id.eq(roomId)
+            )
+            .fetchOne());
+    }
+
     private BooleanExpression roomScopesEq(List<RoomScope> roomScopes) {
         return Objects.isNull(roomScopes) ? null : room.roomScope.in(roomScopes);
     }

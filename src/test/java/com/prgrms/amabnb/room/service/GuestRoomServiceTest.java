@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
@@ -55,20 +56,20 @@ class GuestRoomServiceTest {
     @DisplayName("숙소 상세정보를 가져 올 수 있다.")
     void searchRoomDetail() {
         //given
-        given(roomRepository.findById(anyLong())).willReturn(Optional.of(createRoom()));
+        given(roomRepository.findRoomById(anyLong())).willReturn(Optional.of(createRoom()));
 
         //when
         guestRoomService.searchRoomDetail(1L);
 
         //then
-        then(roomRepository).should(times(1)).findById(anyLong());
+        then(roomRepository).should(times(1)).findRoomById(anyLong());
     }
 
     @Test
     @DisplayName("등록된 숙소가 아니면 조회할 수 없다.")
     void notSavedRoomDetail() {
         //given
-        given(roomRepository.findById(anyLong())).willThrow(new RoomNotFoundException());
+        given(roomRepository.findRoomById(anyLong())).willThrow(new RoomNotFoundException());
 
         //when
         assertThatThrownBy(() -> guestRoomService.searchRoomDetail(1L))
@@ -92,6 +93,7 @@ class GuestRoomServiceTest {
             .roomOption(roomOption)
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .roomImages(List.of(createRoomImage()))
             .build();
     }
 
@@ -99,6 +101,10 @@ class GuestRoomServiceTest {
         return new SearchRoomFilterCondition(
             1, 1, 1, 1, 1000000, null, null
         );
+    }
+
+    private RoomImage createRoomImage() {
+        return new RoomImage(null, "aaa");
     }
 
 }

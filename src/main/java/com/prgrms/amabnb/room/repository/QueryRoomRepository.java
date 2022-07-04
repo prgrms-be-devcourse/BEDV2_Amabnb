@@ -15,4 +15,6 @@ public interface QueryRoomRepository {
     List<Room> findRoomsByHostId(Long userId);
 
     Optional<Room> findRoomByIdAndHostId(Long roomId, Long hostId);
+
+    Optional<Room> findRoomById(Long roomId);
 }
