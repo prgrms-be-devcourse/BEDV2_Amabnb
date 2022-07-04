@@ -36,7 +36,7 @@ class RoomRepositoryTest extends RepositoryTest {
     @DisplayName("숙소정보를 db에 저장할 수 있다")
     void roomJpaSave() {
         //given
-        Room room = createRoom();
+        Room room = createRoom(null);
 
         //when
         roomRepository.save(room);
@@ -51,10 +51,10 @@ class RoomRepositoryTest extends RepositoryTest {
     void findRoomsByFilter() {
         //given
         SearchRoomFilterCondition filter = createFullFilter();
-        Room room1 = createRoom();
-        Room room2 = createRoom();
+        Room room1 = createRoom(null);
+        Room room2 = createRoom(null);
         room2.changePrice(new Money(2000));
-        Room room3 = createRoom();
+        Room room3 = createRoom(null);
         room3.changePrice(new Money(60000));
         roomRepository.save(room1);
         roomRepository.save(room2);
@@ -71,9 +71,9 @@ class RoomRepositoryTest extends RepositoryTest {
     void noFilterTest() {
         //given
         SearchRoomFilterCondition nullFilter = createNullFilter();
-        Room room1 = createRoom();
-        Room room2 = createRoom();
-        Room room3 = createRoom();
+        Room room1 = createRoom(null);
+        Room room2 = createRoom(null);
+        Room room3 = createRoom(null);
         roomRepository.save(room1);
         roomRepository.save(room2);
         roomRepository.save(room3);
@@ -89,14 +89,12 @@ class RoomRepositoryTest extends RepositoryTest {
     @DisplayName("호스트가 등록한 숙소들을 가져온다.")
     void findRoomByHostTest() {
         //given
-        User host = createUser();
-        userRepository.save(host);
+        User host = userRepository.save(createUser());
 
-        Room room1 = createRoom();
-        room1.setHost(host);
-        Room room2 = createRoom();
-        room2.setHost(host);
-        Room room3 = createRoom();
+        Room room1 = createRoom(host);
+        Room room2 = createRoom(host);
+        Room room3 = createRoom(host);
+
         roomRepository.save(room1);
         roomRepository.save(room2);
         roomRepository.save(room3);
@@ -112,11 +110,9 @@ class RoomRepositoryTest extends RepositoryTest {
     @DisplayName("호스트가 등록한 특정 숙소를 가져온다.")
     void findByIdAndHostId() {
         //given
-        User host = createUser();
-        userRepository.save(host);
+        User host = userRepository.save(createUser());
 
-        Room room = createRoom();
-        room.setHost(host);
+        Room room = createRoom(host);
 
         roomRepository.save(room);
 
@@ -157,7 +153,7 @@ class RoomRepositoryTest extends RepositoryTest {
             .build();
     }
 
-    private Room createRoom() {
+    private Room createRoom(User host) {
         RoomAddress roomAddress = new RoomAddress("00000", "창원", "의창구");
         Money price = new Money(1000);
         RoomOption roomOption = new RoomOption(1, 1, 1);
@@ -171,6 +167,7 @@ class RoomRepositoryTest extends RepositoryTest {
             .roomOption(roomOption)
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .host(host)
             .build();
     }
 }
