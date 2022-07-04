@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationDateRequest;
+import com.prgrms.amabnb.reservation.dto.request.ReservationUpdateRequest;
 import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
@@ -65,6 +67,15 @@ public class ReservationGuestApi {
         SearchReservationsRequest request
     ) {
         return ResponseEntity.ok(new ApiResponse<>(reservationGuestService.getReservations(user.id(), request)));
+    }
+
+    @PutMapping("/reservations/{reservationId}")
+    public ResponseEntity<ApiResponse<ReservationResponseForGuest>> modifyReservation(
+        @AuthenticationPrincipal JwtAuthentication user,
+        @PathVariable Long reservationId,
+        @Valid @RequestBody ReservationUpdateRequest request
+    ) {
+        return ResponseEntity.ok(new ApiResponse<>(reservationGuestService.modify(user.id(), reservationId, request)));
     }
 
     @DeleteMapping("/guest/reservations/{reservationId}")

@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -33,6 +34,7 @@ import com.prgrms.amabnb.common.exception.ErrorResponse;
 import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
+import com.prgrms.amabnb.reservation.dto.request.ReservationUpdateRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
 import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
@@ -78,23 +80,7 @@ class ReservationGuestApiTest extends ApiTest {
                     headerWithName("Location").description("예약 리소스 주소")
                 ),
                 responseFields(
-                    fieldWithPath("data.reservation.id").type(JsonFieldType.NUMBER).description("아이디"),
-                    fieldWithPath("data.reservation.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-                    fieldWithPath("data.reservation.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
-                    fieldWithPath("data.reservation.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
-                    fieldWithPath("data.reservation.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
-                    fieldWithPath("data.reservation.reservationStatus").type(JsonFieldType.STRING).description("예약 상태"),
-                    fieldWithPath("data.room.roomId").type(JsonFieldType.NUMBER).description("숙소 아이디"),
-                    fieldWithPath("data.room.name").type(JsonFieldType.STRING).description("숙소 이름"),
-                    fieldWithPath("data.room.roomAddress.zipcode").type(JsonFieldType.STRING)
-                        .description("숙소 우편번호"),
-                    fieldWithPath("data.room.roomAddress.address").type(JsonFieldType.STRING)
-                        .description("숙소 주소"),
-                    fieldWithPath("data.room.roomAddress.detailAddress").type(JsonFieldType.STRING)
-                        .description("숙소 상세주소"),
-                    fieldWithPath("data.host.id").type(JsonFieldType.NUMBER).description("호스트 아이디"),
-                    fieldWithPath("data.host.name").type(JsonFieldType.STRING).description("호스트 이름"),
-                    fieldWithPath("data.host.email").type(JsonFieldType.STRING).description("호스트 이메일")
+                    getReservationResponseForGuestDescriptor()
                 )))
             .andReturn().getResponse();
 
@@ -292,23 +278,7 @@ class ReservationGuestApiTest extends ApiTest {
                     parameterWithName("reservationId").description("예약 아이디")
                 ),
                 responseFields(
-                    fieldWithPath("data.reservation.id").type(JsonFieldType.NUMBER).description("아이디"),
-                    fieldWithPath("data.reservation.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-                    fieldWithPath("data.reservation.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
-                    fieldWithPath("data.reservation.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
-                    fieldWithPath("data.reservation.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
-                    fieldWithPath("data.reservation.reservationStatus").type(JsonFieldType.STRING).description("예약 상태"),
-                    fieldWithPath("data.room.roomId").type(JsonFieldType.NUMBER).description("숙소 아이디"),
-                    fieldWithPath("data.room.name").type(JsonFieldType.STRING).description("숙소 이름"),
-                    fieldWithPath("data.room.roomAddress.zipcode").type(JsonFieldType.STRING)
-                        .description("숙소 우편번호"),
-                    fieldWithPath("data.room.roomAddress.address").type(JsonFieldType.STRING)
-                        .description("숙소 주소"),
-                    fieldWithPath("data.room.roomAddress.detailAddress").type(JsonFieldType.STRING)
-                        .description("숙소 상세주소"),
-                    fieldWithPath("data.host.id").type(JsonFieldType.NUMBER).description("호스트 아이디"),
-                    fieldWithPath("data.host.name").type(JsonFieldType.STRING).description("호스트 이름"),
-                    fieldWithPath("data.host.email").type(JsonFieldType.STRING).description("호스트 이메일")
+                    getReservationResponseForGuestDescriptor()
                 )));
     }
 
@@ -366,6 +336,46 @@ class ReservationGuestApiTest extends ApiTest {
                 )));
     }
 
+    @DisplayName("게스트가 예약 정보를 수정한다. 200 - OK")
+    @Test
+    void modifyReservation() throws Exception {
+        // given
+        String accessToken = 로그인_요청(createUserProfile());
+        MockHttpServletResponse reservationResponse = 예약_요청(accessToken, createReservationRequest(3, 300_000, roomId));
+        Long reservationId = getReservationId(reservationResponse);
+        ReservationUpdateRequest request = new ReservationUpdateRequest(now().plusDays(5L), 5, 200_000);
+
+        // when
+        mockMvc.perform(put("/reservations/{reservationId}", reservationId)
+                .header(AUTHORIZATION, accessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(request)))
+            .andDo(print())
+
+            // then
+            .andExpectAll(
+                status().isOk(),
+                jsonPath("$.data.reservation.checkOut").value(now().plusDays(5L).toString()),
+                jsonPath("$.data.reservation.totalGuest").value(5),
+                jsonPath("$.data.reservation.totalPrice").value(500_000)
+            )
+
+            // docs
+            .andDo(document("reservation-update",
+                tokenRequestHeader(),
+                pathParameters(
+                    parameterWithName("reservationId").description("예약 아이디")
+                ),
+                requestFields(
+                    fieldWithPath("checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+                    fieldWithPath("totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
+                    fieldWithPath("paymentPrice").type(JsonFieldType.NUMBER).description("추가 가격")
+                ),
+                responseFields(
+                    getReservationResponseForGuestDescriptor()
+                )));
+    }
+
     private Long getReservationId(MockHttpServletResponse response) {
         String[] locations = response.getHeader("Location").split("/");
         return Long.valueOf(locations[locations.length - 1]);
@@ -387,8 +397,7 @@ class ReservationGuestApiTest extends ApiTest {
                 .content(objectMapper.writeValueAsString(request)))
             .andReturn().getResponse();
 
-        String[] location = response.getHeader("Location").split("/");
-        return Long.valueOf(location[location.length - 1]);
+        return getReservationId(response);
     }
 
     private UserProfile createUserProfile() {
@@ -459,4 +468,25 @@ class ReservationGuestApiTest extends ApiTest {
             .build();
     }
 
+    private List<FieldDescriptor> getReservationResponseForGuestDescriptor() {
+        return List.of(
+            fieldWithPath("data.reservation.id").type(JsonFieldType.NUMBER).description("아이디"),
+            fieldWithPath("data.reservation.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
+            fieldWithPath("data.reservation.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+            fieldWithPath("data.reservation.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
+            fieldWithPath("data.reservation.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
+            fieldWithPath("data.reservation.reservationStatus").type(JsonFieldType.STRING).description("예약 상태"),
+            fieldWithPath("data.room.roomId").type(JsonFieldType.NUMBER).description("숙소 아이디"),
+            fieldWithPath("data.room.name").type(JsonFieldType.STRING).description("숙소 이름"),
+            fieldWithPath("data.room.roomAddress.zipcode").type(JsonFieldType.STRING)
+                .description("숙소 우편번호"),
+            fieldWithPath("data.room.roomAddress.address").type(JsonFieldType.STRING)
+                .description("숙소 주소"),
+            fieldWithPath("data.room.roomAddress.detailAddress").type(JsonFieldType.STRING)
+                .description("숙소 상세주소"),
+            fieldWithPath("data.host.id").type(JsonFieldType.NUMBER).description("호스트 아이디"),
+            fieldWithPath("data.host.name").type(JsonFieldType.STRING).description("호스트 이름"),
+            fieldWithPath("data.host.email").type(JsonFieldType.STRING).description("호스트 이메일")
+        );
+    }
 }
