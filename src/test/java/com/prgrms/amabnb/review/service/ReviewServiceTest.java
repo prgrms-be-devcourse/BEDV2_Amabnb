@@ -1,5 +1,20 @@
 package com.prgrms.amabnb.review.service;
 
+import static com.prgrms.amabnb.review.service.ReviewServiceTest.Fixture.*;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
+
+import java.time.LocalDate;
+import java.util.Optional;
+
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.dto.response.ReservationReviewResponse;
@@ -17,20 +32,6 @@ import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDate;
-import java.util.Optional;
-
-import static com.prgrms.amabnb.review.service.ReviewServiceTest.Fixture.*;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
@@ -45,41 +46,41 @@ class ReviewServiceTest {
     static class Fixture {
         public static User createUser(String name) {
             return User.builder()
-                    .id(1L)
-                    .name(name)
-                    .userRole(UserRole.GUEST)
-                    .provider("kakao")
-                    .oauthId("oauthId")
-                    .email(new Email("kimziou77@naver.com"))
-                    .profileImgUrl("something url")
-                    .build();
+                .id(1L)
+                .name(name)
+                .userRole(UserRole.GUEST)
+                .provider("kakao")
+                .oauthId("oauthId")
+                .email(new Email("kimziou77@naver.com"))
+                .profileImgUrl("something url")
+                .build();
 
         }
 
         public static Reservation createReservation(User guest, Room room) {
             return Reservation.builder()
-                    .id(1L)
-                    .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
-                    .totalGuest(1)
-                    .totalPrice(new Money(1000))
-                    .room(room)
-                    .guest(guest)
-                    .build();
+                .id(1L)
+                .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
+                .totalGuest(1)
+                .totalPrice(new Money(1000))
+                .room(room)
+                .guest(guest)
+                .build();
         }
 
         public static Room createRoom(User user) {
             var room = Room.builder()
-                    .id(1L)
-                    .name("방이름")
-                    .price(new Money(1000))
-                    .description("방설명")
-                    .maxGuestNum(10)
-                    .host(user)
-                    .address(new RoomAddress("12345", "address", "detailAddress"))
-                    .roomOption(new RoomOption(1, 1, 1))
-                    .roomType(RoomType.HOUSE)
-                    .roomScope(RoomScope.PUBLIC)
-                    .build();
+                .id(1L)
+                .name("방이름")
+                .price(new Money(1000))
+                .description("방설명")
+                .maxGuestNum(10)
+                .host(user)
+                .address(new RoomAddress("12345", "address", "detailAddress"))
+                .roomOption(new RoomOption(1, 1, 1))
+                .roomType(RoomType.HOUSE)
+                .roomScope(RoomScope.PUBLIC)
+                .build();
             return room;
         }
     }
@@ -123,8 +124,8 @@ class ReviewServiceTest {
         void deleteUserReview() {
             givenReservation.changeStatus(ReservationStatus.COMPLETED);
             var givenReview = new Review(1L, "content", 2, givenReservation);
-            var reservationDto = new ReservationReviewResponse(givenReservation.getId(), givenReservation.getReservationStatus(), givenGuest.getId());
-
+            var reservationDto = new ReservationReviewResponse(givenReservation.getId(),
+                givenReservation.getReservationStatus(), givenGuest.getId());
 
             when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(givenReview));
             when(reservationGuestService.findById(anyLong())).thenReturn(reservationDto);
@@ -132,7 +133,7 @@ class ReviewServiceTest {
             reviewService.deleteReview(givenGuest.getId(), givenReview.getId());
 
             then(reviewRepository).should(times(1)).findById(givenReview.getId());
-            then(reviewRepository).should(times(1)).deleteByid(givenReview.getId());
+            then(reviewRepository).should(times(1)).deleteById(givenReview.getId());
         }
     }
 }

@@ -46,7 +46,7 @@ public class ReviewService {
         var reservationDto = reservationGuestService.findById(review.getReservation().getId());
         validateUserPermission(userId, reservationDto.getGuestId());
 
-        reviewRepository.deleteByid(reviewId);
+        reviewRepository.deleteById(reviewId);
     }
 
     private void validateOneReservationOneReview(Long reservationId) {
