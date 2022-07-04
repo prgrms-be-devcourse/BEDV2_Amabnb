@@ -6,6 +6,7 @@ import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,7 +15,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.restdocs.headers.RequestHeadersSnippet;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +24,6 @@ import com.prgrms.amabnb.security.oauth.UserProfile;
 
 @Import(InfraConfig.class)
 @SpringBootTest
-@Transactional
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 public abstract class ApiTest {
@@ -41,6 +40,14 @@ public abstract class ApiTest {
 
     @Autowired
     protected OAuthService oAuthService;
+
+    @Autowired
+    protected DatabaseCleanup databaseCleanup;
+
+    @AfterEach
+    void tearDown() {
+        databaseCleanup.execute();
+    }
 
     protected RequestHeadersSnippet tokenRequestHeader() {
         return requestHeaders(
