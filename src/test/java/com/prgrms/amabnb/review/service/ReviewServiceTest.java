@@ -26,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static com.prgrms.amabnb.review.service.ReviewServiceTest.Fixture.*;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -110,4 +111,28 @@ class ReviewServiceTest {
         }
     }
 
+    @Nested
+    @DisplayName("게스트는 본인이 작성한 리뷰를 삭제할 수 있다 #82")
+    class DeleteReview {
+        User givenGuest = createUser("su");
+        User givenHost = createUser("bin");
+        Reservation givenReservation = createReservation(givenGuest, createRoom(givenHost));
+
+        @Test
+        @DisplayName("리뷰를 삭제한다")
+        void deleteUserReview() {
+            givenReservation.changeStatus(ReservationStatus.COMPLETED);
+            var givenReview = new Review(1L, "content", 2, givenReservation);
+            var reservationDto = new ReservationReviewResponse(givenReservation.getId(), givenReservation.getReservationStatus(), givenGuest.getId());
+
+
+            when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(givenReview));
+            when(reservationGuestService.findById(anyLong())).thenReturn(reservationDto);
+
+            reviewService.deleteReview(givenGuest.getId(), givenReview.getId());
+
+            then(reviewRepository).should(times(1)).findById(givenReview.getId());
+            then(reviewRepository).should(times(1)).deleteByid(givenReview.getId());
+        }
+    }
 }
