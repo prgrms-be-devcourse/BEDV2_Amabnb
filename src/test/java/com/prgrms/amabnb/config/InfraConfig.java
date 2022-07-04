@@ -19,6 +19,7 @@ public class InfraConfig {
     }
 
     static class MockImageUploader implements ImageUploader {
+        String baseS3Path = "https://s3.amand.com/";
 
         @Override
         public List<String> uploadImage(List<MultipartFile> images) throws IOException {
@@ -26,7 +27,7 @@ public class InfraConfig {
             List<String> mock = new ArrayList<>();
 
             for (int i = 0; i < images.size(); i++) {
-                mock.add("https://s3.amand.com/" + i);
+                mock.add(baseS3Path + i);
             }
 
             return mock;
