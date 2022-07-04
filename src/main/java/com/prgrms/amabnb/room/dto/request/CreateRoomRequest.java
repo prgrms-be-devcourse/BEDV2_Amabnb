@@ -97,8 +97,8 @@ public class CreateRoomRequest {
             .roomType(roomType)
             .roomScope(roomScope)
             .host(host)
+            .roomImages(toRoomImages())
             .build();
-        room.addRoomImages(toRoomImages());
         return room;
     }
 

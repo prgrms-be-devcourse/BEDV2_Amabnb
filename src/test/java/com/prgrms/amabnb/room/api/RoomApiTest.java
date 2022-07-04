@@ -149,13 +149,11 @@ class RoomApiTest extends ApiTest {
     @DisplayName("숙소 상세정보를 가져온다.")
     void getRoomDetail() throws Exception {
         //given
-        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-        Room room = createRoomRequest.toRoom(createUser());
-        room.addRoomImages(createRoomRequest.toRoomImages());
-        Room savedRoom = roomRepository.save(room);
+        String accessToken = 로그인_요청();
+        Long saveRoomId = saveRoom(accessToken);
 
         //when, then
-        mockMvc.perform(get("/rooms/" + savedRoom.getId())
+        mockMvc.perform(get("/rooms/" + saveRoomId)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andDo(print());

@@ -20,6 +20,7 @@ import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.dto.request.ModifyRoomRequest;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
@@ -174,7 +175,12 @@ class HostRoomServiceTest {
             .roomOption(roomOption)
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .roomImages(List.of(createRoomImage()))
             .build();
+    }
+    
+    private RoomImage createRoomImage() {
+        return new RoomImage(null, "aaa");
     }
 
 }

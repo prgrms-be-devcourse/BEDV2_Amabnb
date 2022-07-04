@@ -93,7 +93,7 @@ class RoomRepositoryTest extends RepositoryTest {
 
         Room room1 = createRoom(host);
         Room room2 = createRoom(host);
-        Room room3 = createRoom(host);
+        Room room3 = createRoom(null);
 
         roomRepository.save(room1);
         roomRepository.save(room2);
