@@ -48,7 +48,7 @@ class ReservationHostApiTest extends ApiTest {
         // given
         MockHttpServletResponse ReservationResponseForGuest = 예약_요청(로그인_요청("guest"),
             createReservationRequest(3, 300_000, roomId));
-        Long reservationId = extractReservationId(ReservationResponseForGuest);
+        Long reservationId = extractId(ReservationResponseForGuest);
 
         // when
         MockHttpServletResponse response = mockMvc.perform(put("/host/reservations/{reservationId}", reservationId)
@@ -86,7 +86,7 @@ class ReservationHostApiTest extends ApiTest {
         // given
         MockHttpServletResponse ReservationResponseForGuest = 예약_요청(로그인_요청("guest"),
             createReservationRequest(3, 300_000, roomId));
-        Long reservationId = extractReservationId(ReservationResponseForGuest);
+        Long reservationId = extractId(ReservationResponseForGuest);
 
         // when
         MockHttpServletResponse response = mockMvc.perform(delete("/host/reservations/{reservationId}", reservationId)
@@ -110,7 +110,7 @@ class ReservationHostApiTest extends ApiTest {
         // given
         MockHttpServletResponse createResponse = 예약_요청(로그인_요청("guest"),
             createReservationRequest(3, 300_000, roomId));
-        Long reservationId = extractReservationId(createResponse);
+        Long reservationId = extractId(createResponse);
 
         // when
         mockMvc.perform(get("/host/reservations/{reservationId}", reservationId)

@@ -227,7 +227,7 @@ class ReservationGuestApiTest extends ApiTest {
     void cancelByGuest() throws Exception {
         String accessToken = 로그인_요청("guest");
         MockHttpServletResponse reservationResponse = 예약_요청(accessToken, createReservationRequest(3, 300_000, roomId));
-        Long reservationId = extractReservationId(reservationResponse);
+        Long reservationId = extractId(reservationResponse);
 
         // when
         MockHttpServletResponse response = mockMvc.perform(delete("/guest/reservations/{reservationId}", reservationId)
@@ -251,7 +251,7 @@ class ReservationGuestApiTest extends ApiTest {
         // given
         String accessToken = 로그인_요청("guest");
         MockHttpServletResponse reservationResponse = 예약_요청(accessToken, createReservationRequest(3, 300_000, roomId));
-        Long reservationId = extractReservationId(reservationResponse);
+        Long reservationId = extractId(reservationResponse);
 
         // when
         mockMvc.perform(get("/guest/reservations/{reservationId}", reservationId)
@@ -336,7 +336,7 @@ class ReservationGuestApiTest extends ApiTest {
         // given
         String accessToken = 로그인_요청("guest");
         MockHttpServletResponse reservationResponse = 예약_요청(accessToken, createReservationRequest(3, 300_000, roomId));
-        Long reservationId = extractReservationId(reservationResponse);
+        Long reservationId = extractId(reservationResponse);
         ReservationUpdateRequest request = new ReservationUpdateRequest(now().plusDays(5L), 5, 200_000);
 
         // when
