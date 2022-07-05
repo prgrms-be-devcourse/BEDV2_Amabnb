@@ -1,6 +1,6 @@
 package com.prgrms.amabnb.review.api;
 
-import static com.prgrms.amabnb.common.fixture.ReviewFixture.*;
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -45,16 +45,14 @@ class ReviewApiTest extends ApiTest {
 
     @BeforeEach
     @Transactional
-    void setBasicGiven() {
-        var guestProfile = createUserProfile("guest");
-        var hostProfile = createUserProfile("host");
-
-        var givenGuest = userRepository.save(guestProfile.toUser());
-        var givenHost = userRepository.save(hostProfile.toUser());
+    void setBasicGiven() throws Exception {
+        var givenGuest = userRepository.save(createUser("guest"));
+        var givenHost = userRepository.save(createUser("host"));
         var givenRoom = roomRepository.save(createRoom(givenHost));
 
-        givenReservation = reservationRepository.save(createReservation(givenGuest, givenRoom));
-        givenGuestAccessToken = 로그인_요청(guestProfile);
+        givenGuestAccessToken = 로그인_요청(givenGuest.getName());
+        givenReservation = reservationRepository.findById(
+            extractId(예약_요청(givenGuestAccessToken, makeCreateReservationRequest(givenRoom)))).get();
     }
 
     private ResultActions when_리뷰_작성(Long reservationId, String userAccessToken,
