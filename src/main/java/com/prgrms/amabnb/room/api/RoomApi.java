@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.prgrms.amabnb.room.dto.request.PageRoomRequest;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.dto.response.RoomResponse;
-import com.prgrms.amabnb.room.dto.response.RoomScrollResponse;
+import com.prgrms.amabnb.room.dto.response.RoomSearchResponse;
 import com.prgrms.amabnb.room.service.GuestRoomService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,10 +24,12 @@ public class RoomApi {
     private final GuestRoomService guestRoomService;
 
     @GetMapping
-    public ResponseEntity<List<RoomScrollResponse>> getRooms(SearchRoomFilterCondition searchRoomFilterCondition,
-        PageRoomRequest pageRoomRequest) {
+    public ResponseEntity<List<RoomSearchResponse>> getRooms(
+        SearchRoomFilterCondition searchRoomFilterCondition,
+        PageRoomRequest pageRoomRequest
+    ) {
 
-        List<RoomScrollResponse> roomResponses = guestRoomService.searchRoomsByFilterCondition(
+        List<RoomSearchResponse> roomResponses = guestRoomService.searchRoomsByFilterCondition(
             searchRoomFilterCondition, pageRoomRequest.of());
 
         return ResponseEntity.ok(roomResponses);
