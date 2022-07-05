@@ -144,17 +144,6 @@ class ReservationHostServiceTest extends ApiTest {
         );
     }
 
-    private Reservation createReservation(Room room, User guest) {
-        return Reservation.builder()
-            .room(room)
-            .guest(guest)
-            .totalPrice(new Money(20_000))
-            .totalGuest(1)
-            .reservationDate(new ReservationDate(now(), now().plusDays(1L)))
-            .reservationStatus(PENDING)
-            .build();
-    }
-
     private Reservation createReservationByDay(int day) {
         return Reservation.builder()
             .room(room)
