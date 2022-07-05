@@ -171,7 +171,7 @@ class ReservationGuestApiTest extends ApiTest {
     void create_reservation_room_not_found() throws Exception {
         // given
         String accessToken = 로그인_요청(createUserProfile());
-        CreateReservationRequest request = createReservationRequest(10, 100_000, 1L);
+        CreateReservationRequest request = createReservationRequest(10, 100_000, 100L);
 
         // when
         MockHttpServletResponse response = 예약_요청(accessToken, request);

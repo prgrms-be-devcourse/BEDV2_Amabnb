@@ -1,5 +1,7 @@
 package com.prgrms.amabnb.reservation.dto.request;
 
+import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
+
 import java.time.LocalDate;
 
 import javax.validation.constraints.Future;
@@ -60,6 +62,7 @@ public class CreateReservationRequest {
             .reservationDate(new ReservationDate(checkIn, checkOut))
             .totalGuest(totalGuest)
             .totalPrice(new Money(totalPrice))
+            .reservationStatus(PENDING)
             .room(room)
             .guest(guest)
             .build();

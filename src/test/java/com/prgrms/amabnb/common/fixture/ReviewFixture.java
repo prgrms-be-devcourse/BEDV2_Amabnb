@@ -1,5 +1,7 @@
 package com.prgrms.amabnb.common.fixture;
 
+import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
+
 import java.time.LocalDate;
 import java.util.UUID;
 
@@ -21,6 +23,7 @@ public class ReviewFixture {
             .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
             .totalGuest(1)
             .totalPrice(new Money(1000))
+            .reservationStatus(PENDING)
             .room(room)
             .guest(guest)
             .build();

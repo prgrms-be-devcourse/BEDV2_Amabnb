@@ -190,6 +190,7 @@ class ReservationRepositoryTest extends RepositoryTest {
             .reservationDate(reservationDate)
             .totalGuest(3)
             .totalPrice(new Money(100_000))
+            .reservationStatus(PENDING)
             .room(room)
             .guest(guest)
             .build();
