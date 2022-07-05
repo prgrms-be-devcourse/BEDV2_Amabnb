@@ -96,7 +96,7 @@ public class Room extends BaseEntity {
         this.roomType = roomType;
         this.roomScope = roomScope;
         this.host = host;
-        this.roomImages = roomImages;
+        addRoomImages(roomImages);
     }
 
     public void addRoomImages(List<RoomImage> roomImages) {
