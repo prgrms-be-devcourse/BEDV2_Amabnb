@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
-import com.prgrms.amabnb.room.dto.response.RoomScrollResponse;
+import com.prgrms.amabnb.room.dto.response.RoomSearchResponse;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
@@ -29,8 +29,10 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<RoomScrollResponse> findRoomsByFilterCondition(SearchRoomFilterCondition filterCondition,
-        Pageable pageable) {
+    public List<RoomSearchResponse> findRoomsByFilterCondition(
+        SearchRoomFilterCondition filterCondition,
+        Pageable pageable
+    ) {
 
         return jpaQueryFactory.from(room)
             .innerJoin(roomImage)
@@ -48,7 +50,7 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
             .limit(pageable.getPageSize())
             .transform(
                 groupBy(room.id).list(
-                    Projections.fields(RoomScrollResponse.class,
+                    Projections.fields(RoomSearchResponse.class,
                         room.id,
                         room.name,
                         room.price.value.as("price"),

@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RoomScrollResponse {
+public class RoomSearchResponse {
     private Long id;
     private String name;
     private int price;
