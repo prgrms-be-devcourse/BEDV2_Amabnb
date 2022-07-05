@@ -21,10 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
+import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.repository.ReviewRepository;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.repository.RoomRepository;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
@@ -34,12 +36,29 @@ class ReviewApiTest extends ApiTest {
     private UserRepository userRepository;
     @Autowired
     private ReviewRepository reviewRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private RoomRepository roomRepository;
 
     private User givenGuest;
     private User givenHost;
     private Room givenRoom;
     private Reservation givenReservation;
     private String givenGuestAccessToken;
+
+    @BeforeEach
+    @Transactional
+    void setGiven() {
+        var guestProfile = createUserProfile("guest");
+        var hostProfile = createUserProfile("host");
+        givenGuest = userRepository.save(guestProfile.toUser());
+        givenHost = userRepository.save(hostProfile.toUser());
+
+        givenRoom = roomRepository.save(createRoom(givenHost));
+        givenReservation = reservationRepository.save(createReservation(givenGuest, givenRoom));
+        givenGuestAccessToken = 로그인_요청(guestProfile);
+    }
 
     private ResultActions when_리뷰_작성(Long reservationId, String userAccessToken,
         CreateReviewRequest createReviewDto) throws Exception {
@@ -52,19 +71,6 @@ class ReviewApiTest extends ApiTest {
     private ResultActions when_리뷰_삭제(String userAccessToken, Long reviewId) throws Exception {
         return mockMvc.perform(delete("/reviews/{reviewId}", reviewId)
             .header(HttpHeaders.AUTHORIZATION, userAccessToken));
-    }
-
-    @BeforeEach
-    @Transactional
-    void setGiven() {
-        var guestProfile = createUserProfile("guest");
-        var hostProfile = createUserProfile("host");
-        givenGuest = userRepository.save(guestProfile.toUser());
-        givenHost = userRepository.save(hostProfile.toUser());
-
-        givenRoom = createRoom(givenHost);
-        givenReservation = createReservation(givenGuest, givenRoom);
-        givenGuestAccessToken = 로그인_요청(guestProfile);
     }
 
     @Nested
@@ -83,17 +89,19 @@ class ReviewApiTest extends ApiTest {
             givenReservation.changeStatus(ReservationStatus.COMPLETED);
 
             when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest)
-                .andExpect(status().isCreated()).andDo(print());
+                .andExpect(status().isCreated())
+                .andExpect(redirectedUrlPattern("/reviews/*"))
+                .andDo(print());
+
         }
 
         @ParameterizedTest
         @DisplayName("숙소를 방문을 완료(COMPLETED)한 후에 리뷰를 작성할 수 있습니다.")
         @EnumSource(value = ReservationStatus.class, names = {"PENDING", "APPROVED", "GUEST_CANCELED", "HOST_CANCELED"})
         void exception1(ReservationStatus status) throws Exception {
-            var illegalReservation = createReservation(givenGuest, givenRoom);
-            illegalReservation.changeStatus(status);
+            givenReservation.changeStatus(status);
 
-            when_리뷰_작성(illegalReservation.getId(), givenGuestAccessToken, givenReviewRequest)
+            when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest)
                 .andExpect(status().isBadRequest()).andDo(print());
         }
 
