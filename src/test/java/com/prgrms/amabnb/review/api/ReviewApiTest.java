@@ -138,7 +138,7 @@ class ReviewApiTest extends ApiTest {
             givenReservation.changeStatus(ReservationStatus.COMPLETED);
             reservationRepository.save(givenReservation);
 
-            var illegalToken = 로그인_요청(createUserProfile("illegal"));
+            var illegalToken = 로그인_요청("illegal-user");
 
             when_리뷰_작성(givenReservation.getId(), illegalToken, givenReviewRequest)
                 .andExpect(status().isBadRequest())
