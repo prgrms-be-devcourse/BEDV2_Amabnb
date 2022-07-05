@@ -45,9 +45,10 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
             .fetch();
 
         return jpaQueryFactory.selectFrom(room)
-            .innerJoin(room.roomImages, roomImage)
+            .leftJoin(room.roomImages, roomImage)
             .fetchJoin()
             .where(room.id.in(roomIds))
+            .distinct()
             .fetch();
 
     }
@@ -58,6 +59,7 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
             .leftJoin(room.roomImages, roomImage)
             .fetchJoin()
             .where(room.host.id.eq(userId))
+            .distinct()
             .fetch();
     }
 

@@ -16,6 +16,7 @@ import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
@@ -51,13 +52,12 @@ class RoomRepositoryTest extends RepositoryTest {
     void findRoomsByFilter() {
         //given
         SearchRoomFilterCondition filter = createFullFilter();
-        Room room1 = createRoom(null);
+
         Room room2 = createRoom(null);
-        room2.changePrice(new Money(2000));
-        Room room3 = createRoom(null);
-        room3.changePrice(new Money(60000));
-        roomRepository.save(room1);
         roomRepository.save(room2);
+
+        Room room3 = createRoom(null);
+        room3.changePrice(new Money(50000));
         roomRepository.save(room3);
         //when
         List<Room> rooms = roomRepository.findRoomsByFilterCondition(filter, PageRequest.of(0, 10));
@@ -155,7 +155,7 @@ class RoomRepositoryTest extends RepositoryTest {
 
     private Room createRoom(User host) {
         RoomAddress roomAddress = new RoomAddress("00000", "창원", "의창구");
-        Money price = new Money(1000);
+        Money price = new Money(2000);
         RoomOption roomOption = new RoomOption(1, 1, 1);
 
         return Room.builder()
@@ -167,7 +167,12 @@ class RoomRepositoryTest extends RepositoryTest {
             .roomOption(roomOption)
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .roomImages(List.of(createRoomImage(), createRoomImage()))
             .host(host)
             .build();
+    }
+
+    private RoomImage createRoomImage() {
+        return new RoomImage(null, "aa");
     }
 }
