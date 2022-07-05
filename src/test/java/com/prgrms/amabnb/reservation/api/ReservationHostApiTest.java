@@ -1,11 +1,11 @@
 package com.prgrms.amabnb.reservation.api;
 
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static java.time.LocalDate.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,10 +29,6 @@ import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.response.ReservationInfoResponse;
-import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
-import com.prgrms.amabnb.room.entity.RoomScope;
-import com.prgrms.amabnb.room.entity.RoomType;
-import com.prgrms.amabnb.security.oauth.UserProfile;
 
 class ReservationHostApiTest extends ApiTest {
 
@@ -43,17 +38,17 @@ class ReservationHostApiTest extends ApiTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        hostAccessToken = 로그인_요청(createHostProfile());
-        roomId = 숙소_등록(hostAccessToken, createRoomRequest("별빛밤"));
+        hostAccessToken = 로그인_요청("host");
+        roomId = 숙소_등록(hostAccessToken, createRoomRequest());
     }
 
     @DisplayName("호스트가 예약을 승인한다. 200 - OK")
     @Test
     void approveReservation() throws Exception {
         // given
-        MockHttpServletResponse ReservationResponseForGuest = 예약_요청(로그인_요청(createSpancerProfile()),
+        MockHttpServletResponse ReservationResponseForGuest = 예약_요청(로그인_요청("guest"),
             createReservationRequest(3, 300_000, roomId));
-        Long reservationId = getReservationId(ReservationResponseForGuest);
+        Long reservationId = extractId(ReservationResponseForGuest);
 
         // when
         MockHttpServletResponse response = mockMvc.perform(put("/host/reservations/{reservationId}", reservationId)
@@ -89,9 +84,9 @@ class ReservationHostApiTest extends ApiTest {
     @Test
     void cancelByHost() throws Exception {
         // given
-        MockHttpServletResponse ReservationResponseForGuest = 예약_요청(로그인_요청(createSpancerProfile()),
+        MockHttpServletResponse ReservationResponseForGuest = 예약_요청(로그인_요청("guest"),
             createReservationRequest(3, 300_000, roomId));
-        Long reservationId = getReservationId(ReservationResponseForGuest);
+        Long reservationId = extractId(ReservationResponseForGuest);
 
         // when
         MockHttpServletResponse response = mockMvc.perform(delete("/host/reservations/{reservationId}", reservationId)
@@ -113,9 +108,9 @@ class ReservationHostApiTest extends ApiTest {
     @Test
     void getReservation() throws Exception {
         // given
-        MockHttpServletResponse ReservationResponseForGuest = 예약_요청(로그인_요청(createSpancerProfile()),
+        MockHttpServletResponse createResponse = 예약_요청(로그인_요청("guest"),
             createReservationRequest(3, 300_000, roomId));
-        Long reservationId = getReservationId(ReservationResponseForGuest);
+        Long reservationId = extractId(createResponse);
 
         // when
         mockMvc.perform(get("/host/reservations/{reservationId}", reservationId)
@@ -163,7 +158,7 @@ class ReservationHostApiTest extends ApiTest {
     @Test
     void getReservations() throws Exception {
         // given
-        String accessToken = 로그인_요청(createSpancerProfile());
+        String accessToken = 로그인_요청("guest");
         for (int i = 0; i < 2; i++) {
             예약_요청(accessToken, createReservationRequestByDay(i));
         }
@@ -211,69 +206,6 @@ class ReservationHostApiTest extends ApiTest {
                     fieldWithPath("data[].guest.name").type(JsonFieldType.STRING).description("게스트 이름"),
                     fieldWithPath("data[].guest.email").type(JsonFieldType.STRING).description("게스트 이메일")
                 )));
-    }
-
-    private Long getReservationId(MockHttpServletResponse response) {
-        String[] locations = response.getHeader("Location").split("/");
-        return Long.valueOf(locations[locations.length - 1]);
-    }
-
-    private MockHttpServletResponse 예약_요청(String accessToken, CreateReservationRequest request) throws Exception {
-        return mockMvc.perform(post("/reservations")
-                .header(AUTHORIZATION, accessToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andDo(print())
-            .andReturn().getResponse();
-    }
-
-    private Long 숙소_등록(String accessToken, CreateRoomRequest request) throws Exception {
-        MockHttpServletResponse response = mockMvc.perform(post("/host/rooms")
-                .header(AUTHORIZATION, accessToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
-            .andReturn().getResponse();
-
-        String[] location = response.getHeader("Location").split("/");
-        return Long.valueOf(location[location.length - 1]);
-    }
-
-    private UserProfile createHostProfile() {
-        return UserProfile.builder()
-            .oauthId("2")
-            .provider("host")
-            .name("아만드")
-            .email("host@gmail.com")
-            .profileImgUrl("url")
-            .build();
-    }
-
-    private UserProfile createSpancerProfile() {
-        return UserProfile.builder()
-            .oauthId("3")
-            .provider("kakao")
-            .name("스펜서")
-            .email("spancer@gmail.com")
-            .profileImgUrl("url")
-            .build();
-    }
-
-    private CreateRoomRequest createRoomRequest(String name) {
-        return CreateRoomRequest.builder()
-            .name(name)
-            .price(100_000)
-            .description("방설명")
-            .maxGuestNum(10)
-            .zipcode("00000")
-            .address("창원")
-            .detailAddress("의창구")
-            .bedCnt(2)
-            .bedRoomCnt(1)
-            .bathRoomCnt(1)
-            .roomType(RoomType.APARTMENT)
-            .roomScope(RoomScope.PRIVATE)
-            .imagePaths(List.of("test"))
-            .build();
     }
 
     private CreateReservationRequest createReservationRequest(int totalGuest, int totalPrice, Long roomId) {

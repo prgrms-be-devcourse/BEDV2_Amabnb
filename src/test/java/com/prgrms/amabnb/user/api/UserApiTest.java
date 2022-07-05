@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.user.api;
 
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -10,15 +11,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
-import org.springframework.transaction.annotation.Transactional;
 
-import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.token.dto.TokenResponse;
 import com.prgrms.amabnb.token.service.TokenService;
 import com.prgrms.amabnb.user.dto.response.UserRegisterResponse;
 import com.prgrms.amabnb.user.entity.User;
-import com.prgrms.amabnb.user.entity.UserRole;
 import com.prgrms.amabnb.user.repository.UserRepository;
 import com.prgrms.amabnb.user.service.UserService;
 
@@ -35,18 +33,8 @@ class UserApiTest extends ApiTest {
     User givenUser;
 
     @BeforeEach
-    @Transactional
     void setUp() {
-        var user = User.builder()
-            .name("su")
-            .userRole(UserRole.GUEST)
-            .provider("kakao")
-            .oauthId("oauthId")
-            .email(new Email("kimziou77@naver.com"))
-            .profileImgUrl("something url")
-            .build();
-
-        givenUser = userRepository.save(user);
+        givenUser = userRepository.save(createUser("test"));
         givenToken = tokenService.createToken(
             new UserRegisterResponse(givenUser.getId(), givenUser.getUserRole().getGrantedAuthority()));
     }

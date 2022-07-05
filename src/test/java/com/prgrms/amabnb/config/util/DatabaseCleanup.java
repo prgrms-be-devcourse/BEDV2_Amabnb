@@ -1,4 +1,4 @@
-package com.prgrms.amabnb.config;
+package com.prgrms.amabnb.config.util;
 
 import java.util.List;
 import java.util.stream.Collectors;
