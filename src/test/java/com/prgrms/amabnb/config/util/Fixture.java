@@ -83,14 +83,21 @@ public class Fixture {
     }
 
     public static Reservation createReservation(Room room, User guest) {
+        return reservationBuilder(room, guest).build();
+    }
+
+    public static Reservation createReservationWithId(Room room, User guest) {
+        return reservationBuilder(room, guest).id(1L).build();
+    }
+
+    public static Reservation.ReservationBuilder reservationBuilder(Room room, User guest) {
         return Reservation.builder()
             .room(room)
             .guest(guest)
             .totalPrice(room.getPrice())
             .totalGuest(1)
             .reservationDate(new ReservationDate(now(), now().plusDays(1L)))
-            .reservationStatus(PENDING)
-            .build();
+            .reservationStatus(PENDING);
     }
 
     public static CreateRoomRequest createRoomRequest() {
