@@ -3,12 +3,14 @@ package com.prgrms.amabnb.common.fixture;
 import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
@@ -42,8 +44,13 @@ public class ReviewFixture {
             .roomType(RoomType.HOUSE)
             .roomScope(RoomScope.PUBLIC)
             .host(user)
+            .roomImages(List.of(createRoomImage()))
             .build();
         return room;
+    }
+
+    private static RoomImage createRoomImage() {
+        return new RoomImage("aaa");
     }
 
     public static UserProfile createUserProfile(String name) {

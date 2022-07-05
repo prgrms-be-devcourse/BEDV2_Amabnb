@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -26,6 +27,7 @@ import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.repository.ReviewRepository;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
@@ -81,8 +83,13 @@ class ReviewServiceTest {
                 .roomOption(new RoomOption(1, 1, 1))
                 .roomType(RoomType.HOUSE)
                 .roomScope(RoomScope.PUBLIC)
+                .roomImages(List.of(createRoomImage()))
                 .build();
             return room;
+        }
+
+        private static RoomImage createRoomImage() {
+            return new RoomImage("aaa");
         }
     }
 

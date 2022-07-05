@@ -29,6 +29,7 @@ import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionException;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
@@ -307,9 +308,14 @@ class ReservationGuestServiceTest extends ApiTest {
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
             .host(host)
+            .roomImages(List.of(createRoomImage()))
             .build();
 
         return room;
+    }
+
+    private RoomImage createRoomImage() {
+        return new RoomImage("aaa");
     }
 
     private CreateReservationRequest createReservationByDay(int day) {

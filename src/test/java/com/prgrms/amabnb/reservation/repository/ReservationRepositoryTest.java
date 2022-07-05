@@ -26,6 +26,7 @@ import com.prgrms.amabnb.reservation.dto.response.ReservationDto;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
@@ -180,9 +181,14 @@ class ReservationRepositoryTest extends RepositoryTest {
             .roomOption(new RoomOption(1, 1, 1))
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .roomImages(List.of(createRoomImage()))
             .build();
 
         return roomRepository.save(room);
+    }
+
+    private RoomImage createRoomImage() {
+        return new RoomImage("aaa");
     }
 
     private Reservation createReservation(User guest, ReservationDate reservationDate) {

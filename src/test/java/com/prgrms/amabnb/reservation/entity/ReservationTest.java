@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationStatusException;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
@@ -157,7 +159,12 @@ class ReservationTest {
             .roomOption(new RoomOption(1, 1, 1))
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .roomImages(List.of(createRoomImage()))
             .build();
+    }
+
+    private RoomImage createRoomImage() {
+        return new RoomImage("aaa");
     }
 
     private User createUser(String name) {

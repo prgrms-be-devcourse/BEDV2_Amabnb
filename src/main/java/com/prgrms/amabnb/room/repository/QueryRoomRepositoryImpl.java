@@ -28,9 +28,8 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
     @Override
     public List<Room> findRoomsByFilterCondition(SearchRoomFilterCondition filterCondition, Pageable pageable) {
 
-        return jpaQueryFactory.selectFrom(room)
-            .leftJoin(room.roomImages, roomImage)
-            .fetchJoin()
+        List<Long> roomIds = jpaQueryFactory.select(room.id)
+            .from(room)
             .where(
                 bedsGoe(filterCondition.getMinBeds()),
                 bedroomsGoe(filterCondition.getMinBedrooms()),
@@ -45,6 +44,13 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
             .orderBy(room.id.desc())
             .fetch();
 
+        return jpaQueryFactory.selectFrom(room)
+            .leftJoin(room.roomImages, roomImage)
+            .fetchJoin()
+            .where(room.id.in(roomIds))
+            .distinct()
+            .fetch();
+
     }
 
     @Override
@@ -53,6 +59,7 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
             .leftJoin(room.roomImages, roomImage)
             .fetchJoin()
             .where(room.host.id.eq(userId))
+            .distinct()
             .fetch();
     }
 
