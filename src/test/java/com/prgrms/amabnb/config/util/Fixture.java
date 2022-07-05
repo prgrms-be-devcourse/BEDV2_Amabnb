@@ -8,8 +8,10 @@ import java.util.List;
 
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
+import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
+import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomImage;
@@ -21,6 +23,16 @@ import com.prgrms.amabnb.security.oauth.UserProfile;
 import com.prgrms.amabnb.user.entity.User;
 
 public class Fixture {
+
+    public static CreateReservationRequest makeCreateReservationRequest(Room room) {
+        return CreateReservationRequest.builder()
+            .checkIn(now())
+            .checkOut(now().plusDays(3L))
+            .totalGuest(1)
+            .totalPrice(room.getPrice().getValue() * 3)
+            .roomId(room.getId())
+            .build();
+    }
 
     public static UserProfile createUserProfile(String name) {
         return UserProfile.builder()
@@ -71,14 +83,21 @@ public class Fixture {
     }
 
     public static Reservation createReservation(Room room, User guest) {
+        return reservationBuilder(room, guest).build();
+    }
+
+    public static Reservation createReservationWithId(Room room, User guest) {
+        return reservationBuilder(room, guest).id(1L).build();
+    }
+
+    private static Reservation.ReservationBuilder reservationBuilder(Room room, User guest) {
         return Reservation.builder()
             .room(room)
             .guest(guest)
             .totalPrice(room.getPrice())
             .totalGuest(1)
             .reservationDate(new ReservationDate(now(), now().plusDays(1L)))
-            .reservationStatus(PENDING)
-            .build();
+            .reservationStatus(PENDING);
     }
 
     public static CreateRoomRequest createRoomRequest() {
@@ -99,4 +118,7 @@ public class Fixture {
             .build();
     }
 
+    public static Review createReviewWithId(Reservation reservation) {
+        return new Review(1L, "content", 2, reservation);
+    }
 }
