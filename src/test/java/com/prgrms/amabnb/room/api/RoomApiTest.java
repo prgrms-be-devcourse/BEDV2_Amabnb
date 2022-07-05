@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.room.api;
 
+import static com.prgrms.amabnb.common.fixture.ReviewFixture.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -11,7 +12,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -23,13 +23,8 @@ import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
-import com.prgrms.amabnb.security.oauth.OAuthService;
-import com.prgrms.amabnb.security.oauth.UserProfile;
 
 class RoomApiTest extends ApiTest {
-
-    @Autowired
-    OAuthService oAuthService;
 
     @Test
     @WithMockUser
@@ -150,7 +145,7 @@ class RoomApiTest extends ApiTest {
     }
 
     private String 로그인_요청() {
-        return "Bearer" + oAuthService.register(createUserProfile()).accessToken();
+        return "Bearer" + oAuthService.register(createUserProfile("아만드")).accessToken();
     }
 
     private Long saveRoom(String accessToken) throws Exception {
@@ -162,16 +157,6 @@ class RoomApiTest extends ApiTest {
 
         String saveRoomId = location.replaceAll("[^0-9]", "");
         return Long.valueOf(saveRoomId);
-    }
-
-    private UserProfile createUserProfile() {
-        return UserProfile.builder()
-            .oauthId("1")
-            .provider("kakao")
-            .name("아만드")
-            .email("asdasd@gmail.com")
-            .profileImgUrl("url")
-            .build();
     }
 
     private CreateRoomRequest createCreateRoomRequest() {
