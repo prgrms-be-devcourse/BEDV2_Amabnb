@@ -65,6 +65,7 @@ public class Reservation extends BaseEntity {
         ReservationDate reservationDate,
         int totalGuest,
         Money totalPrice,
+        ReservationStatus reservationStatus,
         Room room,
         User guest
     ) {
@@ -74,7 +75,7 @@ public class Reservation extends BaseEntity {
         setTotalPrice(totalPrice);
         setRoom(room);
         setGuest(guest);
-        reservationStatus = ReservationStatus.PENDING;
+        setReservationStatus(reservationStatus);
     }
 
     public Reservation(Long id) {
@@ -150,5 +151,12 @@ public class Reservation extends BaseEntity {
             throw new ReservationInvalidValueException("게스트는 비어있을 수 없습니다.");
         }
         this.guest = guest;
+    }
+
+    private void setReservationStatus(ReservationStatus reservationStatus) {
+        if (reservationStatus == null) {
+            throw new ReservationInvalidValueException("예약 상태는 비어있을 수 없습니다.");
+        }
+        this.reservationStatus = reservationStatus;
     }
 }

@@ -156,6 +156,7 @@ class ReservationHostServiceTest extends ApiTest {
             .totalPrice(new Money(20_000))
             .totalGuest(1)
             .reservationDate(new ReservationDate(now(), now().plusDays(1L)))
+            .reservationStatus(PENDING)
             .build();
     }
 
@@ -163,6 +164,7 @@ class ReservationHostServiceTest extends ApiTest {
         return Reservation.builder()
             .room(room)
             .guest(guest)
+            .reservationStatus(PENDING)
             .totalPrice(new Money(20_000))
             .totalGuest(1)
             .reservationDate(new ReservationDate(now().plusDays(day), now().plusDays(day + 1)))
