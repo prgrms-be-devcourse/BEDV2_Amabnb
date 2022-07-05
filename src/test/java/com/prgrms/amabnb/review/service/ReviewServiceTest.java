@@ -1,6 +1,6 @@
 package com.prgrms.amabnb.review.service;
 
-import static com.prgrms.amabnb.common.fixture.ReviewFixture.*;
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -36,6 +36,7 @@ class ReviewServiceTest {
     private ReviewRepository reviewRepository;
     @Mock
     private ReservationGuestService reservationGuestService;
+
     private Reservation givenReservation;
 
     @BeforeEach
@@ -43,9 +44,8 @@ class ReviewServiceTest {
     void setBasicGiven() {
         var givenGuest = createUser("guest");
         var givenHost = createUser("host");
-        givenReservation = createReservation(givenGuest, createRoom(givenHost));
+        givenReservation = createReservation(createRoom(givenHost), givenGuest);
         givenReservation.changeStatus(COMPLETED);
-
     }
 
     @Nested
@@ -56,7 +56,7 @@ class ReviewServiceTest {
 
         @BeforeEach
         void setAdditionalGivne() {
-            givenReview = new Review(1L, "content", 2, givenReservation);
+            givenReview = createReviewWithId(givenReservation);
             givenReservationDto = ReservationReviewResponse.from(givenReservation);
         }
 
@@ -87,7 +87,7 @@ class ReviewServiceTest {
 
         @BeforeEach
         void setAdditionalGivne() {
-            givenReview = new Review(1L, "content", 2, givenReservation);
+            givenReview = createReviewWithId(givenReservation);
             givenReservationDto = ReservationReviewResponse.from(givenReservation);
         }
 
@@ -114,8 +114,9 @@ class ReviewServiceTest {
 
         @BeforeEach
         void setAdditionalGiven() {
-            givenReview = new Review(1L, "content", 2, givenReservation);
+            givenReview = createReviewWithId(givenReservation);
             givenReservationDto = ReservationReviewResponse.from(givenReservation);
+
             givenEditRequest = new EditReviewRequest("edit-content", 5);
         }
 
