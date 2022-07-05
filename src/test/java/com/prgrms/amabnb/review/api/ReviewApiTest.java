@@ -99,33 +99,43 @@ class ReviewApiTest extends ApiTest {
         @DisplayName("숙소를 방문을 완료(COMPLETED)한 후에 리뷰를 작성할 수 있습니다.")
         @EnumSource(value = ReservationStatus.class, names = {"PENDING", "APPROVED", "GUEST_CANCELED", "HOST_CANCELED"})
         void exception1(ReservationStatus status) throws Exception {
+            var errorMessage = "숙소 방문 완료 후 리뷰를 작성할 수 있습니다.";
             givenReservation.changeStatus(status);
 
             when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest)
-                .andExpect(status().isBadRequest()).andDo(print());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(errorMessage))
+                .andDo(print());
         }
 
         @Test
         @DisplayName("리뷰는 예약 한 건당 한 개만 작성할 수 있습니다.")
         void exception2() throws Exception {
+            var errorMessage = "이미 작성한 예약 건 입니다.";
+
             givenReservation.changeStatus(ReservationStatus.COMPLETED);
 
             var firstReview = when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest);
             firstReview.andExpect(status().isCreated());
 
             var secondReview = when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest);
-            secondReview.andExpect(status().isBadRequest()).andDo(print());
+            secondReview.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(errorMessage))
+                .andDo(print());
         }
 
         @Test
         @DisplayName("예약자 본인만 리뷰를 작성할 수 있습니다.")
         void exception3() throws Exception {
+            var errorMessage = "예약자 본인만 리뷰를 작성할 수 있습니다.";
+
             givenReservation.changeStatus(ReservationStatus.COMPLETED);
 
             var illegalToken = 로그인_요청(createUserProfile("illegal"));
 
             when_리뷰_작성(givenReservation.getId(), illegalToken, givenReviewRequest)
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(errorMessage))
                 .andDo(print());
         }
     }
