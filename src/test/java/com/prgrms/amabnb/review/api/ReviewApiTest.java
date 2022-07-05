@@ -198,7 +198,7 @@ class ReviewApiTest extends ApiTest {
         @Transactional
         void setAdditionalGiven() {
             givenReview = reviewRepository.save(new Review(1L, "content", 4, givenReservation));
-            givenEditDto = new EditReviewRequest("content", 2);
+            givenEditDto = new EditReviewRequest("edit-content", 2);
         }
 
         @Test
