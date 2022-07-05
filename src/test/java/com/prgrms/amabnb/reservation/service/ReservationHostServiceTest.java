@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.reservation.service;
 
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static java.time.LocalDate.*;
 import static org.assertj.core.api.Assertions.*;
@@ -12,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.SearchReservationsRequest;
@@ -25,14 +25,8 @@ import com.prgrms.amabnb.reservation.exception.ReservationNotHavePermissionExcep
 import com.prgrms.amabnb.reservation.exception.ReservationStatusException;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.room.entity.Room;
-import com.prgrms.amabnb.room.entity.RoomImage;
-import com.prgrms.amabnb.room.entity.RoomScope;
-import com.prgrms.amabnb.room.entity.RoomType;
-import com.prgrms.amabnb.room.entity.vo.RoomAddress;
-import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.room.repository.RoomRepository;
 import com.prgrms.amabnb.user.entity.User;
-import com.prgrms.amabnb.user.entity.UserRole;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
 class ReservationHostServiceTest extends ApiTest {
@@ -56,8 +50,8 @@ class ReservationHostServiceTest extends ApiTest {
 
     @BeforeEach
     void setUp() {
-        guest = userRepository.save(createGuest());
-        host = userRepository.save(createHost());
+        guest = userRepository.save(createUser("guest"));
+        host = userRepository.save(createUser("host"));
         room = roomRepository.save(createRoom(host));
         reservationId = reservationRepository.save(createReservation(room, guest)).getId();
     }
@@ -150,17 +144,6 @@ class ReservationHostServiceTest extends ApiTest {
         );
     }
 
-    private Reservation createReservation(Room room, User guest) {
-        return Reservation.builder()
-            .room(room)
-            .guest(guest)
-            .totalPrice(new Money(20_000))
-            .totalGuest(1)
-            .reservationDate(new ReservationDate(now(), now().plusDays(1L)))
-            .reservationStatus(PENDING)
-            .build();
-    }
-
     private Reservation createReservationByDay(int day) {
         return Reservation.builder()
             .room(room)
@@ -172,46 +155,4 @@ class ReservationHostServiceTest extends ApiTest {
             .build();
     }
 
-    private User createGuest() {
-        return User.builder()
-            .oauthId("1")
-            .provider("kakao")
-            .name("아만드")
-            .email(new Email("aramnd@gmail.com"))
-            .userRole(UserRole.GUEST)
-            .profileImgUrl("url")
-            .build();
-    }
-
-    private User createHost() {
-        return User.builder()
-            .oauthId("host")
-            .provider("host")
-            .userRole(UserRole.HOST)
-            .name("host")
-            .email(new Email("host@gmail.com"))
-            .profileImgUrl("urlurlrurlrurlurlurl")
-            .build();
-    }
-
-    private Room createRoom(User host) {
-        Room room = Room.builder()
-            .name("별이 빛나는 밤")
-            .maxGuestNum(10)
-            .description("방 설명 입니다")
-            .address(new RoomAddress("00000", "창원", "의창구"))
-            .price(new Money(10_000))
-            .roomOption(new RoomOption(1, 1, 1))
-            .roomType(RoomType.APARTMENT)
-            .roomScope(RoomScope.PRIVATE)
-            .host(host)
-            .roomImages(List.of(createRoomImage()))
-            .build();
-
-        return room;
-    }
-
-    private RoomImage createRoomImage() {
-        return new RoomImage("aaa");
-    }
 }
