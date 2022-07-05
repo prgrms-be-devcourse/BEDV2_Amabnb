@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.dto.request.ModifyRoomRequest;
 import com.prgrms.amabnb.room.dto.response.RoomResponse;
@@ -50,10 +51,10 @@ public class HostRoomApi {
     }
 
     @GetMapping
-    public ResponseEntity<List<RoomResponse>> getRoomsForHost(
+    public ResponseEntity<ApiResponse<List<RoomResponse>>> getRoomsForHost(
         @AuthenticationPrincipal JwtAuthentication host
     ) {
         List<RoomResponse> roomResponseList = hostRoomService.searchRoomsForHost(host.id());
-        return ResponseEntity.ok(roomResponseList);
+        return ResponseEntity.ok(new ApiResponse<>(roomResponseList));
     }
 }
