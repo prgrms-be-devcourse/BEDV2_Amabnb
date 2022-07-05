@@ -37,7 +37,8 @@ class RoomRepositoryTest extends RepositoryTest {
     @DisplayName("숙소정보를 db에 저장할 수 있다")
     void roomJpaSave() {
         //given
-        Room room = createRoom(null);
+        User host = userRepository.save(createUser());
+        Room room = createRoom(host);
 
         //when
         roomRepository.save(room);
@@ -51,12 +52,13 @@ class RoomRepositoryTest extends RepositoryTest {
     @DisplayName("필터로 걸러진 숙소들을 찾는다")
     void findRoomsByFilter() {
         //given
+        User host = userRepository.save(createUser());
         SearchRoomFilterCondition filter = createFullFilter();
 
-        Room room2 = createRoom(null);
+        Room room2 = createRoom(host);
         roomRepository.save(room2);
 
-        Room room3 = createRoom(null);
+        Room room3 = createRoom(host);
         room3.changePrice(new Money(50000));
         roomRepository.save(room3);
         //when
@@ -70,10 +72,11 @@ class RoomRepositoryTest extends RepositoryTest {
     @DisplayName("필터 조건이 없어으면 모든 숙소정보를 가져온다.")
     void noFilterTest() {
         //given
+        User host = userRepository.save(createUser());
         SearchRoomFilterCondition nullFilter = createNullFilter();
-        Room room1 = createRoom(null);
-        Room room2 = createRoom(null);
-        Room room3 = createRoom(null);
+        Room room1 = createRoom(host);
+        Room room2 = createRoom(host);
+        Room room3 = createRoom(host);
         roomRepository.save(room1);
         roomRepository.save(room2);
         roomRepository.save(room3);
@@ -90,10 +93,19 @@ class RoomRepositoryTest extends RepositoryTest {
     void findRoomByHostTest() {
         //given
         User host = userRepository.save(createUser());
+        User host2 = userRepository.save(User.builder()
+            .oauthId("testOauthId")
+            .provider("testProvider")
+            .userRole(UserRole.GUEST)
+            .name("testUser")
+            .email(new Email("asaaaa@gmail.com"))
+            .phoneNumber(new PhoneNumber("010-2512-1231"))
+            .profileImgUrl("urlurlrurlrurlurlurl")
+            .build());
 
         Room room1 = createRoom(host);
         Room room2 = createRoom(host);
-        Room room3 = createRoom(null);
+        Room room3 = createRoom(host2);
 
         roomRepository.save(room1);
         roomRepository.save(room2);
@@ -173,6 +185,6 @@ class RoomRepositoryTest extends RepositoryTest {
     }
 
     private RoomImage createRoomImage() {
-        return new RoomImage(null, "aa");
+        return new RoomImage("aa");
     }
 }
