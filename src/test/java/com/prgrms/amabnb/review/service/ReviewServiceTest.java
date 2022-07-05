@@ -42,9 +42,9 @@ class ReviewServiceTest {
     @BeforeEach
     @Transactional
     void setBasicGiven() {
-        var givenGuest = createUser("guest");
+        var givenGuest = createUserWithId("guest");
         var givenHost = createUser("host");
-        givenReservation = createReservation(createRoom(givenHost), givenGuest);
+        givenReservation = createReservationWithId(createRoom(givenHost), givenGuest);
         givenReservation.changeStatus(COMPLETED);
     }
 
@@ -109,13 +109,13 @@ class ReviewServiceTest {
     @DisplayName("게스트는 본인이 작성한 리뷰를 수정할 수 있다 #81")
     class EditReview {
         Review givenReview;
-        ReservationReviewResponse givenReservationDto;
+        ReservationReviewResponse givenReservationReviewDto;
         EditReviewRequest givenEditRequest;
 
         @BeforeEach
         void setAdditionalGiven() {
             givenReview = createReviewWithId(givenReservation);
-            givenReservationDto = ReservationReviewResponse.from(givenReservation);
+            givenReservationReviewDto = ReservationReviewResponse.from(givenReservation);
 
             givenEditRequest = new EditReviewRequest("edit-content", 5);
         }
@@ -124,7 +124,7 @@ class ReviewServiceTest {
         @DisplayName("리뷰를 수정한다")
         void createUserReview() {
             when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(givenReview));
-            when(reservationGuestService.findById(anyLong())).thenReturn(givenReservationDto);
+            when(reservationGuestService.findById(anyLong())).thenReturn(givenReservationReviewDto);
 
             var guest = givenReservation.getGuest();
             var result = reviewService.editReview(guest.getId(), givenReview.getId(), givenEditRequest);
