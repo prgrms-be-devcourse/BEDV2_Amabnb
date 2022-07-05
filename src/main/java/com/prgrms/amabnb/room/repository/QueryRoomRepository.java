@@ -6,11 +6,13 @@ import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
+import com.prgrms.amabnb.room.dto.response.RoomScrollResponse;
 import com.prgrms.amabnb.room.entity.Room;
 
 public interface QueryRoomRepository {
 
-    List<Room> findRoomsByFilterCondition(SearchRoomFilterCondition searchRoomFilterCondition, Pageable pageable);
+    List<RoomScrollResponse> findRoomsByFilterCondition(SearchRoomFilterCondition searchRoomFilterCondition,
+        Pageable pageable);
 
     List<Room> findRoomsByHostId(Long userId);
 

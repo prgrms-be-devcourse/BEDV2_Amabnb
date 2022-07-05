@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.dto.response.RoomResponse;
+import com.prgrms.amabnb.room.dto.response.RoomScrollResponse;
 import com.prgrms.amabnb.room.exception.RoomNotFoundException;
 import com.prgrms.amabnb.room.repository.RoomRepository;
 
@@ -18,13 +19,10 @@ public class GuestRoomService {
 
     private final RoomRepository roomRepository;
 
-    public List<RoomResponse> searchRoomsByFilterCondition(SearchRoomFilterCondition filterCondition,
+    public List<RoomScrollResponse> searchRoomsByFilterCondition(SearchRoomFilterCondition filterCondition,
         Pageable pageable) {
 
-        return roomRepository.findRoomsByFilterCondition(filterCondition, pageable)
-            .stream()
-            .map(RoomResponse::from)
-            .toList();
+        return roomRepository.findRoomsByFilterCondition(filterCondition, pageable);
 
     }
 

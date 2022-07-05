@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
+import com.prgrms.amabnb.room.dto.response.RoomScrollResponse;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
@@ -38,11 +39,11 @@ class GuestRoomServiceTest {
     @Test
     @DisplayName("필터 검색을 할 수 있다.")
     void searchByFilter() {
-        //given
-        List<Room> rooms = List.of(createRoom(), createRoom());
+        // //given
+        List<RoomScrollResponse> response = List.of(new RoomScrollResponse());
         SearchRoomFilterCondition searchRoomFilterCondition = createSearchRoomFilterCondition();
         given(roomRepository.findRoomsByFilterCondition(any(SearchRoomFilterCondition.class), any(Pageable.class)))
-            .willReturn(rooms);
+            .willReturn(response);
 
         //when
         guestRoomService.searchRoomsByFilterCondition(searchRoomFilterCondition, PageRequest.of(0, 10));

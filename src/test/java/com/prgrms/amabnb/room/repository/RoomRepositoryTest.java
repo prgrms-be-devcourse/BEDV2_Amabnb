@@ -15,6 +15,7 @@ import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
+import com.prgrms.amabnb.room.dto.response.RoomScrollResponse;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
@@ -62,7 +63,7 @@ class RoomRepositoryTest extends RepositoryTest {
         room3.changePrice(new Money(50000));
         roomRepository.save(room3);
         //when
-        List<Room> rooms = roomRepository.findRoomsByFilterCondition(filter, PageRequest.of(0, 10));
+        List<RoomScrollResponse> rooms = roomRepository.findRoomsByFilterCondition(filter, PageRequest.of(0, 10));
 
         //then
         assertThat(rooms.size()).isEqualTo(1);
@@ -81,7 +82,7 @@ class RoomRepositoryTest extends RepositoryTest {
         roomRepository.save(room2);
         roomRepository.save(room3);
         //when
-        List<Room> rooms = roomRepository.findRoomsByFilterCondition(nullFilter, PageRequest.of(0, 10));
+        List<RoomScrollResponse> rooms = roomRepository.findRoomsByFilterCondition(nullFilter, PageRequest.of(0, 10));
 
         //then
         assertThat(rooms.size()).isEqualTo(3);
