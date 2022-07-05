@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.security.oauth;
 
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -38,13 +39,7 @@ class OAuthServiceTest {
 
         @BeforeEach
         void MOCK_SET() {
-            givenUserProfile = UserProfile.builder()
-                .oauthId("something oauth id")
-                .provider("kakao")
-                .name("subin")
-                .email("armand@prgrms.com")
-                .profileImgUrl("something imageurl")
-                .build();
+            givenUserProfile = createUserProfile("test");
             givenToken = new TokenResponse("accessToekn", "refreshToken");
             givenRegisteredUser = new UserRegisterResponse(1L, "ROLE_USER");
 

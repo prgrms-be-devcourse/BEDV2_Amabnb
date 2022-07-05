@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.user.service;
 
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -14,8 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.prgrms.amabnb.common.vo.Email;
-import com.prgrms.amabnb.security.oauth.UserProfile;
 import com.prgrms.amabnb.user.dto.response.MyUserInfoResponse;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.entity.UserRole;
@@ -31,37 +30,15 @@ class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    private UserProfile createUserProfile() {
-        return UserProfile.builder()
-            .oauthId("1")
-            .provider("kakao")
-            .name("아만드")
-            .email("asdasd@gmail.com")
-            .profileImgUrl("url")
-            .build();
-    }
-
-    private User createUser(long userId, UserRole userRole) {
-        return User.builder()
-            .id(userId)
-            .oauthId("1")
-            .provider("kakao")
-            .name("아만드")
-            .email(new Email("aramnd@gmail.com"))
-            .userRole(userRole)
-            .profileImgUrl("url")
-            .build();
-    }
-
     @Nested
     class register {
         @DisplayName("저장된 유저가 없을 경우 유저를 저장하고 유저 정보를 반환한다.")
         @Test
         void register_NotSavedUser() {
             // given
-            var userProfile = createUserProfile();
+            var userProfile = createUserProfile("test");
             given(userRepository.findByOauthId(any(String.class))).willReturn(Optional.empty());
-            given(userRepository.save(any(User.class))).willReturn(createUser(1L, UserRole.GUEST));
+            given(userRepository.save(any(User.class))).willReturn(createUserWithId("test"));
 
             // when
             var registerResponse = userService.register(userProfile);
@@ -77,17 +54,16 @@ class UserServiceTest {
         @Test
         void register_SavedUser() {
             // given
-            var userProfile = createUserProfile();
-            given(userRepository.findByOauthId(any(String.class))).willReturn(
-                Optional.of(createUser(2L, UserRole.HOST)));
+            var userProfile = createUserProfile("test");
+            given(userRepository.findByOauthId(any(String.class))).willReturn(Optional.of(createUserWithId("test")));
 
             // when
             var registerResponse = userService.register(userProfile);
 
             // then
             assertAll(
-                () -> assertThat(registerResponse.id()).isEqualTo(2L),
-                () -> assertThat(registerResponse.role()).isEqualTo("ROLE_HOST")
+                () -> assertThat(registerResponse.id()).isEqualTo(1L),
+                () -> assertThat(registerResponse.role()).isEqualTo("ROLE_GUEST")
             );
         }
     }
@@ -95,7 +71,7 @@ class UserServiceTest {
     @Nested
     @DisplayName("유저 정보를 조회할 수 있다 #45")
     class FindUserInfo {
-        User givenUser = createUser(1L, UserRole.GUEST);
+        User givenUser = createUserWithId("test");
 
         @DisplayName("Principle 에서 userId를 파싱해 유저정보를 db 에서 가져온다")
         @Test
@@ -129,7 +105,7 @@ class UserServiceTest {
     @Nested
     @DisplayName("유저는 서비스 탈퇴를 할 수 있다 #46")
     class ExitUser {
-        User givenUser = createUser(1L, UserRole.GUEST);
+        User givenUser = createUserWithId("test");
 
         @DisplayName("유저가 탈퇴하면 해당하는 유저 정보를 파기한다")
         @Test
