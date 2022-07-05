@@ -155,7 +155,7 @@ class ReviewApiTest extends ApiTest {
         @BeforeEach
         @Transactional
         void setAdditionalGiven() {
-            givenReview = reviewRepository.save(new Review(1L, "content", 4, givenReservation));
+            givenReview = reviewRepository.save(new Review("content", 4, givenReservation));
         }
 
         @Test
