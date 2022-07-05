@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.room.dto.request.PageRoomRequest;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.dto.response.RoomResponse;
@@ -24,7 +25,7 @@ public class RoomApi {
     private final GuestRoomService guestRoomService;
 
     @GetMapping
-    public ResponseEntity<List<RoomSearchResponse>> getRooms(
+    public ResponseEntity<ApiResponse<List<RoomSearchResponse>>> getRooms(
         SearchRoomFilterCondition searchRoomFilterCondition,
         PageRoomRequest pageRoomRequest
     ) {
@@ -32,13 +33,13 @@ public class RoomApi {
         List<RoomSearchResponse> roomResponses = guestRoomService.searchRoomsByFilterCondition(
             searchRoomFilterCondition, pageRoomRequest.of());
 
-        return ResponseEntity.ok(roomResponses);
+        return ResponseEntity.ok(new ApiResponse<>(roomResponses));
     }
 
     @GetMapping("/{roomId}")
-    public ResponseEntity<RoomResponse> getRoomDetail(@PathVariable Long roomId) {
+    public ResponseEntity<ApiResponse<RoomResponse>> getRoomDetail(@PathVariable Long roomId) {
         RoomResponse roomResponse = guestRoomService.searchRoomDetail(roomId);
-        return ResponseEntity.ok(roomResponse);
+        return ResponseEntity.ok(new ApiResponse<>(roomResponse));
     }
 
 }

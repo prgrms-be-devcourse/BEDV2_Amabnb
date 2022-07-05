@@ -1,8 +1,10 @@
 package com.prgrms.amabnb.room.api;
 
+import static com.prgrms.amabnb.common.fixture.ReviewFixture.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -10,7 +12,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -18,93 +19,20 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.prgrms.amabnb.common.vo.Email;
-import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
-import com.prgrms.amabnb.room.dto.request.ModifyRoomRequest;
-import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
-import com.prgrms.amabnb.room.repository.RoomRepository;
-import com.prgrms.amabnb.room.service.GuestRoomService;
-import com.prgrms.amabnb.room.service.HostRoomService;
-import com.prgrms.amabnb.security.oauth.OAuthService;
-import com.prgrms.amabnb.security.oauth.UserProfile;
-import com.prgrms.amabnb.user.entity.User;
-import com.prgrms.amabnb.user.entity.UserRole;
-import com.prgrms.amabnb.user.repository.UserRepository;
 
 class RoomApiTest extends ApiTest {
-
-    @Autowired
-    HostRoomService hostRoomService;
-
-    @Autowired
-    GuestRoomService guestRoomService;
-
-    @Autowired
-    RoomRepository roomRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    OAuthService oAuthService;
-
-    @Test
-    @DisplayName("숙소 등록 성공 테스트")
-    void createRoom() throws Exception {
-        String accessToken = 로그인_요청();
-        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-
-        mockMvc.perform(post("/host/rooms")
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createRoomRequest)))
-            .andExpect(status().isCreated())
-            .andDo(print())
-            .andDo(document("room-create",
-                requestFields(
-                    fieldWithPath("name").type(JsonFieldType.STRING).description("roomName"),
-                    fieldWithPath("price").type(JsonFieldType.NUMBER).description("price"),
-                    fieldWithPath("description").type(JsonFieldType.STRING).description("description"),
-                    fieldWithPath("maxGuestNum").type(JsonFieldType.NUMBER).description("maxGuestNum"),
-                    fieldWithPath("zipcode").type(JsonFieldType.STRING).description("zipcode"),
-                    fieldWithPath("address").type(JsonFieldType.STRING).description("address"),
-                    fieldWithPath("detailAddress").type(JsonFieldType.STRING).description("detailAddress"),
-                    fieldWithPath("bedCnt").type(JsonFieldType.NUMBER).description("bedCnt"),
-                    fieldWithPath("bedRoomCnt").type(JsonFieldType.NUMBER).description("bedRoomCnt"),
-                    fieldWithPath("bathRoomCnt").type(JsonFieldType.NUMBER).description("bathRoomCnt"),
-                    fieldWithPath("roomType").type(JsonFieldType.STRING).description("roomType"),
-                    fieldWithPath("roomScope").type(JsonFieldType.STRING).description("roomScope"),
-                    fieldWithPath("imagePaths").type(JsonFieldType.ARRAY).description("roomImagePath")
-                )
-            ));
-    }
-
-    @Test
-    @DisplayName("숙소는 userId가 없으면 등록되지 않는다.")
-    void nullUserIdTest() throws Exception {
-        //given
-        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-
-        //when,then
-        mockMvc.perform(post("/rooms")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createRoomRequest)))
-            .andExpect(status().isUnauthorized());
-    }
 
     @Test
     @WithMockUser
     @DisplayName("필터 검색을 할 수 있다.")
     void filterSearchTest() throws Exception {
         //given
-        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-        User user = userRepository.save(createUser());
-        Room room = createRoomRequest.toRoom(user);
-        roomRepository.save(room);
+        String accessToken = 로그인_요청();
+        saveRoom(accessToken);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("minBeds", "1");
@@ -117,12 +45,69 @@ class RoomApiTest extends ApiTest {
         params.add("size", "10");
         params.add("page", "1");
 
-        // when, then
+        // when
         mockMvc.perform(get("/rooms")
                 .contentType(MediaType.APPLICATION_JSON)
                 .params(params))
+            //then
             .andExpect(status().isOk())
-            .andDo(print());
+            .andDo(print())
+            .andDo(document("room-filter-search",
+                requestParameters(
+                    parameterWithName("minBeds").description("최수 침대 수"),
+                    parameterWithName("minBedrooms").description("최수 침실 수"),
+                    parameterWithName("minBathrooms").description("최소 욕실 수"),
+                    parameterWithName("minPrice").description("최소 1박 가격"),
+                    parameterWithName("maxPrice").description("최대 1박 가격"),
+                    parameterWithName("roomTypes").description("숙소 유형"),
+                    parameterWithName("roomScopes").description("숙소 범위"),
+                    parameterWithName("size").description("페이지 사이즈"),
+                    parameterWithName("page").description("페이지 번호")
+                ),
+                responseFields(
+                    fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("숙소 아이디"),
+                    fieldWithPath("data[].name").type(JsonFieldType.STRING).description("숙소 이름"),
+                    fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("1박 가격"),
+                    fieldWithPath("data[].imagePaths").type(JsonFieldType.ARRAY).description("숙소 이미지 경로")
+                )
+            ));
+
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("숙소 상세정보를 가져온다.")
+    void getRoomDetail() throws Exception {
+        //given
+        String accessToken = 로그인_요청();
+        Long roomId = saveRoom(accessToken);
+
+        //when
+        mockMvc.perform(get("/rooms/{roomId}", roomId)
+                .contentType(MediaType.APPLICATION_JSON))
+            //then
+            .andExpect(status().isOk())
+            .andDo(print())
+            .andDo(document("room-detail",
+                pathParameters(
+                    parameterWithName("roomId").description("숙소 아이디")
+                ),
+                responseFields(
+                    fieldWithPath("data.name").type(JsonFieldType.STRING).description("숙소 이름"),
+                    fieldWithPath("data.price").type(JsonFieldType.NUMBER).description("1박 가격"),
+                    fieldWithPath("data.description").type(JsonFieldType.STRING).description("숙소 설명"),
+                    fieldWithPath("data.maxGuestNum").type(JsonFieldType.NUMBER).description("최대 게스트 수"),
+                    fieldWithPath("data.zipcode").type(JsonFieldType.STRING).description("우편번호"),
+                    fieldWithPath("data.address").type(JsonFieldType.STRING).description("주소"),
+                    fieldWithPath("data.detailAddress").type(JsonFieldType.STRING).description("상세 주소"),
+                    fieldWithPath("data.bedCnt").type(JsonFieldType.NUMBER).description("침대 수"),
+                    fieldWithPath("data.bedRoomCnt").type(JsonFieldType.NUMBER).description("침실 수"),
+                    fieldWithPath("data.bathRoomCnt").type(JsonFieldType.NUMBER).description("욕실 수"),
+                    fieldWithPath("data.roomType").type(JsonFieldType.STRING).description("숙소 유형"),
+                    fieldWithPath("data.roomScope").type(JsonFieldType.STRING).description("숙소 범위"),
+                    fieldWithPath("data.imagePaths[].imagePath").type(JsonFieldType.STRING).description("숙소 이미지 경로")
+                )
+            ));
 
     }
 
@@ -146,22 +131,6 @@ class RoomApiTest extends ApiTest {
 
     @Test
     @WithMockUser
-    @DisplayName("숙소 상세정보를 가져온다.")
-    void getRoomDetail() throws Exception {
-        //given
-        String accessToken = 로그인_요청();
-        Long saveRoomId = saveRoom(accessToken);
-
-        //when, then
-        mockMvc.perform(get("/rooms/" + saveRoomId)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andDo(print());
-
-    }
-
-    @Test
-    @WithMockUser
     @DisplayName("등록되지 않은 숙소 상세정보를 가져오지 못한다.")
     void getRoomDetailFailTest() throws Exception {
         //given
@@ -175,66 +144,8 @@ class RoomApiTest extends ApiTest {
 
     }
 
-    @Test
-    @DisplayName("호스트는 자신이 등록한 방 목록을 가져온다")
-    void getHostRooms() throws Exception {
-        //given
-        String accessToken = 로그인_요청();
-        saveRoom(accessToken);
-        saveRoom(accessToken);
-
-        //when, then
-        mockMvc.perform(get("/host/rooms")
-                .header(HttpHeaders.AUTHORIZATION, accessToken))
-            .andExpect(status().isOk())
-            .andDo(print());
-    }
-
-    @Test
-    @DisplayName("호스트는 자신이 등록한 숙소를 수정할 수 있다.")
-    void modifyTest() throws Exception {
-        //given
-        ModifyRoomRequest modifyRequest = createModifyRequest();
-        String accessToken = 로그인_요청();
-        Long roomId = saveRoom(accessToken);
-
-        // when,then
-        mockMvc.perform(put("/host/rooms/" + roomId)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(modifyRequest)))
-            .andExpect(status().isOk())
-            .andDo(print());
-
-    }
-
-    @Test
-    @DisplayName("Request 하나라도 값이 없다면 수정이 불가능하다")
-    void name() throws Exception {
-        //given
-        String accessToken = 로그인_요청();
-        Long roomId = saveRoom(accessToken);
-
-        ModifyRoomRequest modifyRequest = ModifyRoomRequest.builder()
-            .bedCnt(11)
-            .bedRoomCnt(11)
-            .bathRoomCnt(11)
-            .description("수정된 방 설명")
-            .price(111111)
-            .maxGuestNum(1111)
-            .build();
-        //when
-        mockMvc.perform(put("/host/rooms/" + roomId)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(modifyRequest)))
-            .andExpect(status().isBadRequest());
-        //then
-
-    }
-
     private String 로그인_요청() {
-        return "Bearer" + oAuthService.register(createUserProfile()).accessToken();
+        return "Bearer" + oAuthService.register(createUserProfile("아만드")).accessToken();
     }
 
     private Long saveRoom(String accessToken) throws Exception {
@@ -246,16 +157,6 @@ class RoomApiTest extends ApiTest {
 
         String saveRoomId = location.replaceAll("[^0-9]", "");
         return Long.valueOf(saveRoomId);
-    }
-
-    private UserProfile createUserProfile() {
-        return UserProfile.builder()
-            .oauthId("1")
-            .provider("kakao")
-            .name("아만드")
-            .email("asdasd@gmail.com")
-            .profileImgUrl("url")
-            .build();
     }
 
     private CreateRoomRequest createCreateRoomRequest() {
@@ -273,30 +174,6 @@ class RoomApiTest extends ApiTest {
             .roomType(RoomType.HOUSE)
             .roomScope(RoomScope.PRIVATE)
             .imagePaths(List.of("aaa", "bbb"))
-            .build();
-    }
-
-    private ModifyRoomRequest createModifyRequest() {
-        return ModifyRoomRequest.builder()
-            .name("수정된 이름")
-            .bedCnt(11)
-            .bedRoomCnt(11)
-            .bathRoomCnt(11)
-            .description("수정된 방 설명")
-            .price(111111)
-            .maxGuestNum(1111)
-            .build();
-    }
-
-    private User createUser() {
-        return User.builder()
-            .oauthId("testOauthId")
-            .provider("testProvider")
-            .userRole(UserRole.GUEST)
-            .name("testUser")
-            .email(new Email("asdsadsad@gmail.com"))
-            .phoneNumber(new PhoneNumber("010-2312-1231"))
-            .profileImgUrl("urlurlrurlrurlurlurl")
             .build();
     }
 }
