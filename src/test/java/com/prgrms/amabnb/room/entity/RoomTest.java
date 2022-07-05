@@ -3,6 +3,8 @@ package com.prgrms.amabnb.room.entity;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -34,6 +36,7 @@ class RoomTest {
             .roomOption(roomOption)
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .roomImages(List.of(createRoomImage()))
             .build();
 
         //then
@@ -108,6 +111,7 @@ class RoomTest {
             .roomOption(roomOption)
             .roomType(RoomType.APARTMENT)
             .roomScope(RoomScope.PRIVATE)
+            .roomImages(List.of(createRoomImage()))
             .build();
 
         // when
@@ -115,5 +119,9 @@ class RoomTest {
 
         // then
         assertThat(result).isTrue();
+    }
+
+    private RoomImage createRoomImage() {
+        return new RoomImage("aaa");
     }
 }

@@ -2,6 +2,7 @@ package com.prgrms.amabnb.room.repository;
 
 import static com.prgrms.amabnb.room.entity.QRoom.*;
 import static com.prgrms.amabnb.room.entity.QRoomImage.*;
+import static com.querydsl.core.group.GroupBy.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -11,9 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
+import com.prgrms.amabnb.room.dto.response.RoomSearchResponse;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -26,11 +29,14 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Room> findRoomsByFilterCondition(SearchRoomFilterCondition filterCondition, Pageable pageable) {
+    public List<RoomSearchResponse> findRoomsByFilterCondition(
+        SearchRoomFilterCondition filterCondition,
+        Pageable pageable
+    ) {
 
-        return jpaQueryFactory.selectFrom(room)
-            .leftJoin(room.roomImages, roomImage)
-            .fetchJoin()
+        return jpaQueryFactory.from(room)
+            .innerJoin(roomImage)
+            .on(room.id.eq(roomImage.room.id))
             .where(
                 bedsGoe(filterCondition.getMinBeds()),
                 bedroomsGoe(filterCondition.getMinBedrooms()),
@@ -42,8 +48,16 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
             )
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
-            .orderBy(room.id.desc())
-            .fetch();
+            .transform(
+                groupBy(room.id).list(
+                    Projections.fields(RoomSearchResponse.class,
+                        room.id,
+                        room.name,
+                        room.price.value.as("price"),
+                        list(roomImage.imagePath).as("imagePaths")
+                    )
+                )
+            );
 
     }
 
@@ -53,6 +67,7 @@ public class QueryRoomRepositoryImpl implements QueryRoomRepository {
             .leftJoin(room.roomImages, roomImage)
             .fetchJoin()
             .where(room.host.id.eq(userId))
+            .distinct()
             .fetch();
     }
 

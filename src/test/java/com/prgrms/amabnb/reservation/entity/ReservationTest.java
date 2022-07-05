@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.reservation.entity;
 
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -12,18 +13,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.reservation.exception.ReservationInvalidValueException;
 import com.prgrms.amabnb.reservation.exception.ReservationStatusException;
 import com.prgrms.amabnb.room.entity.Room;
-import com.prgrms.amabnb.room.entity.RoomScope;
-import com.prgrms.amabnb.room.entity.RoomType;
-import com.prgrms.amabnb.room.entity.vo.RoomAddress;
-import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.user.entity.User;
-import com.prgrms.amabnb.user.entity.UserRole;
 
 class ReservationTest {
 
@@ -34,7 +29,7 @@ class ReservationTest {
         int totalGuest = 5;
         Money totalPrice = new Money(10_000);
         ReservationDate reservationDate = new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L));
-        Room room = createRoom();
+        Room room = createRoom(createUser("host"));
         User guest = createUser("guest");
 
         // when
@@ -135,7 +130,7 @@ class ReservationTest {
     }
 
     private Reservation.ReservationBuilder createReservationBuilder() {
-        Room room = createRoom();
+        Room room = createRoom(createUser("host"));
         User user = createUser("guest");
 
         return Reservation.builder()
@@ -145,30 +140,6 @@ class ReservationTest {
             .reservationStatus(PENDING)
             .room(room)
             .guest(user);
-    }
-
-    private Room createRoom() {
-        return Room.builder()
-            .name("별이 빛나는 밤")
-            .maxGuestNum(1)
-            .description("방 설명 입니다")
-            .address(new RoomAddress("00000", "창원", "의창구"))
-            .price(new Money(1_000))
-            .roomOption(new RoomOption(1, 1, 1))
-            .roomType(RoomType.APARTMENT)
-            .roomScope(RoomScope.PRIVATE)
-            .build();
-    }
-
-    private User createUser(String name) {
-        return User.builder()
-            .oauthId(name)
-            .provider(name)
-            .userRole(UserRole.GUEST)
-            .name(name)
-            .email(new Email(name + "@gmail.com"))
-            .profileImgUrl("urlurlrurlrurlurlurl")
-            .build();
     }
 
 }
