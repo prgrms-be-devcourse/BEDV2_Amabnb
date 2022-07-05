@@ -90,7 +90,7 @@ public class Fixture {
         return reservationBuilder(room, guest).id(1L).build();
     }
 
-    public static Reservation.ReservationBuilder reservationBuilder(Room room, User guest) {
+    private static Reservation.ReservationBuilder reservationBuilder(Room room, User guest) {
         return Reservation.builder()
             .room(room)
             .guest(guest)
