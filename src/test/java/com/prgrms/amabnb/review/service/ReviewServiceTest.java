@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.review.service;
 
+import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static com.prgrms.amabnb.review.service.ReviewServiceTest.Fixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -19,7 +20,6 @@ import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.dto.response.ReservationReviewResponse;
 import com.prgrms.amabnb.reservation.entity.Reservation;
-import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
 import com.prgrms.amabnb.reservation.service.ReservationGuestService;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
@@ -63,6 +63,7 @@ class ReviewServiceTest {
                 .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
                 .totalGuest(1)
                 .totalPrice(new Money(1000))
+                .reservationStatus(PENDING)
                 .room(room)
                 .guest(guest)
                 .build();
@@ -95,7 +96,7 @@ class ReviewServiceTest {
         @Test
         @DisplayName("리뷰를 작성한다")
         void createUserReview() {
-            givenReservation.changeStatus(ReservationStatus.COMPLETED);
+            givenReservation.changeStatus(COMPLETED);
             var givenReservationDto = ReservationReviewResponse.from(givenReservation);
             var givenReview = new Review(1L, "content", 2, givenReservation);
             var givenRequestDto = new CreateReviewRequest("content", 2);
@@ -122,7 +123,7 @@ class ReviewServiceTest {
         @Test
         @DisplayName("리뷰를 삭제한다")
         void deleteUserReview() {
-            givenReservation.changeStatus(ReservationStatus.COMPLETED);
+            givenReservation.changeStatus(COMPLETED);
             var givenReview = new Review(1L, "content", 2, givenReservation);
             var reservationDto = new ReservationReviewResponse(givenReservation.getId(),
                 givenReservation.getReservationStatus(), givenGuest.getId());

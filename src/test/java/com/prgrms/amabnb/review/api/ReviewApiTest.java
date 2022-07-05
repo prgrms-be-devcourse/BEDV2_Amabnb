@@ -87,6 +87,7 @@ class ReviewApiTest extends ApiTest {
         @DisplayName("리뷰를 작성할 수 있다.")
         void postReview() throws Exception {
             givenReservation.changeStatus(ReservationStatus.COMPLETED);
+            reservationRepository.save(givenReservation);
 
             when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest)
                 .andExpect(status().isCreated())
@@ -101,6 +102,7 @@ class ReviewApiTest extends ApiTest {
         void exception1(ReservationStatus status) throws Exception {
             var errorMessage = "숙소 방문 완료 후 리뷰를 작성할 수 있습니다.";
             givenReservation.changeStatus(status);
+            reservationRepository.save(givenReservation);
 
             when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest)
                 .andExpect(status().isBadRequest())
@@ -114,6 +116,7 @@ class ReviewApiTest extends ApiTest {
             var errorMessage = "이미 작성한 예약 건 입니다.";
 
             givenReservation.changeStatus(ReservationStatus.COMPLETED);
+            reservationRepository.save(givenReservation);
 
             var firstReview = when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest);
             firstReview.andExpect(status().isCreated());
@@ -130,6 +133,7 @@ class ReviewApiTest extends ApiTest {
             var errorMessage = "예약자 본인만 리뷰를 작성할 수 있습니다.";
 
             givenReservation.changeStatus(ReservationStatus.COMPLETED);
+            reservationRepository.save(givenReservation);
 
             var illegalToken = 로그인_요청(createUserProfile("illegal"));
 

@@ -42,6 +42,7 @@ class ReservationTest {
             .totalGuest(totalGuest)
             .totalPrice(totalPrice)
             .reservationDate(reservationDate)
+            .reservationStatus(PENDING)
             .room(room)
             .guest(guest)
             .build();
@@ -141,6 +142,7 @@ class ReservationTest {
             .totalGuest(5)
             .totalPrice(new Money(10_000))
             .reservationDate(new ReservationDate(LocalDate.now(), LocalDate.now().plusDays(3L)))
+            .reservationStatus(PENDING)
             .room(room)
             .guest(user);
     }

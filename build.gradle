@@ -53,6 +53,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
     testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'com.google.guava:guava:31.1-jre'
 
     // lombok
     compileOnly 'org.projectlombok:lombok'
