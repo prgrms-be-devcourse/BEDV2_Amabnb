@@ -5,6 +5,7 @@ import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.vo.ReservationDate;
@@ -15,6 +16,7 @@ import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.security.oauth.UserProfile;
 import com.prgrms.amabnb.user.entity.User;
+import com.prgrms.amabnb.user.entity.UserRole;
 
 public class ReviewFixture {
     public static Reservation createReservation(User guest, Room room) {
@@ -54,6 +56,19 @@ public class ReviewFixture {
             .email(UUID.randomUUID() + "@gmail.com")
             .profileImgUrl("url")
             .build();
+    }
+
+    public static User createUser(String name) {
+        return User.builder()
+            .id(1L)
+            .name(name)
+            .userRole(UserRole.GUEST)
+            .provider("kakao")
+            .oauthId("oauthId")
+            .email(new Email("kimziou77@naver.com"))
+            .profileImgUrl("something url")
+            .build();
+
     }
 
 }
