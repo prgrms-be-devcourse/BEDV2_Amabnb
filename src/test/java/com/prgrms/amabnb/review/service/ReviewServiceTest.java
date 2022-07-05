@@ -16,7 +16,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.prgrms.amabnb.reservation.dto.response.ReservationReviewResponse;
 import com.prgrms.amabnb.reservation.entity.Reservation;
@@ -40,7 +39,6 @@ class ReviewServiceTest {
     private Reservation givenReservation;
 
     @BeforeEach
-    @Transactional
     void setBasicGiven() {
         var givenGuest = createUserWithId("guest");
         var givenHost = createUser("host");

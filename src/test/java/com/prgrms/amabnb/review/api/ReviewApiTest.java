@@ -44,7 +44,6 @@ class ReviewApiTest extends ApiTest {
     private String givenGuestAccessToken;
 
     @BeforeEach
-    @Transactional
     void setBasicGiven() throws Exception {
         var givenGuest = userRepository.save(createUser("guest"));
         var givenHost = userRepository.save(createUser("host"));
