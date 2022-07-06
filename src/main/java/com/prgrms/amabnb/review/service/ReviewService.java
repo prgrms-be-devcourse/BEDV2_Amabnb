@@ -70,9 +70,14 @@ public class ReviewService {
         return EditReviewResponse.from(editDto);
     }
 
-    public List<SearchReviewResponse> searchMyReviews(Long userId, SearchReviewRequest searchReviewDto,
-        PageRequest pageable) {
-        return reviewRepository.findAllByCondition(userId, searchReviewDto, pageable);
+    public List<SearchReviewResponse> searchMyReviews(
+        Long userId, SearchReviewRequest condition, PageRequest pageable) {
+        return reviewRepository.findMyReviewByCondition(userId, condition, pageable);
+    }
+
+    public List<SearchReviewResponse> searchRoomReviews(
+        Long roomId, SearchReviewRequest condition, PageRequest pageable) {
+        return reviewRepository.findRoomReviewByCondition(roomId, condition, pageable);
     }
 
     private void validateOneReservationOneReview(Long reservationId) {
@@ -92,4 +97,5 @@ public class ReviewService {
             throw new ReviewNoPermissionException();
         }
     }
+
 }

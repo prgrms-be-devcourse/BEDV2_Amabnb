@@ -35,6 +35,7 @@ import com.prgrms.amabnb.review.dto.request.PageReviewRequest;
 import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.repository.ReviewRepository;
+import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.repository.RoomRepository;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
@@ -62,7 +63,7 @@ class ReviewApiTest extends ApiTest {
         givenReservationId = extractId(예약_요청(givenGuestAccessToken, makeCreateReservationRequest(room)));
     }
 
-    private ResultActions 리뷰_작성(Long reservationId, String userAccessToken,
+    ResultActions 리뷰_작성(Long reservationId, String userAccessToken,
         CreateReviewRequest createReviewDto) throws Exception {
         return mockMvc.perform(post("/reservations/{reservationId}/reviews", reservationId)
             .header(HttpHeaders.AUTHORIZATION, userAccessToken)
@@ -70,7 +71,7 @@ class ReviewApiTest extends ApiTest {
             .content(toJson(createReviewDto)));
     }
 
-    private void 예약_상태_변경(Long reservationId, ReservationStatus status) {
+    void 예약_상태_변경(Long reservationId, ReservationStatus status) {
         var reservation = reservationRepository.findById(reservationId).get();
         reservation.changeStatus(status);
         reservationRepository.save(reservation);
@@ -144,7 +145,21 @@ class ReviewApiTest extends ApiTest {
     @DisplayName("게스트는 본인이 작성한 리뷰 목록을 조회할 수 있다 #70")
     class SearchMyReviews {
 
-        private List<String> guestTokens = new ArrayList<>();
+        List<String> guestTokens = new ArrayList<>();
+
+        ResultActions 본인_리뷰_조회(
+            String guestUserAccessToken, SearchReviewRequest request, PageReviewRequest page) throws Exception {
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("score", String.valueOf(request.getScore()));
+            params.add("size", String.valueOf(page.getSize()));
+            params.add("page", String.valueOf(page.getPage()));
+
+            return mockMvc.perform(get("/reviews")
+                .header(HttpHeaders.AUTHORIZATION, guestUserAccessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(params));
+        }
 
         @BeforeEach
         void setMultiValues() throws Exception {
@@ -165,20 +180,6 @@ class ReviewApiTest extends ApiTest {
             }
         }
 
-        private ResultActions 본인_리뷰_조회(
-            String guestUserAccessToken, SearchReviewRequest request, PageReviewRequest page) throws Exception {
-
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("score", String.valueOf(request.getScore()));
-            params.add("size", String.valueOf(page.getSize()));
-            params.add("page", String.valueOf(page.getPage()));
-
-            return mockMvc.perform(get("/reviews")
-                .header(HttpHeaders.AUTHORIZATION, guestUserAccessToken)
-                .contentType(MediaType.APPLICATION_JSON)
-                .params(params));
-        }
-
         @Test
         @DisplayName("조건에 맞는 리뷰를 전부 가져온다")
         void findMyReviews() throws Exception {
@@ -187,7 +188,60 @@ class ReviewApiTest extends ApiTest {
 
             본인_리뷰_조회(guestTokens.get(0), givenSearchRequest, givenPageReviewRequest)
                 .andExpect(status().isOk())
-                // .andExpect(jsonPath("$.data.]"))
+                .andDo(print());
+        }
+    }
+
+    @Nested
+    @DisplayName("게스트는 숙소의 리뷰를 조회할 수 있다 #67")
+    class SearchRoomReviews {
+
+        Room givenRoom;
+        String givenUserAccessToken;
+
+        ResultActions 숙소_리뷰_조회(
+            Long roomId, SearchReviewRequest request, PageReviewRequest page) throws Exception {
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("score", String.valueOf(request.getScore()));
+            params.add("size", String.valueOf(page.getSize()));
+            params.add("page", String.valueOf(page.getPage()));
+
+            return mockMvc.perform(get("/rooms/{roomId}/reviews", roomId)
+                .header(HttpHeaders.AUTHORIZATION, givenUserAccessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(params));
+        }
+
+        @BeforeEach
+        void setAdditionalGiven() throws Exception {
+            var host = userRepository.save(createUser(UUID.randomUUID().toString().substring(20)));
+            givenRoom = roomRepository.save(createRoom(host));
+            givenUserAccessToken = 로그인_요청("su");
+            for (int i = 0; i < 5; i++) {
+                writeReview(givenRoom, 5);
+            }
+            writeReview(givenRoom, 1);
+            writeReview(givenRoom, 2);
+            writeReview(givenRoom, 3);
+        }
+
+        void writeReview(Room room, int score) throws Exception {
+            var guest = userRepository.save(createUser(UUID.randomUUID().toString().substring(20)));
+            var accessToken = 로그인_요청(guest.getName());
+            var reservation = reservationRepository.save(createReservation(room, guest));
+            예약_상태_변경(reservation.getId(), COMPLETED);
+            리뷰_작성(reservation.getId(), accessToken, new CreateReviewRequest("content", score));
+        }
+
+        @Test
+        @DisplayName("조건에 맞는 리뷰를 전부 가져온다")
+        void searchRoomReviews() throws Exception {
+            var givenSearchRequest = new SearchReviewRequest(5);
+            var givenPageReviewRequest = new PageReviewRequest(10, 10);
+
+            숙소_리뷰_조회(givenRoom.getId(), givenSearchRequest, givenPageReviewRequest)
+                .andExpect(status().isOk())
                 .andDo(print());
         }
     }
@@ -198,7 +252,7 @@ class ReviewApiTest extends ApiTest {
         Review givenReview;
         EditReviewRequest givenEditDto;
 
-        private ResultActions 리뷰_수정(String userAccessToken, Long reviewId,
+        ResultActions 리뷰_수정(String userAccessToken, Long reviewId,
             EditReviewRequest editReviewDto) throws Exception {
             return mockMvc.perform(post("/reviews/{reviewId}", reviewId)
                 .header(HttpHeaders.AUTHORIZATION, userAccessToken)
@@ -240,7 +294,7 @@ class ReviewApiTest extends ApiTest {
     class DeleteReview {
         Review givenReview;
 
-        private ResultActions 리뷰_삭제(String userAccessToken, Long reviewId) throws Exception {
+        ResultActions 리뷰_삭제(String userAccessToken, Long reviewId) throws Exception {
             return mockMvc.perform(delete("/reviews/{reviewId}", reviewId)
                 .header(HttpHeaders.AUTHORIZATION, userAccessToken));
         }

@@ -87,21 +87,49 @@ class ReviewServiceTest {
     class SearchMyReviews {
 
         @Test
-        @DisplayName("서비스는 레포지토리에 검색 조건을 넘겨준다")
+        @DisplayName("개인 리뷰를 검색 조건에 따라 조회한다")
         void search() {
             var givenUserId = 1L;
-            var givenResult = List.of(new SearchReviewResponse(2));
+
             var givenCondition = new SearchReviewRequest(2);
             var givenPageable = new PageReviewRequest(10, 10);
 
+            var givenResult = List.of(new SearchReviewResponse(2, "content"));
+
             when(reviewRepository
-                .findAllByCondition(anyLong(), any(SearchReviewRequest.class), any(Pageable.class)))
+                .findMyReviewByCondition(anyLong(), any(SearchReviewRequest.class), any(Pageable.class)))
                 .thenReturn(givenResult);
 
             reviewService.searchMyReviews(givenUserId, givenCondition, givenPageable.of());
 
             then(reviewRepository).should(times(1))
-                .findAllByCondition(givenUserId, givenCondition, givenPageable.of());
+                .findMyReviewByCondition(givenUserId, givenCondition, givenPageable.of());
+        }
+
+    }
+
+    @Nested
+    @DisplayName("게스트는 숙소의 리뷰를 조회할 수 있다 #67")
+    class SearchRoomReviews {
+
+        @Test
+        @DisplayName("숙소 리뷰를 검색 조건에 따라 조회한다")
+        void search() {
+            var givenRoomId = 1L;
+
+            var givenCondition = new SearchReviewRequest(2);
+            var givenPageable = new PageReviewRequest(10, 10);
+
+            var givenResult = List.of(new SearchReviewResponse(2, "content"));
+
+            when(reviewRepository
+                .findRoomReviewByCondition(anyLong(), any(SearchReviewRequest.class), any()))
+                .thenReturn(givenResult);
+
+            reviewService.searchRoomReviews(givenRoomId, givenCondition, givenPageable.of());
+
+            then(reviewRepository).should(times(1))
+                .findRoomReviewByCondition(givenRoomId, givenCondition, givenPageable.of());
         }
 
     }

@@ -12,8 +12,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SearchReviewResponse {
     private int score;
+    private String content;
 
     public static SearchReviewResponse from(Review review) {
-        return new SearchReviewResponse(review.getScore());
+        return new SearchReviewResponse(review.getScore(), review.getContent());
     }
 }

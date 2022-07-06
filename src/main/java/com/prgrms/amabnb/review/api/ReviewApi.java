@@ -42,6 +42,26 @@ public class ReviewApi {
         return ResponseEntity.created(URI.create("/reviews/" + createdReviewId)).build();
     }
 
+    @GetMapping("/rooms/{roomId}/reviews")
+    public ResponseEntity<ApiResponse<List<SearchReviewResponse>>> searchRoomReviews(
+        @PathVariable Long roomId,
+        @Valid SearchReviewRequest searchDto,
+        PageReviewRequest pageReviewRequest
+    ) {
+        return ResponseEntity.ok(
+            new ApiResponse<>(reviewService.searchRoomReviews(roomId, searchDto, pageReviewRequest.of())));
+    }
+
+    @GetMapping("/reviews")
+    public ResponseEntity<ApiResponse<List<SearchReviewResponse>>> searchMyReviews(
+        @AuthenticationPrincipal JwtAuthentication user,
+        @Valid SearchReviewRequest searchReviewDto,
+        PageReviewRequest pageReviewRequest
+    ) {
+        return ResponseEntity.ok(
+            new ApiResponse<>(reviewService.searchMyReviews(user.id(), searchReviewDto, pageReviewRequest.of())));
+    }
+
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<Void> deleteReview(
         @AuthenticationPrincipal JwtAuthentication user,
@@ -61,13 +81,4 @@ public class ReviewApi {
         return ResponseEntity.ok().body(new ApiResponse<>(editedReview));
     }
 
-    @GetMapping("/reviews")
-    public ResponseEntity<ApiResponse<List<SearchReviewResponse>>> searchMyReviews(
-        @AuthenticationPrincipal JwtAuthentication user,
-        SearchReviewRequest searchReviewDto,
-        PageReviewRequest pageReviewRequest
-    ) {
-        return ResponseEntity.ok(
-            new ApiResponse<>(reviewService.searchMyReviews(user.id(), searchReviewDto, pageReviewRequest.of())));
-    }
 }

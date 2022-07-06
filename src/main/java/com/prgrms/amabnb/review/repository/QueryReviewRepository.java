@@ -8,5 +8,9 @@ import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
 import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
 
 public interface QueryReviewRepository {
-    List<SearchReviewResponse> findAllByCondition(Long userId, SearchReviewRequest condition, Pageable pageable);
+    List<SearchReviewResponse> findMyReviewByCondition(
+        Long userId, SearchReviewRequest condition, Pageable pageable);
+
+    List<SearchReviewResponse> findRoomReviewByCondition(
+        Long roomId, SearchReviewRequest condition, Pageable pageable);
 }

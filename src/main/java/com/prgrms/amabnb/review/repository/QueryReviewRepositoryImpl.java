@@ -23,16 +23,38 @@ public class QueryReviewRepositoryImpl implements QueryReviewRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<SearchReviewResponse> findAllByCondition(Long userId, SearchReviewRequest condition,
-        Pageable pageable) {
-        return jpaQueryFactory.select(Projections.constructor(SearchReviewResponse.class, review.score))
+    public List<SearchReviewResponse> findMyReviewByCondition(
+        Long userId, SearchReviewRequest condition, Pageable pageable) {
+        return jpaQueryFactory.select(
+                Projections.constructor(SearchReviewResponse.class, review.score, review.content))
             .from(review)
+            .innerJoin(review.reservation)
+            .innerJoin(review.reservation.guest)
+            .on(review.reservation.guest.id.eq(userId))
             .where(
-                scoreEq(condition.getScore()),
-                hasReviewPermission(userId)
+                scoreEq(condition.getScore())
             )
-            .orderBy(review.score.desc())
+            .orderBy(review.id.asc(), review.createdAt.desc(), review.score.desc())
             .limit(pageable.getPageSize())
+            .offset(pageable.getOffset())
+            .fetch();
+    }
+
+    @Override
+    public List<SearchReviewResponse> findRoomReviewByCondition(
+        Long roomId, SearchReviewRequest condition, Pageable pageable) {
+        return jpaQueryFactory.select(
+                Projections.constructor(SearchReviewResponse.class, review.score, review.content))
+            .from(review)
+            .innerJoin(review.reservation)
+            .innerJoin(review.reservation.room)
+            .on(review.reservation.room.id.eq(roomId))
+            .where(
+                scoreEq(condition.getScore())
+            )
+            .orderBy(review.id.asc(), review.createdAt.desc(), review.score.desc())
+            .limit(pageable.getPageSize())
+            .offset(pageable.getOffset())
             .fetch();
     }
 
@@ -40,7 +62,4 @@ public class QueryReviewRepositoryImpl implements QueryReviewRepository {
         return Objects.isNull(score) ? null : review.score.eq(score);
     }
 
-    private BooleanExpression hasReviewPermission(Long userId) {
-        return Objects.isNull(userId) ? null : review.reservation.guest.id.eq(userId);
-    }
 }
