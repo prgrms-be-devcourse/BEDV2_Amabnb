@@ -1,6 +1,6 @@
 package com.prgrms.amabnb.room.api;
 
-import static com.prgrms.amabnb.common.fixture.ReviewFixture.*;
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;

@@ -1,6 +1,6 @@
 package com.prgrms.amabnb.room.api;
 
-import static com.prgrms.amabnb.common.fixture.ReviewFixture.*;
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -34,8 +34,7 @@ class HostRoomApiTest extends ApiTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(createRoomRequest)))
             .andExpect(status().isCreated())
-            .andDo(print())
-            .andDo(document("room-create",
+            .andDo(document.document(
                 requestFields(
                     fieldWithPath("name").type(JsonFieldType.STRING).description("숙소 이름"),
                     fieldWithPath("price").type(JsonFieldType.NUMBER).description("1박 가격"),
@@ -67,7 +66,7 @@ class HostRoomApiTest extends ApiTest {
                 .header(HttpHeaders.AUTHORIZATION, accessToken))
             .andExpect(status().isOk())
             .andDo(print())
-            .andDo(document("host-rooms",
+            .andDo(document.document(
                 responseFields(
                     fieldWithPath("data[].name").type(JsonFieldType.STRING).description("숙소 이름"),
                     fieldWithPath("data[].price").type(JsonFieldType.NUMBER).description("1박 가격"),
