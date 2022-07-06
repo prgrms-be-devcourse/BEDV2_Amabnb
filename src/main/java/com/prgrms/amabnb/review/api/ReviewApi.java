@@ -1,12 +1,14 @@
 package com.prgrms.amabnb.review.api;
 
 import java.net.URI;
+import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
+import com.prgrms.amabnb.review.dto.request.PageReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
 import com.prgrms.amabnb.review.dto.response.EditReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
 import com.prgrms.amabnb.review.service.ReviewService;
 import com.prgrms.amabnb.security.jwt.JwtAuthentication;
 
@@ -54,5 +59,15 @@ public class ReviewApi {
     ) {
         var editedReview = reviewService.editReview(user.id(), reviewId, editDto);
         return ResponseEntity.ok().body(new ApiResponse<>(editedReview));
+    }
+
+    @GetMapping("/reviews")
+    public ResponseEntity<ApiResponse<List<SearchReviewResponse>>> searchMyReviews(
+        @AuthenticationPrincipal JwtAuthentication user,
+        SearchReviewRequest searchReviewDto,
+        PageReviewRequest pageReviewRequest
+    ) {
+        return ResponseEntity.ok(
+            new ApiResponse<>(reviewService.searchMyReviews(user.id(), searchReviewDto, pageReviewRequest.of())));
     }
 }
