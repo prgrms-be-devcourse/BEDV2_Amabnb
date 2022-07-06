@@ -18,9 +18,11 @@ import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
 import com.prgrms.amabnb.review.dto.request.PageReviewRequest;
-import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchMyReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchRoomReviewRequest;
 import com.prgrms.amabnb.review.dto.response.EditReviewResponse;
-import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchMyReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchRoomReviewResponse;
 import com.prgrms.amabnb.review.service.ReviewService;
 import com.prgrms.amabnb.security.jwt.JwtAuthentication;
 
@@ -42,6 +44,26 @@ public class ReviewApi {
         return ResponseEntity.created(URI.create("/reviews/" + createdReviewId)).build();
     }
 
+    @GetMapping("/rooms/{roomId}/reviews")
+    public ResponseEntity<ApiResponse<List<SearchRoomReviewResponse>>> searchRoomReviews(
+        @PathVariable Long roomId,
+        SearchRoomReviewRequest searchDto,
+        PageReviewRequest pageReviewRequest
+    ) {
+        return ResponseEntity.ok(
+            new ApiResponse<>(reviewService.searchRoomReviews(roomId, searchDto, pageReviewRequest.of())));
+    }
+
+    @GetMapping("/reviews")
+    public ResponseEntity<ApiResponse<List<SearchMyReviewResponse>>> searchMyReviews(
+        @AuthenticationPrincipal JwtAuthentication user,
+        SearchMyReviewRequest searchReviewDto,
+        PageReviewRequest pageReviewRequest
+    ) {
+        return ResponseEntity.ok(
+            new ApiResponse<>(reviewService.searchMyReviews(user.id(), searchReviewDto, pageReviewRequest.of())));
+    }
+
     @DeleteMapping("/reviews/{reviewId}")
     public ResponseEntity<Void> deleteReview(
         @AuthenticationPrincipal JwtAuthentication user,
@@ -61,13 +83,4 @@ public class ReviewApi {
         return ResponseEntity.ok().body(new ApiResponse<>(editedReview));
     }
 
-    @GetMapping("/reviews")
-    public ResponseEntity<ApiResponse<List<SearchReviewResponse>>> searchMyReviews(
-        @AuthenticationPrincipal JwtAuthentication user,
-        SearchReviewRequest searchReviewDto,
-        PageReviewRequest pageReviewRequest
-    ) {
-        return ResponseEntity.ok(
-            new ApiResponse<>(reviewService.searchMyReviews(user.id(), searchReviewDto, pageReviewRequest.of())));
-    }
 }
