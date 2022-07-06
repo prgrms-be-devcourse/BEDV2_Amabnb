@@ -1,11 +1,10 @@
 package com.prgrms.amabnb.room.api;
 
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,9 +15,6 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import com.prgrms.amabnb.config.ApiTest;
-import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
-import com.prgrms.amabnb.room.entity.RoomScope;
-import com.prgrms.amabnb.room.entity.RoomType;
 
 class RoomApiTest extends ApiTest {
 
@@ -35,7 +31,7 @@ class RoomApiTest extends ApiTest {
         params.add("minBathrooms", "1");
         params.add("minPrice", "1");
         params.add("maxPrice", "10000000");
-        params.add("roomTypes", "HOUSE");
+        params.add("roomTypes", "APARTMENT");
         params.add("roomScopes", "PRIVATE");
         params.add("size", "10");
         params.add("page", "1");
@@ -66,7 +62,6 @@ class RoomApiTest extends ApiTest {
                     fieldWithPath("data[].imagePaths").type(JsonFieldType.ARRAY).description("숙소 이미지 경로")
                 )
             ));
-
     }
 
     @Test
@@ -102,7 +97,6 @@ class RoomApiTest extends ApiTest {
                     fieldWithPath("data.imagePaths[].imagePath").type(JsonFieldType.STRING).description("숙소 이미지 경로")
                 )
             ));
-
     }
 
     @Test
@@ -140,28 +134,11 @@ class RoomApiTest extends ApiTest {
         String location = mockMvc.perform(post("/host/rooms")
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createCreateRoomRequest())))
+                .content(objectMapper.writeValueAsString(createRoomRequest())))
             .andReturn().getResponse().getHeader("Location");
 
         String saveRoomId = location.replaceAll("[^0-9]", "");
         return Long.valueOf(saveRoomId);
     }
 
-    private CreateRoomRequest createCreateRoomRequest() {
-        return CreateRoomRequest.builder()
-            .name("방이름")
-            .price(1)
-            .description("방설명")
-            .maxGuestNum(1)
-            .zipcode("00000")
-            .address("창원")
-            .detailAddress("의창구")
-            .bedCnt(2)
-            .bedRoomCnt(1)
-            .bathRoomCnt(1)
-            .roomType(RoomType.HOUSE)
-            .roomScope(RoomScope.PRIVATE)
-            .imagePaths(List.of("aaa", "bbb"))
-            .build();
-    }
 }

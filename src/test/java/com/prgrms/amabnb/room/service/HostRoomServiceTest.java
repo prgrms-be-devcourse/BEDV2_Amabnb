@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.room.service;
 
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -14,20 +15,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.prgrms.amabnb.common.exception.EntityNotFoundException;
-import com.prgrms.amabnb.common.vo.Email;
-import com.prgrms.amabnb.common.vo.Money;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.dto.request.ModifyRoomRequest;
 import com.prgrms.amabnb.room.entity.Room;
-import com.prgrms.amabnb.room.entity.RoomImage;
-import com.prgrms.amabnb.room.entity.RoomScope;
-import com.prgrms.amabnb.room.entity.RoomType;
-import com.prgrms.amabnb.room.entity.vo.RoomAddress;
-import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.room.exception.RoomNotFoundException;
 import com.prgrms.amabnb.room.repository.RoomRepository;
 import com.prgrms.amabnb.user.entity.User;
-import com.prgrms.amabnb.user.entity.UserRole;
 import com.prgrms.amabnb.user.exception.UserNotFoundException;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
@@ -47,10 +40,10 @@ class HostRoomServiceTest {
     @DisplayName("숙소를 생성할 수 있다.")
     void createRoomTest() {
         //given
-        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-        User user = createUser();
+        CreateRoomRequest createRoomRequest = createRoomRequest();
+        User user = createUser("fdas");
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
-        given(roomRepository.save(any())).willReturn(createRoom());
+        given(roomRepository.save(any())).willReturn(createRoom(user));
 
         //when
         Long savedRoomId = hostRoomService.createRoom(1L, createRoomRequest);
@@ -64,8 +57,8 @@ class HostRoomServiceTest {
     @DisplayName("유저를 찾지 못하면 숙소를 등록할 수 없다.")
     void createFailTest() {
         //given
-        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
-        User user = createUser();
+        CreateRoomRequest createRoomRequest = createRoomRequest();
+        User user = createUser("fdsa");
         given(userRepository.findById(anyLong())).willThrow(EntityNotFoundException.class);
         //when,then
         assertThatThrownBy(() -> hostRoomService.createRoom(1L, createRoomRequest))
@@ -76,7 +69,7 @@ class HostRoomServiceTest {
     @DisplayName("호스트는 자신이 등록한 방을 수정할 수 있다.")
     void modifyRoomTest() {
         //given
-        Room room = createRoom();
+        Room room = createRoom(createUser("fdas"));
         given(roomRepository.findRoomByIdAndHostId(anyLong(), anyLong())).willReturn(Optional.of(room));
         //when
         hostRoomService.modifyRoom(1L, 1L, createModifyRoomRequest());
@@ -99,7 +92,7 @@ class HostRoomServiceTest {
     void searchRoomsForHostTest() {
         //given
         given(userRepository.existsById(anyLong())).willReturn(true);
-        given(roomRepository.findRoomsByHostId(anyLong())).willReturn(List.of(createRoom()));
+        given(roomRepository.findRoomsByHostId(anyLong())).willReturn(List.of(createRoom(createUser("fda"))));
         //when
         hostRoomService.searchRoomsForHost(1L);
         //then
@@ -117,35 +110,6 @@ class HostRoomServiceTest {
 
     }
 
-    private User createUser() {
-        return User.builder()
-            .oauthId("testOauthId")
-            .provider("testProvider")
-            .userRole(UserRole.GUEST)
-            .name("testUser")
-            .email(new Email("asdsadsad@gmail.com"))
-            .profileImgUrl("urlurlrurlrurlurlurl")
-            .build();
-    }
-
-    private CreateRoomRequest createCreateRoomRequest() {
-        return CreateRoomRequest.builder()
-            .name("방이름")
-            .price(1)
-            .description("방설명")
-            .maxGuestNum(1)
-            .zipcode("00000")
-            .address("창원")
-            .detailAddress("의창구")
-            .bedCnt(2)
-            .bedRoomCnt(1)
-            .bathRoomCnt(1)
-            .roomType(RoomType.APARTMENT)
-            .roomScope(RoomScope.PRIVATE)
-            .imagePaths(List.of("aaa", "bbb"))
-            .build();
-    }
-
     private ModifyRoomRequest createModifyRoomRequest() {
         return ModifyRoomRequest.builder()
             .name("수정된 방이름")
@@ -156,29 +120,6 @@ class HostRoomServiceTest {
             .bedRoomCnt(11)
             .bathRoomCnt(11)
             .build();
-    }
-
-    private Room createRoom() {
-        RoomAddress roomAddress = new RoomAddress("00000", "창원", "의창구");
-        Money price = new Money(20000);
-        RoomOption roomOption = new RoomOption(1, 1, 1);
-
-        return Room.builder()
-            .id(1l)
-            .name("방 이름")
-            .maxGuestNum(1)
-            .description("방 설명 입니다")
-            .address(roomAddress)
-            .price(price)
-            .roomOption(roomOption)
-            .roomType(RoomType.APARTMENT)
-            .roomScope(RoomScope.PRIVATE)
-            .roomImages(List.of(createRoomImage()))
-            .build();
-    }
-
-    private RoomImage createRoomImage() {
-        return new RoomImage(null, "aaa");
     }
 
 }

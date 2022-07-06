@@ -1,12 +1,11 @@
 package com.prgrms.amabnb.room.api;
 
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,8 +16,6 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.dto.request.ModifyRoomRequest;
-import com.prgrms.amabnb.room.entity.RoomScope;
-import com.prgrms.amabnb.room.entity.RoomType;
 
 class HostRoomApiTest extends ApiTest {
 
@@ -27,7 +24,7 @@ class HostRoomApiTest extends ApiTest {
     void createRoom() throws Exception {
         //given
         String accessToken = 로그인_요청("host");
-        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
+        CreateRoomRequest createRoomRequest = createRoomRequest();
 
         //when
         mockMvc.perform(post("/host/rooms")
@@ -129,7 +126,7 @@ class HostRoomApiTest extends ApiTest {
     @DisplayName("숙소는 userId가 없으면 등록되지 않는다.")
     void nullUserIdTest() throws Exception {
         //given
-        CreateRoomRequest createRoomRequest = createCreateRoomRequest();
+        CreateRoomRequest createRoomRequest = createRoomRequest();
 
         //when,then
         mockMvc.perform(post("/host/rooms")
@@ -167,29 +164,11 @@ class HostRoomApiTest extends ApiTest {
         String location = mockMvc.perform(post("/host/rooms")
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createCreateRoomRequest())))
+                .content(objectMapper.writeValueAsString(createRoomRequest())))
             .andReturn().getResponse().getHeader("Location");
 
         String saveRoomId = location.replaceAll("[^0-9]", "");
         return Long.valueOf(saveRoomId);
-    }
-
-    private CreateRoomRequest createCreateRoomRequest() {
-        return CreateRoomRequest.builder()
-            .name("방이름")
-            .price(1)
-            .description("방설명")
-            .maxGuestNum(1)
-            .zipcode("00000")
-            .address("창원")
-            .detailAddress("의창구")
-            .bedCnt(2)
-            .bedRoomCnt(1)
-            .bathRoomCnt(1)
-            .roomType(RoomType.HOUSE)
-            .roomScope(RoomScope.PRIVATE)
-            .imagePaths(List.of("aaa", "bbb"))
-            .build();
     }
 
     private ModifyRoomRequest createModifyRequest() {
