@@ -1,6 +1,5 @@
 package com.prgrms.amabnb.room.api;
 
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -26,9 +24,8 @@ import com.prgrms.amabnb.room.entity.RoomType;
 class RoomApiTest extends ApiTest {
 
     @Test
-    @WithMockUser
     @DisplayName("필터 검색을 할 수 있다.")
-    void filterSearchTest() throws Exception {
+    void filterSearchRooms() throws Exception {
         //given
         String accessToken = 로그인_요청("host");
         saveRoom(accessToken);
@@ -51,7 +48,7 @@ class RoomApiTest extends ApiTest {
             //then
             .andExpect(status().isOk())
             .andDo(print())
-            .andDo(document("room-filter-search",
+            .andDo(document.document(
                 requestParameters(
                     parameterWithName("minBeds").description("최수 침대 수"),
                     parameterWithName("minBedrooms").description("최수 침실 수"),
@@ -74,7 +71,6 @@ class RoomApiTest extends ApiTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("숙소 상세정보를 가져온다.")
     void getRoomDetail() throws Exception {
         //given
@@ -87,7 +83,7 @@ class RoomApiTest extends ApiTest {
             //then
             .andExpect(status().isOk())
             .andDo(print())
-            .andDo(document("room-detail",
+            .andDo(document.document(
                 pathParameters(
                     parameterWithName("roomId").description("숙소 아이디")
                 ),
@@ -111,7 +107,6 @@ class RoomApiTest extends ApiTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("필터를 설정하지 않아도 숙소를 들고온다.")
     void noFilterSearchTest() throws Exception {
 
@@ -129,7 +124,6 @@ class RoomApiTest extends ApiTest {
     }
 
     @Test
-    @WithMockUser
     @DisplayName("등록되지 않은 숙소 상세정보를 가져오지 못한다.")
     void getRoomDetailFailTest() throws Exception {
         //given
@@ -142,7 +136,7 @@ class RoomApiTest extends ApiTest {
             .andDo(print());
 
     }
-    
+
     private Long saveRoom(String accessToken) throws Exception {
         String location = mockMvc.perform(post("/host/rooms")
                 .header(HttpHeaders.AUTHORIZATION, accessToken)

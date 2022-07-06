@@ -1,6 +1,5 @@
 package com.prgrms.amabnb.room.api;
 
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -86,7 +85,7 @@ class HostRoomApiTest extends ApiTest {
 
     @Test
     @DisplayName("호스트는 자신이 등록한 숙소를 수정할 수 있다.")
-    void modifyTest() throws Exception {
+    void modifyRoom() throws Exception {
         //given
         ModifyRoomRequest modifyRequest = createModifyRequest();
         String accessToken = 로그인_요청("host");
@@ -99,7 +98,7 @@ class HostRoomApiTest extends ApiTest {
                 .content(objectMapper.writeValueAsString(modifyRequest)))
             .andExpect(status().isOk())
             .andDo(print())
-            .andDo(document("host-room-modify",
+            .andDo(document.document(
                 requestFields(
                     fieldWithPath("name").type(JsonFieldType.STRING).description("숙소 이름"),
                     fieldWithPath("bedCnt").type(JsonFieldType.NUMBER).description("침대 수"),
