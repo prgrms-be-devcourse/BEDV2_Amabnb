@@ -1,6 +1,6 @@
 package com.prgrms.amabnb.review.api;
 
-import static com.prgrms.amabnb.common.fixture.ReviewFixture.*;
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -23,11 +23,10 @@ import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
+import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.repository.ReviewRepository;
-import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.repository.RoomRepository;
-import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.repository.UserRepository;
 
 class ReviewApiTest extends ApiTest {
@@ -41,23 +40,18 @@ class ReviewApiTest extends ApiTest {
     @Autowired
     private RoomRepository roomRepository;
 
-    private User givenGuest;
-    private User givenHost;
-    private Room givenRoom;
     private Reservation givenReservation;
     private String givenGuestAccessToken;
 
     @BeforeEach
-    @Transactional
-    void setGiven() {
-        var guestProfile = createUserProfile("guest");
-        var hostProfile = createUserProfile("host");
-        givenGuest = userRepository.save(guestProfile.toUser());
-        givenHost = userRepository.save(hostProfile.toUser());
+    void setBasicGiven() throws Exception {
+        var givenGuest = userRepository.save(createUser("guest"));
+        var givenHost = userRepository.save(createUser("host"));
+        var givenRoom = roomRepository.save(createRoom(givenHost));
 
-        givenRoom = roomRepository.save(createRoom(givenHost));
-        givenReservation = reservationRepository.save(createReservation(givenGuest, givenRoom));
-        givenGuestAccessToken = 로그인_요청(guestProfile);
+        givenGuestAccessToken = 로그인_요청(givenGuest.getName());
+        givenReservation = reservationRepository.findById(
+            extractId(예약_요청(givenGuestAccessToken, makeCreateReservationRequest(givenRoom)))).get();
     }
 
     private ResultActions when_리뷰_작성(Long reservationId, String userAccessToken,
@@ -71,6 +65,14 @@ class ReviewApiTest extends ApiTest {
     private ResultActions when_리뷰_삭제(String userAccessToken, Long reviewId) throws Exception {
         return mockMvc.perform(delete("/reviews/{reviewId}", reviewId)
             .header(HttpHeaders.AUTHORIZATION, userAccessToken));
+    }
+
+    private ResultActions when_리뷰_수정(String userAccessToken, Long reviewId,
+        EditReviewRequest editReviewDto) throws Exception {
+        return mockMvc.perform(post("/reviews/{reviewId}", reviewId)
+            .header(HttpHeaders.AUTHORIZATION, userAccessToken)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(toJson(editReviewDto)));
     }
 
     @Nested
@@ -130,12 +132,12 @@ class ReviewApiTest extends ApiTest {
         @Test
         @DisplayName("예약자 본인만 리뷰를 작성할 수 있습니다.")
         void exception3() throws Exception {
-            var errorMessage = "예약자 본인만 리뷰를 작성할 수 있습니다.";
+            var errorMessage = "리뷰에 대한 권한이 존재하지 않습니다.";
 
             givenReservation.changeStatus(ReservationStatus.COMPLETED);
             reservationRepository.save(givenReservation);
 
-            var illegalToken = 로그인_요청(createUserProfile("illegal"));
+            var illegalToken = 로그인_요청("illegal-user");
 
             when_리뷰_작성(givenReservation.getId(), illegalToken, givenReviewRequest)
                 .andExpect(status().isBadRequest())
@@ -152,11 +154,11 @@ class ReviewApiTest extends ApiTest {
         @BeforeEach
         @Transactional
         void setAdditionalGiven() {
-            givenReview = reviewRepository.saveAndFlush(new Review(1L, "content", 4, givenReservation));
+            givenReview = reviewRepository.save(new Review("content", 4, givenReservation));
         }
 
         @Test
-        @DisplayName("리뷰를 삭제할 수 있다.")
+        @DisplayName("리뷰를 삭제할 수 있다")
         void deleteReview() throws Exception {
             assertThat(reviewRepository.count()).isOne();
 
@@ -168,17 +170,56 @@ class ReviewApiTest extends ApiTest {
         }
 
         @Test
-        @DisplayName("예약자 본인만 리뷰를 삭제할 수 있습니다.")
+        @DisplayName("예약자 본인만 리뷰를 삭제할 수 있다")
         void deleteReviewno() throws Exception {
+            var errorMessage = "리뷰에 대한 권한이 존재하지 않습니다.";
             assertThat(reviewRepository.count()).isOne();
 
-            var illegalToken = 로그인_요청(createUserProfile("illegal-user"));
+            var illegalToken = 로그인_요청("illegal-user");
 
             when_리뷰_삭제(illegalToken, givenReview.getId())
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(errorMessage))
                 .andDo(print());
 
             assertThat(reviewRepository.count()).isOne();
+        }
+    }
+
+    @Nested
+    @DisplayName("게스트는 본인이 작성한 리뷰를 수정할 수 있다 #81")
+    class EditReview {
+
+        Review givenReview;
+        EditReviewRequest givenEditDto;
+
+        @BeforeEach
+        @Transactional
+        void setAdditionalGiven() {
+            givenReview = reviewRepository.save(new Review(1L, "content", 4, givenReservation));
+            givenEditDto = new EditReviewRequest("edit-content", 2);
+        }
+
+        @Test
+        @DisplayName("리뷰를 수정할 수 있다")
+        void postReview() throws Exception {
+            when_리뷰_수정(givenGuestAccessToken, givenReview.getId(), givenEditDto)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content").value(givenEditDto.getContent()))
+                .andExpect(jsonPath("$.data.score").value(givenEditDto.getScore()))
+                .andDo(print());
+        }
+
+        @Test
+        @DisplayName("본인이 작성하지 않은 리뷰는 수정할 수 없다")
+        void noPermission() throws Exception {
+            var errorMessage = "리뷰에 대한 권한이 존재하지 않습니다.";
+            var illegalToken = 로그인_요청("illegal-user");
+
+            when_리뷰_수정(illegalToken, givenReview.getId(), givenEditDto)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(errorMessage))
+                .andDo(print());
         }
     }
 }

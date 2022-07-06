@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.token.api;
 
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
@@ -14,6 +15,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
 
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.token.dto.RefreshTokenRequest;
@@ -43,11 +45,26 @@ class TokenApiTest extends ApiTest {
             mockMvc.perform(post("/tokens")
                     .with(oauth2Login())
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenToken.accessToken())
-                    .contentType(MediaType.APPLICATION_JSON).content(toJson(givenToken.refreshToken())))
-                .andExpect(handler().methodName("refreshAccessToken"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("data.accessToken").exists())
-                .andDo(print());
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(toJson(new RefreshTokenRequest(givenToken.refreshToken()))))
+
+                // then
+                .andExpectAll(
+                    handler().methodName("refreshAccessToken"),
+                    status().isOk(),
+                    jsonPath("data.accessToken").exists()
+                )
+
+                // docs
+                .andDo(document.document(
+                    tokenRequestHeader(),
+                    requestFields(
+                        fieldWithPath("refreshToken").type(JsonFieldType.STRING).description("refresh Token")
+                    ),
+                    responseFields(
+                        fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("access Token")
+                    )
+                ));
         }
 
         @Test
@@ -82,11 +99,20 @@ class TokenApiTest extends ApiTest {
     class deleteRefreshToken {
         @Test
         void deleteRefreshToken() throws Exception {
+            // given
             mockMvc.perform(delete("/tokens")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + givenToken.accessToken()))
-                .andExpect(handler().methodName("deleteRefreshToken"))
-                .andExpect(status().isNoContent())
-                .andDo(print());
+
+                // then
+                .andExpectAll(
+                    handler().methodName("deleteRefreshToken"),
+                    status().isNoContent()
+                )
+
+                //docs
+                .andDo(document.document(
+                    tokenRequestHeader()
+                ));
         }
     }
 }

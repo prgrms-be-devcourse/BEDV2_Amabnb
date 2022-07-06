@@ -29,7 +29,7 @@ spring:
             client-secret: test
             scope: test
             redirect-uri: test
-            authorization-grant-type: test
+            authorization-grant-type: authorization_code
         provider:
           kakao:
             authorization_uri: test

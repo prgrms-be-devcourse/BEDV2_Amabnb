@@ -8,6 +8,8 @@ import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.service.ReservationGuestService;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
+import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
+import com.prgrms.amabnb.review.dto.response.EditReviewResponse;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.exception.AlreadyReviewException;
 import com.prgrms.amabnb.review.exception.ReviewNoPermissionException;
@@ -47,6 +49,20 @@ public class ReviewService {
         validateUserPermission(userId, reservationDto.getGuestId());
 
         reviewRepository.deleteById(reviewId);
+    }
+
+    @Transactional
+    public EditReviewResponse editReview(Long userId, Long reviewId, EditReviewRequest editDto) {
+        var review = reviewRepository.findById(reviewId)
+            .orElseThrow(ReviewNotFoundException::new);
+
+        var reservationDto = reservationGuestService.findById(review.getReservation().getId());
+        validateUserPermission(userId, reservationDto.getGuestId());
+
+        review.changeContent(editDto.getContent());
+        review.changeScore(editDto.getScore());
+
+        return EditReviewResponse.from(editDto);
     }
 
     private void validateOneReservationOneReview(Long reservationId) {

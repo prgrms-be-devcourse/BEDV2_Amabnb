@@ -27,8 +27,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
+            .cors()
+            .and()
+
             .authorizeHttpRequests()
-            .antMatchers("/token").permitAll()
+            .antMatchers("/tokens").permitAll()
+            .antMatchers("/docs/**").permitAll()
+            .antMatchers("/favicon.ico").permitAll()
             .anyRequest().authenticated()
             .and()
 

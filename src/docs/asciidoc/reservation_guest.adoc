@@ -1,0 +1,126 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:docinfo: shared-head
+
+
+== 예약 게스트 API
+
+=== 공통
+
+모든 예약 게스트 요청은 JWT access token 이 필요합니다.
+
+include::{snippets}/reservation-guest-api-test/create_reservation/request-headers.adoc[]
+
+=== 예약 생성
+
+==== Request
+
+include::{snippets}/reservation-guest-api-test/create_reservation/request-fields.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/reservation-guest-api-test/create_reservation/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-guest-api-test/create_reservation/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/reservation-guest-api-test/create_reservation/http-response.adoc[]
+
+=== 예약 불가능 날짜 조회
+
+==== Request
+
+include::{snippets}/reservation-guest-api-test/get-reservation-dates/request-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/reservation-guest-api-test/get-reservation-dates/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-guest-api-test/get-reservation-dates/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/reservation-guest-api-test/get-reservation-dates/http-response.adoc[]
+
+=== 예약 단건 조회
+
+==== Request
+
+include::{snippets}/reservation-guest-api-test/get-reservation/path-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/reservation-guest-api-test/get-reservation/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-guest-api-test/get-reservation/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/reservation-guest-api-test/get-reservation/http-response.adoc[]
+
+=== 예약 다건 조회
+
+==== Request
+
+include::{snippets}/reservation-guest-api-test/get-reservations/request-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/reservation-guest-api-test/get-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-guest-api-test/get-reservations/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/reservation-guest-api-test/get-reservations/http-response.adoc[]
+
+=== 예약 수정
+
+==== Request
+
+include::{snippets}/reservation-guest-api-test/modify-reservation/request-fields.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/reservation-guest-api-test/modify-reservation/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-guest-api-test/modify-reservation/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/reservation-guest-api-test/modify-reservation/http-response.adoc[]
+
+=== 예약 취소
+
+==== Request
+
+include::{snippets}/reservation-guest-api-test/cancel/path-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/reservation-guest-api-test/cancel/http-request.adoc[]
+
+==== Response
+
+===== Response HTTP Example
+
+include::{snippets}/reservation-guest-api-test/cancel/http-response.adoc[]
+

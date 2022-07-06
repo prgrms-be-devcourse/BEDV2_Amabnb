@@ -1,0 +1,90 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:docinfo: shared-head
+
+
+== 예약 호스트 API
+
+=== 공통
+
+모든 예약 호스트 요청은 JWT access token 이 필요합니다.
+
+include::{snippets}/reservation-guest-api-test/create_reservation/request-headers.adoc[]
+
+=== 예약 단건 조회
+
+==== Request
+
+include::{snippets}/reservation-host-api-test/get-reservation/path-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/reservation-host-api-test/get-reservation/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-host-api-test/get-reservation/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/reservation-host-api-test/get-reservation/http-response.adoc[]
+
+=== 예약 다건 조회
+
+==== Request
+
+include::{snippets}/reservation-host-api-test/get-reservations/request-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/reservation-host-api-test/get-reservations/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-host-api-test/get-reservations/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/reservation-host-api-test/get-reservations/http-response.adoc[]
+
+=== 예약 승인
+
+==== Request
+
+include::{snippets}/reservation-host-api-test/approve-reservation/path-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/reservation-host-api-test/approve-reservation/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/reservation-host-api-test/approve-reservation/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/reservation-host-api-test/approve-reservation/http-response.adoc[]
+
+=== 예약 취소
+
+==== Request
+
+include::{snippets}/reservation-host-api-test/cancel/path-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/reservation-host-api-test/cancel/http-request.adoc[]
+
+==== Response
+
+===== Response HTTP Example
+
+include::{snippets}/reservation-host-api-test/cancel/http-response.adoc[]
+

@@ -37,7 +37,4 @@ public class UserService {
         return "delete success : " + userId;
     }
 
-    public boolean isExist(Long userId) {
-        return userRepository.existsById(userId);
-    }
 }

@@ -1,0 +1,17 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:docinfo: shared-head
+
+= Amabnb
+
+include::user.adoc[]
+include::token.adoc[]
+include::reservation_guest.adoc[]
+include::reservation_host.adoc[]
