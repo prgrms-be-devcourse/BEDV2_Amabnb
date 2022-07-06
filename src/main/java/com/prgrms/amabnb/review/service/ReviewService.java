@@ -12,9 +12,11 @@ import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.service.ReservationGuestService;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
-import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchMyReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchRoomReviewRequest;
 import com.prgrms.amabnb.review.dto.response.EditReviewResponse;
-import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchMyReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchRoomReviewResponse;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.exception.AlreadyReviewException;
 import com.prgrms.amabnb.review.exception.ReviewNoPermissionException;
@@ -70,9 +72,14 @@ public class ReviewService {
         return EditReviewResponse.from(editDto);
     }
 
-    public List<SearchReviewResponse> searchMyReviews(Long userId, SearchReviewRequest searchReviewDto,
-        PageRequest pageable) {
-        return reviewRepository.findAllByCondition(userId, searchReviewDto, pageable);
+    public List<SearchMyReviewResponse> searchMyReviews(
+        Long userId, SearchMyReviewRequest condition, PageRequest pageable) {
+        return reviewRepository.findMyReviewByCondition(userId, condition, pageable);
+    }
+
+    public List<SearchRoomReviewResponse> searchRoomReviews(
+        Long roomId, SearchRoomReviewRequest condition, PageRequest pageable) {
+        return reviewRepository.findRoomReviewByCondition(roomId, condition, pageable);
     }
 
     private void validateOneReservationOneReview(Long reservationId) {
@@ -92,4 +99,5 @@ public class ReviewService {
             throw new ReviewNoPermissionException();
         }
     }
+
 }
