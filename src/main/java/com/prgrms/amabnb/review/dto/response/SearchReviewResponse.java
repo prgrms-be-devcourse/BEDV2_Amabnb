@@ -10,10 +10,11 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class SearchMyReviewResponse {
+public class SearchReviewResponse {
     private int score;
+    private String content;
 
-    public static SearchMyReviewResponse from(Review review) {
-        return new SearchMyReviewResponse(review.getScore());
+    public static SearchReviewResponse from(Review review) {
+        return new SearchReviewResponse(review.getScore(), review.getContent());
     }
 }

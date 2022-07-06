@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EditReviewResponse {
-    String content;
-    int score;
+    private int score;
+    private String content;
 
     public static EditReviewResponse from(EditReviewRequest dto) {
-        return new EditReviewResponse(dto.getContent(), dto.getScore());
+        return new EditReviewResponse(dto.getScore(), dto.getContent());
     }
 }

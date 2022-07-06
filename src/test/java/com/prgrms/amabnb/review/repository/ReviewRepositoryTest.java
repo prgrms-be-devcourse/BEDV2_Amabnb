@@ -13,10 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.review.dto.request.PageReviewRequest;
-import com.prgrms.amabnb.review.dto.request.SearchMyReviewRequest;
-import com.prgrms.amabnb.review.dto.request.SearchRoomReviewRequest;
-import com.prgrms.amabnb.review.dto.response.SearchMyReviewResponse;
-import com.prgrms.amabnb.review.dto.response.SearchRoomReviewResponse;
+import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
+import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.repository.RoomRepository;
@@ -39,7 +37,7 @@ class ReviewRepositoryTest extends RepositoryTest {
     class FindMyReviewByCondition {
         int givenReviewScore = 2;
         PageReviewRequest pageable = new PageReviewRequest(10, 10);
-        SearchMyReviewRequest givenSearchRequest = new SearchMyReviewRequest(givenReviewScore);
+        SearchReviewRequest givenSearchRequest = new SearchReviewRequest(givenReviewScore);
 
         @Test
         @DisplayName("검색 조건에 해당하더라도, 본인이 작성한 글만 조회할 수 있다")
@@ -47,9 +45,9 @@ class ReviewRepositoryTest extends RepositoryTest {
             var user1 = createUser("user1");
             var user2 = createUser("user2");
 
-            var review1 = SearchMyReviewResponse.from(createReview(user1));
-            var review2 = SearchMyReviewResponse.from(createReview(user1));
-            var review3 = SearchMyReviewResponse.from(createReview(user2));
+            var review1 = SearchReviewResponse.from(createReview(user1));
+            var review2 = SearchReviewResponse.from(createReview(user1));
+            var review3 = SearchReviewResponse.from(createReview(user2));
             assertThat(reviewRepository.count()).isEqualTo(3);
 
             var result = reviewRepository.findMyReviewByCondition(user1.getId(), givenSearchRequest, pageable.of());
@@ -72,16 +70,16 @@ class ReviewRepositoryTest extends RepositoryTest {
     class FindRoomReviewByCondition {
         int givenReviewScore = 2;
         PageReviewRequest pageable = new PageReviewRequest(10, 10);
-        SearchRoomReviewRequest condition = new SearchRoomReviewRequest(givenReviewScore);
+        SearchReviewRequest condition = new SearchReviewRequest(givenReviewScore);
 
         @Test
         @DisplayName("선택한 숙소에 대한 리뷰를 조건에 맞게 조회할 수 있다.")
         void findRoomReview() {
             var host = userRepository.save(createUser(UUID.randomUUID().toString().substring(20)));
             var room1 = roomRepository.save(createRoom(host));
-            var review1 = SearchRoomReviewResponse.from(writeReview(room1));
-            var review2 = SearchRoomReviewResponse.from(writeReview(room1));
-            var review3 = SearchRoomReviewResponse.from(writeReview(room1));
+            var review1 = SearchReviewResponse.from(writeReview(room1));
+            var review2 = SearchReviewResponse.from(writeReview(room1));
+            var review3 = SearchReviewResponse.from(writeReview(room1));
 
             var room2 = roomRepository.save(createRoom(host));
             writeReview(room2);

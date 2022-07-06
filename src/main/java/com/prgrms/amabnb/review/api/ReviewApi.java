@@ -18,11 +18,9 @@ import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
 import com.prgrms.amabnb.review.dto.request.PageReviewRequest;
-import com.prgrms.amabnb.review.dto.request.SearchMyReviewRequest;
-import com.prgrms.amabnb.review.dto.request.SearchRoomReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
 import com.prgrms.amabnb.review.dto.response.EditReviewResponse;
-import com.prgrms.amabnb.review.dto.response.SearchMyReviewResponse;
-import com.prgrms.amabnb.review.dto.response.SearchRoomReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
 import com.prgrms.amabnb.review.service.ReviewService;
 import com.prgrms.amabnb.security.jwt.JwtAuthentication;
 
@@ -45,9 +43,9 @@ public class ReviewApi {
     }
 
     @GetMapping("/rooms/{roomId}/reviews")
-    public ResponseEntity<ApiResponse<List<SearchRoomReviewResponse>>> searchRoomReviews(
+    public ResponseEntity<ApiResponse<List<SearchReviewResponse>>> searchRoomReviews(
         @PathVariable Long roomId,
-        SearchRoomReviewRequest searchDto,
+        @Valid SearchReviewRequest searchDto,
         PageReviewRequest pageReviewRequest
     ) {
         return ResponseEntity.ok(
@@ -55,9 +53,9 @@ public class ReviewApi {
     }
 
     @GetMapping("/reviews")
-    public ResponseEntity<ApiResponse<List<SearchMyReviewResponse>>> searchMyReviews(
+    public ResponseEntity<ApiResponse<List<SearchReviewResponse>>> searchMyReviews(
         @AuthenticationPrincipal JwtAuthentication user,
-        SearchMyReviewRequest searchReviewDto,
+        @Valid SearchReviewRequest searchReviewDto,
         PageReviewRequest pageReviewRequest
     ) {
         return ResponseEntity.ok(

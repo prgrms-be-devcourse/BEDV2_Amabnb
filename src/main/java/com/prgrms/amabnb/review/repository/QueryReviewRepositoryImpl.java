@@ -5,14 +5,11 @@ import static com.prgrms.amabnb.review.entity.QReview.*;
 import java.util.List;
 import java.util.Objects;
 
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.prgrms.amabnb.review.dto.request.SearchMyReviewRequest;
-import com.prgrms.amabnb.review.dto.request.SearchRoomReviewRequest;
-import com.prgrms.amabnb.review.dto.response.SearchMyReviewResponse;
-import com.prgrms.amabnb.review.dto.response.SearchRoomReviewResponse;
+import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
+import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -26,9 +23,10 @@ public class QueryReviewRepositoryImpl implements QueryReviewRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<SearchMyReviewResponse> findMyReviewByCondition(Long userId, SearchMyReviewRequest condition,
-        Pageable pageable) {
-        return jpaQueryFactory.select(Projections.constructor(SearchMyReviewResponse.class, review.score))
+    public List<SearchReviewResponse> findMyReviewByCondition(
+        Long userId, SearchReviewRequest condition, Pageable pageable) {
+        return jpaQueryFactory.select(
+                Projections.constructor(SearchReviewResponse.class, review.score, review.content))
             .from(review)
             .innerJoin(review.reservation)
             .innerJoin(review.reservation.guest)
@@ -42,10 +40,10 @@ public class QueryReviewRepositoryImpl implements QueryReviewRepository {
     }
 
     @Override
-    public List<SearchRoomReviewResponse> findRoomReviewByCondition(Long roomId, SearchRoomReviewRequest condition,
-        PageRequest pageable) {
+    public List<SearchReviewResponse> findRoomReviewByCondition(
+        Long roomId, SearchReviewRequest condition, Pageable pageable) {
         return jpaQueryFactory.select(
-                Projections.constructor(SearchRoomReviewResponse.class, review.content, review.score))
+                Projections.constructor(SearchReviewResponse.class, review.score, review.content))
             .from(review)
             .innerJoin(review.reservation)
             .innerJoin(review.reservation.room)
