@@ -26,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getRequestURI().endsWith("tokens");
+        return request.getRequestURI().endsWith("tokens") && request.getMethod().equalsIgnoreCase("POST");
     }
 
     @Override
