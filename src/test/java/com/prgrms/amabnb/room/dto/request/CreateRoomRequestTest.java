@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.room.dto.request;
 
+import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
@@ -19,13 +20,10 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
-import com.prgrms.amabnb.user.entity.User;
-import com.prgrms.amabnb.user.entity.UserRole;
 
 class CreateRoomRequestTest {
 
@@ -192,7 +190,7 @@ class CreateRoomRequestTest {
     @DisplayName("toRoom 테스트")
     void toRoomTest() {
         //then
-        assertThat(createRoomRequest.toRoom(createUser())).isInstanceOf(Room.class);
+        assertThat(createRoomRequest.toRoom(createUser("fdas"))).isInstanceOf(Room.class);
     }
 
     @Test
@@ -206,16 +204,5 @@ class CreateRoomRequestTest {
         //then
         assertThat(roomImage.getImagePath()).isEqualTo("aaa");
         assertThat(roomImagesSize).isEqualTo(2);
-    }
-
-    private User createUser() {
-        return User.builder()
-            .oauthId("testOauthId")
-            .provider("testProvider")
-            .userRole(UserRole.GUEST)
-            .name("testUser")
-            .email(new Email("asdsadsad@gmail.com"))
-            .profileImgUrl("urlurlrurlrurlurlurl")
-            .build();
     }
 }
