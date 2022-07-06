@@ -1,0 +1,71 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:docinfo: shared-head
+
+
+== 숙소 호스트 API
+
+=== 공통
+
+모든 예약 게스트 요청은 JWT access token 이 필요합니다.
+
+include::{snippets}/host-room-api-test/create-room/request-headers.adoc[]
+
+=== 숙소 생성
+
+==== Request
+
+include::{snippets}/host-room-api-test/create-room/request-fields.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/host-room-api-test/create-room/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/host-room-api-test/create-room/response-headers.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/host-room-api-test/create-room/http-response.adoc[]
+
+=== 호스트 숙소 조회
+
+==== Request
+
+===== Request HTTP Example
+
+include::{snippets}/host-room-api-test/get-host-rooms/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/host-room-api-test/get-host-rooms/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/host-room-api-test/get-host-rooms/http-response.adoc[]
+
+=== 숙소 수정
+
+==== Request
+
+include::{snippets}/host-room-api-test/modify-room/path-parameters.adoc[]
+
+include::{snippets}/host-room-api-test/modify-room/request-fields.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/host-room-api-test/modify-room/http-request.adoc[]
+
+==== Response
+
+===== Response HTTP Example
+
+include::{snippets}/host-room-api-test/modify-room/http-response.adoc[]
