@@ -1,6 +1,5 @@
 package com.prgrms.amabnb.room.api;
 
-import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -26,7 +25,7 @@ class HostRoomApiTest extends ApiTest {
     @Test
     @DisplayName("숙소 등록 성공 테스트")
     void createRoom() throws Exception {
-        String accessToken = 로그인_요청();
+        String accessToken = 로그인_요청("host");
         CreateRoomRequest createRoomRequest = createCreateRoomRequest();
 
         mockMvc.perform(post("/host/rooms")
@@ -57,7 +56,7 @@ class HostRoomApiTest extends ApiTest {
     @DisplayName("호스트는 자신이 등록한 방 목록을 가져온다")
     void getHostRooms() throws Exception {
         //given
-        String accessToken = 로그인_요청();
+        String accessToken = 로그인_요청("host");
         saveRoom(accessToken);
         saveRoom(accessToken);
 
@@ -90,7 +89,7 @@ class HostRoomApiTest extends ApiTest {
     void modifyTest() throws Exception {
         //given
         ModifyRoomRequest modifyRequest = createModifyRequest();
-        String accessToken = 로그인_요청();
+        String accessToken = 로그인_요청("host");
         Long roomId = saveRoom(accessToken);
 
         // when,then
@@ -131,7 +130,7 @@ class HostRoomApiTest extends ApiTest {
     @DisplayName("Request 하나라도 값이 없다면 수정이 불가능하다")
     void invalidRequestModifyTest() throws Exception {
         //given
-        String accessToken = 로그인_요청();
+        String accessToken = 로그인_요청("host");
         Long roomId = saveRoom(accessToken);
 
         ModifyRoomRequest modifyRequest = ModifyRoomRequest.builder()
@@ -150,10 +149,6 @@ class HostRoomApiTest extends ApiTest {
             .andExpect(status().isBadRequest());
         //then
 
-    }
-
-    private String 로그인_요청() {
-        return "Bearer" + oAuthService.register(createUserProfile("아만드")).accessToken();
     }
 
     private Long saveRoom(String accessToken) throws Exception {

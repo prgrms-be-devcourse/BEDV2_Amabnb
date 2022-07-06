@@ -1,6 +1,5 @@
 package com.prgrms.amabnb.room.api;
 
-import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -31,7 +30,7 @@ class RoomApiTest extends ApiTest {
     @DisplayName("필터 검색을 할 수 있다.")
     void filterSearchTest() throws Exception {
         //given
-        String accessToken = 로그인_요청();
+        String accessToken = 로그인_요청("host");
         saveRoom(accessToken);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
@@ -79,7 +78,7 @@ class RoomApiTest extends ApiTest {
     @DisplayName("숙소 상세정보를 가져온다.")
     void getRoomDetail() throws Exception {
         //given
-        String accessToken = 로그인_요청();
+        String accessToken = 로그인_요청("host");
         Long roomId = saveRoom(accessToken);
 
         //when
@@ -143,11 +142,7 @@ class RoomApiTest extends ApiTest {
             .andDo(print());
 
     }
-
-    private String 로그인_요청() {
-        return "Bearer" + oAuthService.register(createUserProfile("아만드")).accessToken();
-    }
-
+    
     private Long saveRoom(String accessToken) throws Exception {
         String location = mockMvc.perform(post("/host/rooms")
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
