@@ -1,6 +1,7 @@
 package com.prgrms.amabnb.security.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,6 +35,7 @@ public class SecurityConfig {
             .antMatchers("/tokens").permitAll()
             .antMatchers("/docs/**").permitAll()
             .antMatchers("/favicon.ico").permitAll()
+            .antMatchers(HttpMethod.GET, "/rooms/**").permitAll()
             .anyRequest().authenticated()
             .and()
 
