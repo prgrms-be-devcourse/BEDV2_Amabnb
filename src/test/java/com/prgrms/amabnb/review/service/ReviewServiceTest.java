@@ -25,11 +25,9 @@ import com.prgrms.amabnb.reservation.service.ReservationGuestService;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
 import com.prgrms.amabnb.review.dto.request.PageReviewRequest;
-import com.prgrms.amabnb.review.dto.request.SearchMyReviewRequest;
-import com.prgrms.amabnb.review.dto.request.SearchRoomReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
 import com.prgrms.amabnb.review.dto.response.EditReviewResponse;
-import com.prgrms.amabnb.review.dto.response.SearchMyReviewResponse;
-import com.prgrms.amabnb.review.dto.response.SearchRoomReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.repository.ReviewRepository;
 
@@ -89,17 +87,17 @@ class ReviewServiceTest {
     class SearchMyReviews {
 
         @Test
-        @DisplayName("서비스는 레포지토리에 검색 조건을 넘겨준다")
+        @DisplayName("개인 리뷰를 검색 조건에 따라 조회한다")
         void search() {
             var givenUserId = 1L;
 
-            var givenCondition = new SearchMyReviewRequest(2);
+            var givenCondition = new SearchReviewRequest(2);
             var givenPageable = new PageReviewRequest(10, 10);
 
-            var givenResult = List.of(new SearchMyReviewResponse(2));
+            var givenResult = List.of(new SearchReviewResponse(2, "content"));
 
             when(reviewRepository
-                .findMyReviewByCondition(anyLong(), any(SearchMyReviewRequest.class), any(Pageable.class)))
+                .findMyReviewByCondition(anyLong(), any(SearchReviewRequest.class), any(Pageable.class)))
                 .thenReturn(givenResult);
 
             reviewService.searchMyReviews(givenUserId, givenCondition, givenPageable.of());
@@ -115,17 +113,17 @@ class ReviewServiceTest {
     class SearchRoomReviews {
 
         @Test
-        @DisplayName("서비스는 레포지토리에 검색 조건을 넘겨준다")
+        @DisplayName("숙소 리뷰를 검색 조건에 따라 조회한다")
         void search() {
             var givenRoomId = 1L;
 
-            var givenCondition = new SearchRoomReviewRequest(2);
+            var givenCondition = new SearchReviewRequest(2);
             var givenPageable = new PageReviewRequest(10, 10);
 
-            var givenResult = List.of(new SearchRoomReviewResponse("content", 2));
+            var givenResult = List.of(new SearchReviewResponse(2, "content"));
 
             when(reviewRepository
-                .findRoomReviewByCondition(anyLong(), any(SearchRoomReviewRequest.class), any()))
+                .findRoomReviewByCondition(anyLong(), any(SearchReviewRequest.class), any()))
                 .thenReturn(givenResult);
 
             reviewService.searchRoomReviews(givenRoomId, givenCondition, givenPageable.of());
