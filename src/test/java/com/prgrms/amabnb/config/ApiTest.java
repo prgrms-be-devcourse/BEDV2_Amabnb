@@ -24,6 +24,7 @@ import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.filter.CharacterEncodingFilter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,6 +70,7 @@ public abstract class ApiTest {
                 prettyPrint())
         );
         this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+            .addFilter(new CharacterEncodingFilter("UTF-8", true))
             .apply(documentationConfiguration(provider))
             .apply(springSecurity())
             .alwaysDo(document)
