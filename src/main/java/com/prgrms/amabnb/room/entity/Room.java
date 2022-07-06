@@ -15,14 +15,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
 import com.prgrms.amabnb.common.vo.Money;
-import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.room.entity.vo.RoomAddress;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.room.exception.RoomInvalidValueException;
@@ -74,10 +72,6 @@ public class Room extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User host;
-
-    @OneToMany
-    @JoinColumn(name = "review_id")
-    private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "room", cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<RoomImage> roomImages = new ArrayList<>();
