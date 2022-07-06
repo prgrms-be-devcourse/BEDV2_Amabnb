@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.prgrms.amabnb.common.exception.EntityNotFoundException;
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
-import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.dto.request.ModifyRoomRequest;
 import com.prgrms.amabnb.room.entity.Room;
@@ -125,7 +124,6 @@ class HostRoomServiceTest {
             .userRole(UserRole.GUEST)
             .name("testUser")
             .email(new Email("asdsadsad@gmail.com"))
-            .phoneNumber(new PhoneNumber("010-2312-1231"))
             .profileImgUrl("urlurlrurlrurlurlurl")
             .build();
     }
@@ -178,7 +176,7 @@ class HostRoomServiceTest {
             .roomImages(List.of(createRoomImage()))
             .build();
     }
-    
+
     private RoomImage createRoomImage() {
         return new RoomImage(null, "aaa");
     }

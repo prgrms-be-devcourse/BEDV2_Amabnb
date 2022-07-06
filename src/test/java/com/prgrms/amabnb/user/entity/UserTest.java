@@ -10,7 +10,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import com.prgrms.amabnb.common.vo.Email;
-import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.user.exception.UserInvalidValueException;
 
 class UserTest {
@@ -22,7 +21,6 @@ class UserTest {
             .userRole(UserRole.GUEST)
             .name("testUser")
             .email(new Email("asdsadsad@gmail.com"))
-            .phoneNumber(new PhoneNumber("010-2312-1231"))
             .profileImgUrl("urlurlrurlrurlurlurl");
     }
 
@@ -42,7 +40,6 @@ class UserTest {
             () -> assertThat(user.getUserRole()).isEqualTo(UserRole.GUEST),
             () -> assertThat(user.getUserRole().getGrantedAuthority()).isEqualTo(UserRole.GUEST.getGrantedAuthority()),
             () -> assertThat(user.getEmail()).isEqualTo(new Email("asdsadsad@gmail.com")),
-            () -> assertThat(user.getPhoneNumber().get()).isEqualTo(new PhoneNumber("010-2312-1231")),
             () -> assertThat(user.getProfileImgUrl()).isEqualTo("urlurlrurlrurlurlurl")
         );
     }

@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 
 import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.common.vo.Money;
-import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.dto.response.RoomSearchResponse;
@@ -100,7 +99,6 @@ class RoomRepositoryTest extends RepositoryTest {
             .userRole(UserRole.GUEST)
             .name("testUser")
             .email(new Email("asaaaa@gmail.com"))
-            .phoneNumber(new PhoneNumber("010-2512-1231"))
             .profileImgUrl("urlurlrurlrurlurlurl")
             .build());
 
@@ -161,7 +159,6 @@ class RoomRepositoryTest extends RepositoryTest {
             .userRole(UserRole.GUEST)
             .name("testUser")
             .email(new Email("asdsadsad@gmail.com"))
-            .phoneNumber(new PhoneNumber("010-2312-1231"))
             .profileImgUrl("urlurlrurlrurlurlurl")
             .build();
     }

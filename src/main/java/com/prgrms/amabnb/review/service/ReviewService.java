@@ -1,5 +1,8 @@
 package com.prgrms.amabnb.review.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,7 +12,9 @@ import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.service.ReservationGuestService;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
 import com.prgrms.amabnb.review.dto.response.EditReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.exception.AlreadyReviewException;
 import com.prgrms.amabnb.review.exception.ReviewNoPermissionException;
@@ -63,6 +68,11 @@ public class ReviewService {
         review.changeScore(editDto.getScore());
 
         return EditReviewResponse.from(editDto);
+    }
+
+    public List<SearchReviewResponse> searchMyReviews(Long userId, SearchReviewRequest searchReviewDto,
+        PageRequest pageable) {
+        return reviewRepository.findAllByCondition(userId, searchReviewDto, pageable);
     }
 
     private void validateOneReservationOneReview(Long reservationId) {
