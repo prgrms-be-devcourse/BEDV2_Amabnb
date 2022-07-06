@@ -1,7 +1,6 @@
 package com.prgrms.amabnb.user.entity;
 
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Embedded;
@@ -15,7 +14,6 @@ import javax.persistence.Table;
 
 import com.prgrms.amabnb.common.model.BaseEntity;
 import com.prgrms.amabnb.common.vo.Email;
-import com.prgrms.amabnb.common.vo.PhoneNumber;
 import com.prgrms.amabnb.user.exception.UserInvalidValueException;
 
 import lombok.AccessLevel;
@@ -47,9 +45,6 @@ public class User extends BaseEntity {
     @Embedded
     private Email email;
 
-    @Embedded
-    private PhoneNumber phoneNumber;
-
     @Column(nullable = false)
     private String profileImgUrl;
 
@@ -57,7 +52,7 @@ public class User extends BaseEntity {
     private UserRole userRole;
 
     @Builder
-    public User(Long id, String oauthId, String provider, String name, Email email, PhoneNumber phoneNumber,
+    public User(Long id, String oauthId, String provider, String name, Email email,
         String profileImgUrl, UserRole userRole) {
         setOauthId(oauthId);
         setName(name);
@@ -65,7 +60,6 @@ public class User extends BaseEntity {
         setProfileImgUrl(profileImgUrl);
         this.id = id;
         this.email = email;
-        this.phoneNumber = phoneNumber;
         this.userRole = userRole;
     }
 
@@ -107,7 +101,4 @@ public class User extends BaseEntity {
         this.oauthId = oauthId;
     }
 
-    public Optional<PhoneNumber> getPhoneNumber() {
-        return Optional.ofNullable(this.phoneNumber);
-    }
 }
