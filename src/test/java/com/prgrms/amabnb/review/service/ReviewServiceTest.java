@@ -25,9 +25,11 @@ import com.prgrms.amabnb.reservation.service.ReservationGuestService;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
 import com.prgrms.amabnb.review.dto.request.PageReviewRequest;
-import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchMyReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchRoomReviewRequest;
 import com.prgrms.amabnb.review.dto.response.EditReviewResponse;
-import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchMyReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchRoomReviewResponse;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.repository.ReviewRepository;
 
@@ -90,18 +92,46 @@ class ReviewServiceTest {
         @DisplayName("서비스는 레포지토리에 검색 조건을 넘겨준다")
         void search() {
             var givenUserId = 1L;
-            var givenResult = List.of(new SearchReviewResponse(2));
-            var givenCondition = new SearchReviewRequest(2);
+
+            var givenCondition = new SearchMyReviewRequest(2);
             var givenPageable = new PageReviewRequest(10, 10);
 
+            var givenResult = List.of(new SearchMyReviewResponse(2));
+
             when(reviewRepository
-                .findAllByCondition(anyLong(), any(SearchReviewRequest.class), any(Pageable.class)))
+                .findMyReviewByCondition(anyLong(), any(SearchMyReviewRequest.class), any(Pageable.class)))
                 .thenReturn(givenResult);
 
             reviewService.searchMyReviews(givenUserId, givenCondition, givenPageable.of());
 
             then(reviewRepository).should(times(1))
-                .findAllByCondition(givenUserId, givenCondition, givenPageable.of());
+                .findMyReviewByCondition(givenUserId, givenCondition, givenPageable.of());
+        }
+
+    }
+
+    @Nested
+    @DisplayName("게스트는 숙소의 리뷰를 조회할 수 있다 #67")
+    class SearchRoomReviews {
+
+        @Test
+        @DisplayName("서비스는 레포지토리에 검색 조건을 넘겨준다")
+        void search() {
+            var givenRoomId = 1L;
+
+            var givenCondition = new SearchRoomReviewRequest(2);
+            var givenPageable = new PageReviewRequest(10, 10);
+
+            var givenResult = List.of(new SearchRoomReviewResponse("content", 2));
+
+            when(reviewRepository
+                .findRoomReviewByCondition(anyLong(), any(SearchRoomReviewRequest.class), any()))
+                .thenReturn(givenResult);
+
+            reviewService.searchRoomReviews(givenRoomId, givenCondition, givenPageable.of());
+
+            then(reviewRepository).should(times(1))
+                .findRoomReviewByCondition(givenRoomId, givenCondition, givenPageable.of());
         }
 
     }
