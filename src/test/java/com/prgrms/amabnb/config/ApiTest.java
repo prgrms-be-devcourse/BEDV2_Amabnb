@@ -13,7 +13,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -35,7 +34,6 @@ import com.prgrms.amabnb.security.oauth.OAuthService;
 
 @Import(InfraConfig.class)
 @SpringBootTest
-@AutoConfigureRestDocs
 @ExtendWith(RestDocumentationExtension.class)
 public abstract class ApiTest {
 
