@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -16,13 +17,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 
 import com.prgrms.amabnb.reservation.dto.response.ReservationReviewResponse;
 import com.prgrms.amabnb.reservation.entity.Reservation;
 import com.prgrms.amabnb.reservation.service.ReservationGuestService;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
+import com.prgrms.amabnb.review.dto.request.PageReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
 import com.prgrms.amabnb.review.dto.response.EditReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.repository.ReviewRepository;
 
@@ -78,29 +83,27 @@ class ReviewServiceTest {
     }
 
     @Nested
-    @DisplayName("게스트는 본인이 작성한 리뷰를 삭제할 수 있다 #82")
-    class DeleteReview {
-        Review givenReview;
-        ReservationReviewResponse givenReservationDto;
-
-        @BeforeEach
-        void setAdditionalGivne() {
-            givenReview = createReviewWithId(givenReservation);
-            givenReservationDto = ReservationReviewResponse.from(givenReservation);
-        }
+    @DisplayName("게스트는 본인이 작성한 리뷰 목록을 조회할 수 있다 #70")
+    class SearchMyReviews {
 
         @Test
-        @DisplayName("리뷰를 삭제한다")
-        void deleteUserReview() {
-            when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(givenReview));
-            when(reservationGuestService.findById(anyLong())).thenReturn(givenReservationDto);
+        @DisplayName("서비스는 레포지토리에 검색 조건을 넘겨준다")
+        void search() {
+            var givenUserId = 1L;
+            var givenResult = List.of(new SearchReviewResponse(2));
+            var givenCondition = new SearchReviewRequest(2);
+            var givenPageable = new PageReviewRequest(10, 10);
 
-            var guest = givenReservation.getGuest();
-            reviewService.deleteReview(guest.getId(), givenReview.getId());
+            when(reviewRepository
+                .findAllByCondition(anyLong(), any(SearchReviewRequest.class), any(Pageable.class)))
+                .thenReturn(givenResult);
 
-            then(reviewRepository).should(times(1)).findById(givenReview.getId());
-            then(reviewRepository).should(times(1)).deleteById(givenReview.getId());
+            reviewService.searchMyReviews(givenUserId, givenCondition, givenPageable.of());
+
+            then(reviewRepository).should(times(1))
+                .findAllByCondition(givenUserId, givenCondition, givenPageable.of());
         }
+
     }
 
     @Nested
@@ -135,6 +138,33 @@ class ReviewServiceTest {
                 () -> assertThat(result.getContent()).isEqualTo(givenEditRequest.getContent()),
                 () -> assertThat(result.getScore()).isEqualTo(givenEditRequest.getScore())
             );
+        }
+
+    }
+
+    @Nested
+    @DisplayName("게스트는 본인이 작성한 리뷰를 삭제할 수 있다 #82")
+    class DeleteReview {
+        Review givenReview;
+        ReservationReviewResponse givenReservationDto;
+
+        @BeforeEach
+        void setAdditionalGivne() {
+            givenReview = createReviewWithId(givenReservation);
+            givenReservationDto = ReservationReviewResponse.from(givenReservation);
+        }
+
+        @Test
+        @DisplayName("리뷰를 삭제한다")
+        void deleteUserReview() {
+            when(reviewRepository.findById(anyLong())).thenReturn(Optional.of(givenReview));
+            when(reservationGuestService.findById(anyLong())).thenReturn(givenReservationDto);
+
+            var guest = givenReservation.getGuest();
+            reviewService.deleteReview(guest.getId(), givenReview.getId());
+
+            then(reviewRepository).should(times(1)).findById(givenReview.getId());
+            then(reviewRepository).should(times(1)).deleteById(givenReview.getId());
         }
     }
 }
