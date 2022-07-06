@@ -1,5 +1,6 @@
 package com.prgrms.amabnb.reservation.api;
 
+import static com.prgrms.amabnb.config.util.DocumentFormatGenerator.*;
 import static com.prgrms.amabnb.config.util.Fixture.*;
 import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static java.time.LocalDate.*;
@@ -8,13 +9,14 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -30,14 +32,10 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.prgrms.amabnb.common.exception.ErrorResponse;
-import com.prgrms.amabnb.common.model.ApiResponse;
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.reservation.dto.request.ReservationUpdateRequest;
-import com.prgrms.amabnb.reservation.dto.response.ReservationDateResponse;
-import com.prgrms.amabnb.reservation.dto.response.ReservationResponseForGuest;
 
 class ReservationGuestApiTest extends ApiTest {
 
@@ -56,16 +54,25 @@ class ReservationGuestApiTest extends ApiTest {
         CreateReservationRequest request = createReservationRequest(1, 300_000, roomId);
 
         // when
-        MockHttpServletResponse response = mockMvc.perform(post("/reservations")
+        mockMvc.perform(post("/reservations")
                 .header(AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
-            .andDo(print())
-            .andDo(document("reservation-create",
+
+            // then
+            .andExpectAll(
+                status().isCreated(),
+                jsonPath("$.data.reservation.id").exists()
+            )
+
+            // docs
+            .andDo(document.document(
                 tokenRequestHeader(),
                 requestFields(
-                    fieldWithPath("checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-                    fieldWithPath("checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+                    fieldWithPath("checkIn").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("체크인 날짜"),
+                    fieldWithPath("checkOut").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("체크아웃 날짜"),
                     fieldWithPath("totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
                     fieldWithPath("totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
                     fieldWithPath("roomId").type(JsonFieldType.NUMBER).description("숙소 아이디")
@@ -75,18 +82,7 @@ class ReservationGuestApiTest extends ApiTest {
                 ),
                 responseFields(
                     getReservationResponseForGuestDescriptor()
-                )))
-            .andReturn().getResponse();
-
-        // then
-        ApiResponse<ReservationResponseForGuest> apiResponse = objectMapper.readValue(response.getContentAsString(),
-            new TypeReference<>() {
-            });
-        assertAll(
-            () -> assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value()),
-            () -> assertThat(apiResponse.data().getReservation().getId()).isPositive()
-        );
-
+                )));
     }
 
     @DisplayName("로그인을 하지 않고 예약 할 수 없다. 401 - UNAUTHORIZED ")
@@ -126,7 +122,7 @@ class ReservationGuestApiTest extends ApiTest {
 
     @DisplayName("숙소 가격이 일치하지 않으면 예약할 수 없다. 400 - BAD REQUEST")
     @Test
-    void xcreate_reservation_invalid_price() throws Exception {
+    void create_reservation_invalid_price() throws Exception {
         String accessToken = 로그인_요청("guest");
         CreateReservationRequest request = createReservationRequest(1, 200_000, roomId);
 
@@ -190,59 +186,58 @@ class ReservationGuestApiTest extends ApiTest {
         params.add("endDate", now.plusMonths(1L).toString());
 
         // when
-        MockHttpServletResponse response = mockMvc.perform(
+        mockMvc.perform(
                 get("/rooms/{roomId}/reservations-date", roomId)
                     .header(HttpHeaders.AUTHORIZATION, accessToken)
                     .params(params)
                     .contentType(MediaType.APPLICATION_JSON))
-            .andDo(print())
-            .andDo(document("reservation-date",
+
+            // then
+            .andExpectAll(
+                status().isOk(),
+                jsonPath("$.data[0].checkIn").value(now.toString()),
+                jsonPath("$.data[0].checkOut").value(now.plusDays(2L).toString())
+            )
+
+            // docs
+            .andDo(document.document(
                 tokenRequestHeader(),
                 pathParameters(
                     parameterWithName("roomId").description("숙소 아이디")
                 ),
                 requestParameters(
-                    parameterWithName("startDate").description("조회 시작 날짜"),
-                    parameterWithName("endDate").description("조회 끝 날짜")
+                    parameterWithName("startDate").attributes(getDateFormat()).description("조회 시작 날짜"),
+                    parameterWithName("endDate").attributes(getDateFormat()).description("조회 끝 날짜")
                 ),
                 responseFields(
-                    fieldWithPath("data[].checkIn").description("예약 체크인 날짜"),
-                    fieldWithPath("data[].checkOut").description("예약 체크아웃 날짜")
-                )))
-            .andReturn().getResponse();
-
-        // then
-        ApiResponse<List<ReservationDateResponse>> apiResponse = objectMapper.readValue(response.getContentAsString(),
-            new TypeReference<>() {
-            });
-        assertAll(
-            () -> assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value()),
-            () -> assertThat(apiResponse.data()).extracting("checkIn", "checkOut")
-                .containsExactly(tuple(now, now.plusDays(2L)))
-        );
+                    fieldWithPath("data[].checkIn").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("예약 체크인 날짜"),
+                    fieldWithPath("data[].checkOut").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("예약 체크아웃 날짜")
+                )));
     }
 
     @DisplayName("게스트가 예약을 취소한다. 204 - NO CONTENT")
     @Test
-    void cancelByGuest() throws Exception {
+    void cancel() throws Exception {
         String accessToken = 로그인_요청("guest");
         MockHttpServletResponse reservationResponse = 예약_요청(accessToken, createReservationRequest(3, 300_000, roomId));
         Long reservationId = extractId(reservationResponse);
 
         // when
-        MockHttpServletResponse response = mockMvc.perform(delete("/guest/reservations/{reservationId}", reservationId)
+        mockMvc.perform(delete("/guest/reservations/{reservationId}", reservationId)
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON))
-            .andDo(print())
-            .andDo(document("reservation-guest-cancel",
+
+            // then
+            .andExpect(status().isNoContent())
+
+            // docs
+            .andDo(document.document(
                 tokenRequestHeader(),
                 pathParameters(
                     parameterWithName("reservationId").description("예약 아이디")
-                )))
-            .andReturn().getResponse();
-
-        // then
-        assertThat(response.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
+                )));
     }
 
     @DisplayName("게스트가 예약 정보를 단건 조회한다. 200 - OK")
@@ -266,7 +261,7 @@ class ReservationGuestApiTest extends ApiTest {
             )
 
             // docs
-            .andDo(document("reservation-guest-findOne",
+            .andDo(document.document(
                 tokenRequestHeader(),
                 pathParameters(
                     parameterWithName("reservationId").description("예약 아이디")
@@ -301,7 +296,7 @@ class ReservationGuestApiTest extends ApiTest {
             )
 
             // docs
-            .andDo(document("reservation-guest-find",
+            .andDo(document.document(
                 tokenRequestHeader(),
                 requestParameters(
                     parameterWithName("pageSize").description("페이지 사이즈"),
@@ -310,8 +305,10 @@ class ReservationGuestApiTest extends ApiTest {
                 ),
                 responseFields(
                     fieldWithPath("data[].reservation.id").type(JsonFieldType.NUMBER).description("아이디"),
-                    fieldWithPath("data[].reservation.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-                    fieldWithPath("data[].reservation.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+                    fieldWithPath("data[].reservation.checkIn").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("체크인 날짜"),
+                    fieldWithPath("data[].reservation.checkOut").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("체크아웃 날짜"),
                     fieldWithPath("data[].reservation.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
                     fieldWithPath("data[].reservation.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
                     fieldWithPath("data[].reservation.reservationStatus").type(JsonFieldType.STRING)
@@ -355,7 +352,7 @@ class ReservationGuestApiTest extends ApiTest {
             )
 
             // docs
-            .andDo(document("reservation-update",
+            .andDo(document.document(
                 tokenRequestHeader(),
                 pathParameters(
                     parameterWithName("reservationId").description("예약 아이디")
@@ -390,11 +387,19 @@ class ReservationGuestApiTest extends ApiTest {
             .build();
     }
 
+    private ErrorResponse extractErrorResponse(MockHttpServletResponse response) throws IOException {
+        return objectMapper.readValue(response.getContentAsString(StandardCharsets.UTF_8), ErrorResponse.class);
+    }
+
     private List<FieldDescriptor> getReservationResponseForGuestDescriptor() {
         return List.of(
             fieldWithPath("data.reservation.id").type(JsonFieldType.NUMBER).description("아이디"),
-            fieldWithPath("data.reservation.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-            fieldWithPath("data.reservation.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+            fieldWithPath("data.reservation.checkIn").attributes(getDateFormat())
+                .type(JsonFieldType.STRING)
+                .description("체크인 날짜"),
+            fieldWithPath("data.reservation.checkOut").attributes(getDateFormat())
+                .type(JsonFieldType.STRING)
+                .description("체크아웃 날짜"),
             fieldWithPath("data.reservation.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
             fieldWithPath("data.reservation.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
             fieldWithPath("data.reservation.reservationStatus").type(JsonFieldType.STRING).description("예약 상태"),
