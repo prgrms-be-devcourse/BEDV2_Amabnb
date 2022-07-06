@@ -1,10 +1,15 @@
 package com.prgrms.amabnb.review.api;
 
 import static com.prgrms.amabnb.config.util.Fixture.*;
+import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +22,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import com.prgrms.amabnb.config.ApiTest;
 import com.prgrms.amabnb.reservation.entity.Reservation;
@@ -24,6 +31,8 @@ import com.prgrms.amabnb.reservation.entity.ReservationStatus;
 import com.prgrms.amabnb.reservation.repository.ReservationRepository;
 import com.prgrms.amabnb.review.dto.request.CreateReviewRequest;
 import com.prgrms.amabnb.review.dto.request.EditReviewRequest;
+import com.prgrms.amabnb.review.dto.request.PageReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
 import com.prgrms.amabnb.review.entity.Review;
 import com.prgrms.amabnb.review.repository.ReviewRepository;
 import com.prgrms.amabnb.room.repository.RoomRepository;
@@ -40,21 +49,20 @@ class ReviewApiTest extends ApiTest {
     @Autowired
     private RoomRepository roomRepository;
 
-    private Reservation givenReservation;
     private String givenGuestAccessToken;
+    private Long givenReservationId;
 
     @BeforeEach
     void setBasicGiven() throws Exception {
-        var givenGuest = userRepository.save(createUser("guest"));
-        var givenHost = userRepository.save(createUser("host"));
-        var givenRoom = roomRepository.save(createRoom(givenHost));
+        var guest = userRepository.save(createUser("guest"));
+        var host = userRepository.save(createUser("host"));
+        var room = roomRepository.save(createRoom(host));
 
-        givenGuestAccessToken = 로그인_요청(givenGuest.getName());
-        givenReservation = reservationRepository.findById(
-            extractId(예약_요청(givenGuestAccessToken, makeCreateReservationRequest(givenRoom)))).get();
+        givenGuestAccessToken = 로그인_요청(guest.getName());
+        givenReservationId = extractId(예약_요청(givenGuestAccessToken, makeCreateReservationRequest(room)));
     }
 
-    private ResultActions when_리뷰_작성(Long reservationId, String userAccessToken,
+    private ResultActions 리뷰_작성(Long reservationId, String userAccessToken,
         CreateReviewRequest createReviewDto) throws Exception {
         return mockMvc.perform(post("/reservations/{reservationId}/reviews", reservationId)
             .header(HttpHeaders.AUTHORIZATION, userAccessToken)
@@ -62,17 +70,10 @@ class ReviewApiTest extends ApiTest {
             .content(toJson(createReviewDto)));
     }
 
-    private ResultActions when_리뷰_삭제(String userAccessToken, Long reviewId) throws Exception {
-        return mockMvc.perform(delete("/reviews/{reviewId}", reviewId)
-            .header(HttpHeaders.AUTHORIZATION, userAccessToken));
-    }
-
-    private ResultActions when_리뷰_수정(String userAccessToken, Long reviewId,
-        EditReviewRequest editReviewDto) throws Exception {
-        return mockMvc.perform(post("/reviews/{reviewId}", reviewId)
-            .header(HttpHeaders.AUTHORIZATION, userAccessToken)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(toJson(editReviewDto)));
+    private void 예약_상태_변경(Long reservationId, ReservationStatus status) {
+        var reservation = reservationRepository.findById(reservationId).get();
+        reservation.changeStatus(status);
+        reservationRepository.save(reservation);
     }
 
     @Nested
@@ -86,60 +87,148 @@ class ReviewApiTest extends ApiTest {
         }
 
         @Test
-        @DisplayName("리뷰를 작성할 수 있다.")
+        @DisplayName("리뷰를 작성할 수 있다")
         void postReview() throws Exception {
-            givenReservation.changeStatus(ReservationStatus.COMPLETED);
-            reservationRepository.save(givenReservation);
-
-            when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest)
+            예약_상태_변경(givenReservationId, COMPLETED);
+            var reserv = reservationRepository.findById(givenReservationId).get();
+            리뷰_작성(reserv.getId(), givenGuestAccessToken, givenReviewRequest)
                 .andExpect(status().isCreated())
                 .andExpect(redirectedUrlPattern("/reviews/*"))
                 .andDo(print());
-
         }
 
         @ParameterizedTest
-        @DisplayName("숙소를 방문을 완료(COMPLETED)한 후에 리뷰를 작성할 수 있습니다.")
+        @DisplayName("숙소를 방문을 완료(COMPLETED)한 후에 리뷰를 작성할 수 있다")
         @EnumSource(value = ReservationStatus.class, names = {"PENDING", "APPROVED", "GUEST_CANCELED", "HOST_CANCELED"})
         void exception1(ReservationStatus status) throws Exception {
             var errorMessage = "숙소 방문 완료 후 리뷰를 작성할 수 있습니다.";
-            givenReservation.changeStatus(status);
-            reservationRepository.save(givenReservation);
+            예약_상태_변경(givenReservationId, status);
 
-            when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest)
+            리뷰_작성(givenReservationId, givenGuestAccessToken, givenReviewRequest)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(errorMessage))
                 .andDo(print());
         }
 
         @Test
-        @DisplayName("리뷰는 예약 한 건당 한 개만 작성할 수 있습니다.")
+        @DisplayName("리뷰는 예약 한 건당 한 개만 작성할 수 있다")
         void exception2() throws Exception {
             var errorMessage = "이미 작성한 예약 건 입니다.";
+            예약_상태_변경(givenReservationId, COMPLETED);
 
-            givenReservation.changeStatus(ReservationStatus.COMPLETED);
-            reservationRepository.save(givenReservation);
-
-            var firstReview = when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest);
+            var firstReview = 리뷰_작성(givenReservationId, givenGuestAccessToken, givenReviewRequest);
             firstReview.andExpect(status().isCreated());
 
-            var secondReview = when_리뷰_작성(givenReservation.getId(), givenGuestAccessToken, givenReviewRequest);
+            var secondReview = 리뷰_작성(givenReservationId, givenGuestAccessToken, givenReviewRequest);
             secondReview.andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(errorMessage))
                 .andDo(print());
         }
 
         @Test
-        @DisplayName("예약자 본인만 리뷰를 작성할 수 있습니다.")
+        @DisplayName("예약자 본인만 리뷰를 작성할 수 있다")
         void exception3() throws Exception {
             var errorMessage = "리뷰에 대한 권한이 존재하지 않습니다.";
-
-            givenReservation.changeStatus(ReservationStatus.COMPLETED);
-            reservationRepository.save(givenReservation);
+            예약_상태_변경(givenReservationId, COMPLETED);
 
             var illegalToken = 로그인_요청("illegal-user");
 
-            when_리뷰_작성(givenReservation.getId(), illegalToken, givenReviewRequest)
+            리뷰_작성(givenReservationId, illegalToken, givenReviewRequest)
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(errorMessage))
+                .andDo(print());
+        }
+    }
+
+    @Nested
+    @DisplayName("게스트는 본인이 작성한 리뷰 목록을 조회할 수 있다 #70")
+    class SearchMyReviews {
+
+        private List<String> guestTokens = new ArrayList<>();
+
+        @BeforeEach
+        void setMultiValues() throws Exception {
+            for (int i = 0; i < 5; i++) {
+                var guest = userRepository.save(createUser(UUID.randomUUID().toString().substring(20)));
+                var host = userRepository.save(createUser(UUID.randomUUID().toString().substring(20)));
+                var room = roomRepository.save(createRoom(host));
+
+                var guestAccessToken = 로그인_요청(guest.getName());
+
+                guestTokens.add(guestAccessToken);
+
+                var reservationId = extractId(예약_요청(guestAccessToken, makeCreateReservationRequest(room)));
+                예약_상태_변경(reservationId, COMPLETED);
+
+                var review = new CreateReviewRequest("content", 1);
+                리뷰_작성(reservationId, guestAccessToken, review);
+            }
+        }
+
+        private ResultActions 본인_리뷰_조회(
+            String guestUserAccessToken, SearchReviewRequest request, PageReviewRequest page) throws Exception {
+
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("score", String.valueOf(request.getScore()));
+            params.add("size", String.valueOf(page.getSize()));
+            params.add("page", String.valueOf(page.getPage()));
+
+            return mockMvc.perform(get("/reviews")
+                .header(HttpHeaders.AUTHORIZATION, guestUserAccessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .params(params));
+        }
+
+        @Test
+        @DisplayName("조건에 맞는 리뷰를 전부 가져온다")
+        void findMyReviews() throws Exception {
+            var givenSearchRequest = new SearchReviewRequest(1);
+            var givenPageReviewRequest = new PageReviewRequest(10, 10);
+
+            본인_리뷰_조회(guestTokens.get(0), givenSearchRequest, givenPageReviewRequest)
+                .andExpect(status().isOk())
+                // .andExpect(jsonPath("$.data.]"))
+                .andDo(print());
+        }
+    }
+
+    @Nested
+    @DisplayName("게스트는 본인이 작성한 리뷰를 수정할 수 있다 #81")
+    class EditReview {
+        Review givenReview;
+        EditReviewRequest givenEditDto;
+
+        private ResultActions 리뷰_수정(String userAccessToken, Long reviewId,
+            EditReviewRequest editReviewDto) throws Exception {
+            return mockMvc.perform(post("/reviews/{reviewId}", reviewId)
+                .header(HttpHeaders.AUTHORIZATION, userAccessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(toJson(editReviewDto)));
+        }
+
+        @BeforeEach
+        void setAdditionalGiven() {
+            givenReview = reviewRepository.save(new Review(1L, "content", 4, new Reservation(givenReservationId)));
+            givenEditDto = new EditReviewRequest("edit-content", 2);
+        }
+
+        @Test
+        @DisplayName("리뷰를 수정할 수 있다")
+        void postReview() throws Exception {
+            리뷰_수정(givenGuestAccessToken, givenReview.getId(), givenEditDto)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.content").value(givenEditDto.getContent()))
+                .andExpect(jsonPath("$.data.score").value(givenEditDto.getScore()))
+                .andDo(print());
+        }
+
+        @Test
+        @DisplayName("본인이 작성하지 않은 리뷰는 수정할 수 없다")
+        void noPermission() throws Exception {
+            var errorMessage = "리뷰에 대한 권한이 존재하지 않습니다.";
+            var illegalToken = 로그인_요청("illegal-user");
+
+            리뷰_수정(illegalToken, givenReview.getId(), givenEditDto)
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(errorMessage))
                 .andDo(print());
@@ -151,10 +240,15 @@ class ReviewApiTest extends ApiTest {
     class DeleteReview {
         Review givenReview;
 
+        private ResultActions 리뷰_삭제(String userAccessToken, Long reviewId) throws Exception {
+            return mockMvc.perform(delete("/reviews/{reviewId}", reviewId)
+                .header(HttpHeaders.AUTHORIZATION, userAccessToken));
+        }
+
         @BeforeEach
         @Transactional
         void setAdditionalGiven() {
-            givenReview = reviewRepository.save(new Review("content", 4, givenReservation));
+            givenReview = reviewRepository.save(new Review("content", 4, new Reservation(givenReservationId)));
         }
 
         @Test
@@ -162,7 +256,7 @@ class ReviewApiTest extends ApiTest {
         void deleteReview() throws Exception {
             assertThat(reviewRepository.count()).isOne();
 
-            when_리뷰_삭제(givenGuestAccessToken, givenReview.getId())
+            리뷰_삭제(givenGuestAccessToken, givenReview.getId())
                 .andExpect(status().isNoContent())
                 .andDo(print());
 
@@ -177,7 +271,7 @@ class ReviewApiTest extends ApiTest {
 
             var illegalToken = 로그인_요청("illegal-user");
 
-            when_리뷰_삭제(illegalToken, givenReview.getId())
+            리뷰_삭제(illegalToken, givenReview.getId())
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(errorMessage))
                 .andDo(print());
@@ -186,40 +280,4 @@ class ReviewApiTest extends ApiTest {
         }
     }
 
-    @Nested
-    @DisplayName("게스트는 본인이 작성한 리뷰를 수정할 수 있다 #81")
-    class EditReview {
-
-        Review givenReview;
-        EditReviewRequest givenEditDto;
-
-        @BeforeEach
-        @Transactional
-        void setAdditionalGiven() {
-            givenReview = reviewRepository.save(new Review(1L, "content", 4, givenReservation));
-            givenEditDto = new EditReviewRequest("edit-content", 2);
-        }
-
-        @Test
-        @DisplayName("리뷰를 수정할 수 있다")
-        void postReview() throws Exception {
-            when_리뷰_수정(givenGuestAccessToken, givenReview.getId(), givenEditDto)
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.content").value(givenEditDto.getContent()))
-                .andExpect(jsonPath("$.data.score").value(givenEditDto.getScore()))
-                .andDo(print());
-        }
-
-        @Test
-        @DisplayName("본인이 작성하지 않은 리뷰는 수정할 수 없다")
-        void noPermission() throws Exception {
-            var errorMessage = "리뷰에 대한 권한이 존재하지 않습니다.";
-            var illegalToken = 로그인_요청("illegal-user");
-
-            when_리뷰_수정(illegalToken, givenReview.getId(), givenEditDto)
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(errorMessage))
-                .andDo(print());
-        }
-    }
 }
