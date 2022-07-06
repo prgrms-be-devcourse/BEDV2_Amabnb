@@ -1,0 +1,51 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:docinfo: shared-head
+
+
+== 토큰 API
+
+=== 공통
+
+모든 토큰 요청은 JWT access token 이 필요합니다.
+
+include::{snippets}/refresh-access-token/refresh-access-token_success/request-headers.adoc[]
+
+=== access 토큰 재발급
+
+==== Request
+
+include::{snippets}/refresh-access-token/refresh-access-token_success/request-fields.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/refresh-access-token/refresh-access-token_success/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/refresh-access-token/refresh-access-token_success/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/refresh-access-token/refresh-access-token_success/http-response.adoc[]
+
+=== refresh 토큰 삭제 (로그아웃)
+
+==== Request
+
+===== Request HTTP Example
+
+include::{snippets}/delete-refresh-token/delete-refresh-token/http-request.adoc[]
+
+==== Response
+
+===== Response HTTP Example
+
+include::{snippets}/delete-refresh-token/delete-refresh-token/http-response.adoc[]
