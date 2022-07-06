@@ -3,7 +3,6 @@ package com.prgrms.amabnb.room.api;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
@@ -47,16 +46,16 @@ class RoomApiTest extends ApiTest {
                 .params(params))
             //then
             .andExpect(status().isOk())
-            .andDo(print())
+
             .andDo(document.document(
                 requestParameters(
-                    parameterWithName("minBeds").description("최수 침대 수"),
-                    parameterWithName("minBedrooms").description("최수 침실 수"),
-                    parameterWithName("minBathrooms").description("최소 욕실 수"),
-                    parameterWithName("minPrice").description("최소 1박 가격"),
-                    parameterWithName("maxPrice").description("최대 1박 가격"),
-                    parameterWithName("roomTypes").description("숙소 유형"),
-                    parameterWithName("roomScopes").description("숙소 범위"),
+                    parameterWithName("minBeds").optional().description("최수 침대 수"),
+                    parameterWithName("minBedrooms").optional().description("최수 침실 수"),
+                    parameterWithName("minBathrooms").optional().description("최소 욕실 수"),
+                    parameterWithName("minPrice").optional().description("최소 1박 가격"),
+                    parameterWithName("maxPrice").optional().description("최대 1박 가격"),
+                    parameterWithName("roomTypes").optional().description("숙소 유형"),
+                    parameterWithName("roomScopes").optional().description("숙소 범위"),
                     parameterWithName("size").description("페이지 사이즈"),
                     parameterWithName("page").description("페이지 번호")
                 ),
@@ -82,7 +81,7 @@ class RoomApiTest extends ApiTest {
                 .contentType(MediaType.APPLICATION_JSON))
             //then
             .andExpect(status().isOk())
-            .andDo(print())
+
             .andDo(document.document(
                 pathParameters(
                     parameterWithName("roomId").description("숙소 아이디")
@@ -114,12 +113,12 @@ class RoomApiTest extends ApiTest {
         params.add("page", "10");
         params.add("size", "10");
 
-        // when, then
+        // when
         mockMvc.perform(get("/rooms")
                 .contentType(MediaType.APPLICATION_JSON)
                 .params(params))
-            .andExpect(status().isOk())
-            .andDo(print());
+            //then
+            .andExpect(status().isOk());
 
     }
 
@@ -129,11 +128,11 @@ class RoomApiTest extends ApiTest {
         //given
         Long notSavedRoomId = 3712893721L;
 
-        //when, then
+        //when
         mockMvc.perform(get("/rooms/" + notSavedRoomId)
                 .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound())
-            .andDo(print());
+            //then
+            .andExpect(status().isNotFound());
 
     }
 
