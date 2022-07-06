@@ -34,7 +34,7 @@ public class QueryReviewRepositoryImpl implements QueryReviewRepository {
             .where(
                 scoreEq(condition.getScore())
             )
-            .orderBy(review.score.desc())
+            .orderBy(review.id.asc(), review.createdAt.desc(), review.score.desc())
             .limit(pageable.getPageSize())
             .fetch();
     }
@@ -51,7 +51,7 @@ public class QueryReviewRepositoryImpl implements QueryReviewRepository {
             .where(
                 scoreEq(condition.getScore())
             )
-            .orderBy(review.score.desc())
+            .orderBy(review.id.asc(), review.createdAt.desc(), review.score.desc())
             .limit(pageable.getPageSize())
             .fetch();
     }
