@@ -3,53 +3,80 @@ package com.prgrms.amabnb.config;
 import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.restdocs.RestDocumentationContextProvider;
+import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.headers.RequestHeadersSnippet;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.prgrms.amabnb.common.exception.ErrorResponse;
 import com.prgrms.amabnb.config.util.DatabaseCleanup;
 import com.prgrms.amabnb.reservation.dto.request.CreateReservationRequest;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.security.oauth.OAuthService;
-import com.prgrms.amabnb.security.oauth.UserProfile;
 
 @Import(InfraConfig.class)
 @SpringBootTest
-@AutoConfigureMockMvc
 @AutoConfigureRestDocs
+@ExtendWith(RestDocumentationExtension.class)
 public abstract class ApiTest {
 
     static {
         System.setProperty("com.amazonaws.sdk.disableEc2Metadata", "true");
     }
 
-    @Autowired
     protected MockMvc mockMvc;
-
     @Autowired
     protected ObjectMapper objectMapper;
-
     @Autowired
     protected OAuthService oAuthService;
-
     @Autowired
     protected DatabaseCleanup databaseCleanup;
+
+    protected RestDocumentationResultHandler document;
+
+    @BeforeEach
+    void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
+        this.document = document(
+            "{class-name}/{method-name}",
+            preprocessRequest(
+                modifyUris()
+                    .scheme("http")
+                    .host("54.180.129.133")
+                    .removePort(),
+                prettyPrint()),
+            preprocessResponse(removeHeaders("Transfer-Encoding",
+                    "Date",
+                    "Keep-Alive",
+                    "Connection"
+                ),
+                prettyPrint())
+        );
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
+            .apply(documentationConfiguration(provider))
+            .apply(springSecurity())
+            .alwaysDo(document)
+            .alwaysDo(print())
+            .build();
+    }
 
     @AfterEach
     void tearDown() {
@@ -62,12 +89,8 @@ public abstract class ApiTest {
         );
     }
 
-    protected String 로그인_요청(UserProfile userProfile) {
-        return "Bearer" + oAuthService.register(userProfile).accessToken();
-    }
-
     protected String 로그인_요청(String name) {
-        return "Bearer" + oAuthService.register(createUserProfile(name)).accessToken();
+        return "Bearer " + oAuthService.register(createUserProfile(name)).accessToken();
     }
 
     protected MockHttpServletResponse 예약_요청(String accessToken, CreateReservationRequest request) throws Exception {
@@ -92,10 +115,6 @@ public abstract class ApiTest {
     protected Long extractId(MockHttpServletResponse response) {
         String[] locations = response.getHeader("Location").split("/");
         return Long.valueOf(locations[locations.length - 1]);
-    }
-
-    protected ErrorResponse extractErrorResponse(MockHttpServletResponse response) throws IOException {
-        return objectMapper.readValue(response.getContentAsString(StandardCharsets.UTF_8), ErrorResponse.class);
     }
 
     protected String toJson(Object object) throws JsonProcessingException {
