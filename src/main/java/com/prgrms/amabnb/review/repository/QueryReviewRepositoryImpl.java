@@ -5,11 +5,14 @@ import static com.prgrms.amabnb.review.entity.QReview.*;
 import java.util.List;
 import java.util.Objects;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import com.prgrms.amabnb.review.dto.request.SearchReviewRequest;
-import com.prgrms.amabnb.review.dto.response.SearchReviewResponse;
+import com.prgrms.amabnb.review.dto.request.SearchMyReviewRequest;
+import com.prgrms.amabnb.review.dto.request.SearchRoomReviewRequest;
+import com.prgrms.amabnb.review.dto.response.SearchMyReviewResponse;
+import com.prgrms.amabnb.review.dto.response.SearchRoomReviewResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -23,13 +26,32 @@ public class QueryReviewRepositoryImpl implements QueryReviewRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<SearchReviewResponse> findAllByCondition(Long userId, SearchReviewRequest condition,
+    public List<SearchMyReviewResponse> findMyReviewByCondition(Long userId, SearchMyReviewRequest condition,
         Pageable pageable) {
-        return jpaQueryFactory.select(Projections.constructor(SearchReviewResponse.class, review.score))
+        return jpaQueryFactory.select(Projections.constructor(SearchMyReviewResponse.class, review.score))
             .from(review)
+            .innerJoin(review.reservation)
+            .innerJoin(review.reservation.guest)
+            .on(review.reservation.guest.id.eq(userId))
             .where(
-                scoreEq(condition.getScore()),
-                hasReviewPermission(userId)
+                scoreEq(condition.getScore())
+            )
+            .orderBy(review.score.desc())
+            .limit(pageable.getPageSize())
+            .fetch();
+    }
+
+    @Override
+    public List<SearchRoomReviewResponse> findRoomReviewByCondition(Long roomId, SearchRoomReviewRequest condition,
+        PageRequest pageable) {
+        return jpaQueryFactory.select(
+                Projections.constructor(SearchRoomReviewResponse.class, review.content, review.score))
+            .from(review)
+            .innerJoin(review.reservation)
+            .innerJoin(review.reservation.room)
+            .on(review.reservation.room.id.eq(roomId))
+            .where(
+                scoreEq(condition.getScore())
             )
             .orderBy(review.score.desc())
             .limit(pageable.getPageSize())
@@ -40,7 +62,4 @@ public class QueryReviewRepositoryImpl implements QueryReviewRepository {
         return Objects.isNull(score) ? null : review.score.eq(score);
     }
 
-    private BooleanExpression hasReviewPermission(Long userId) {
-        return Objects.isNull(userId) ? null : review.reservation.guest.id.eq(userId);
-    }
 }
