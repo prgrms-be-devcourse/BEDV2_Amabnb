@@ -1,0 +1,68 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:docinfo: shared-head
+
+
+== 유저 API
+
+=== 공통
+
+로그인을 제외한 모든 유저 요청은 JWT access token 이 필요합니다.
+
+include::{snippets}/delete-account/delete-user/request-headers.adoc[]
+
+=== 카카오 로그인
+
+==== Request
+
+===== Request HTTP Example
+
+include::{snippets}/user-api-test/login-document/http-request.adoc[]
+
+==== Response
+
+카카오 로그인 창
+
+===== Response HTTP Example
+
+include::{snippets}/user-api-test/login-document/http-response.adoc[]
+
+로그인 완료 시 토큰 응답
+
+=== 정보 조회
+
+==== Request
+
+===== Request HTTP Example
+
+include::{snippets}/my-page/user-page/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/my-page/user-page/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/my-page/user-page/http-response.adoc[]
+
+=== 탈퇴
+
+==== Request
+
+===== Request HTTP Example
+
+include::{snippets}/delete-account/delete-user/http-request.adoc[]
+
+==== Response
+
+===== Response HTTP Example
+
+include::{snippets}/delete-account/delete-user/http-response.adoc[]
+

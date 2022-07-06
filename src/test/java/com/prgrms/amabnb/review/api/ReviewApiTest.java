@@ -175,7 +175,7 @@ class ReviewApiTest extends ApiTest {
             var errorMessage = "리뷰에 대한 권한이 존재하지 않습니다.";
             assertThat(reviewRepository.count()).isOne();
 
-            var illegalToken = 로그인_요청(createUserProfile("illegal-user"));
+            var illegalToken = 로그인_요청("illegal-user");
 
             when_리뷰_삭제(illegalToken, givenReview.getId())
                 .andExpect(status().isBadRequest())
@@ -214,7 +214,7 @@ class ReviewApiTest extends ApiTest {
         @DisplayName("본인이 작성하지 않은 리뷰는 수정할 수 없다")
         void noPermission() throws Exception {
             var errorMessage = "리뷰에 대한 권한이 존재하지 않습니다.";
-            var illegalToken = 로그인_요청(createUserProfile("illegal-user"));
+            var illegalToken = 로그인_요청("illegal-user");
 
             when_리뷰_수정(illegalToken, givenReview.getId(), givenEditDto)
                 .andExpect(status().isBadRequest())

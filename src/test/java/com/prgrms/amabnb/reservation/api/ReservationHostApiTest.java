@@ -1,12 +1,12 @@
 package com.prgrms.amabnb.reservation.api;
 
+import static com.prgrms.amabnb.config.util.DocumentFormatGenerator.*;
 import static com.prgrms.amabnb.config.util.Fixture.*;
 import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static java.time.LocalDate.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
@@ -47,7 +47,7 @@ class ReservationHostApiTest extends ApiTest {
     void approveReservation() throws Exception {
         // given
         MockHttpServletResponse ReservationResponseForGuest = 예약_요청(로그인_요청("guest"),
-            createReservationRequest(3, 300_000, roomId));
+            createReservationRequest(roomId));
         Long reservationId = extractId(ReservationResponseForGuest);
 
         // when
@@ -55,15 +55,17 @@ class ReservationHostApiTest extends ApiTest {
                 .header(HttpHeaders.AUTHORIZATION, hostAccessToken)
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .andDo(document("reservation-host-approve",
+            .andDo(document.document(
                 tokenRequestHeader(),
                 pathParameters(
                     parameterWithName("reservationId").description("예약 아이디")
                 ),
                 responseFields(
                     fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("예약 아이디"),
-                    fieldWithPath("data.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-                    fieldWithPath("data.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+                    fieldWithPath("data.checkIn").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("체크인 날짜"),
+                    fieldWithPath("data.checkOut").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("체크아웃 날짜"),
                     fieldWithPath("data.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
                     fieldWithPath("data.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
                     fieldWithPath("data.reservationStatus").type(JsonFieldType.STRING).description("예약 상태")
@@ -82,10 +84,10 @@ class ReservationHostApiTest extends ApiTest {
 
     @DisplayName("호스트가 예약을 취소한다. 204 - NO CONTENT")
     @Test
-    void cancelByHost() throws Exception {
+    void cancel() throws Exception {
         // given
         MockHttpServletResponse ReservationResponseForGuest = 예약_요청(로그인_요청("guest"),
-            createReservationRequest(3, 300_000, roomId));
+            createReservationRequest(roomId));
         Long reservationId = extractId(ReservationResponseForGuest);
 
         // when
@@ -93,7 +95,7 @@ class ReservationHostApiTest extends ApiTest {
                 .header(HttpHeaders.AUTHORIZATION, hostAccessToken)
                 .contentType(MediaType.APPLICATION_JSON))
             .andDo(print())
-            .andDo(document("reservation-host-approve",
+            .andDo(document.document(
                 tokenRequestHeader(),
                 pathParameters(
                     parameterWithName("reservationId").description("예약 아이디")
@@ -109,7 +111,7 @@ class ReservationHostApiTest extends ApiTest {
     void getReservation() throws Exception {
         // given
         MockHttpServletResponse createResponse = 예약_요청(로그인_요청("guest"),
-            createReservationRequest(3, 300_000, roomId));
+            createReservationRequest(roomId));
         Long reservationId = extractId(createResponse);
 
         // when
@@ -128,15 +130,17 @@ class ReservationHostApiTest extends ApiTest {
             )
 
             // docs
-            .andDo(document("reservation-host-findOne",
+            .andDo(document.document(
                 tokenRequestHeader(),
                 pathParameters(
                     parameterWithName("reservationId").description("예약 아이디")
                 ),
                 responseFields(
                     fieldWithPath("data.reservation.id").type(JsonFieldType.NUMBER).description("아이디"),
-                    fieldWithPath("data.reservation.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-                    fieldWithPath("data.reservation.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+                    fieldWithPath("data.reservation.checkIn").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("체크인 날짜"),
+                    fieldWithPath("data.reservation.checkOut").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("체크아웃 날짜"),
                     fieldWithPath("data.reservation.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
                     fieldWithPath("data.reservation.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
                     fieldWithPath("data.reservation.reservationStatus").type(JsonFieldType.STRING).description("예약 상태"),
@@ -179,7 +183,7 @@ class ReservationHostApiTest extends ApiTest {
             )
 
             // docs
-            .andDo(document("reservation-host-find",
+            .andDo(document.document(
                 tokenRequestHeader(),
                 requestParameters(
                     parameterWithName("pageSize").description("페이지 사이즈"),
@@ -188,8 +192,10 @@ class ReservationHostApiTest extends ApiTest {
                 ),
                 responseFields(
                     fieldWithPath("data[].reservation.id").type(JsonFieldType.NUMBER).description("아이디"),
-                    fieldWithPath("data[].reservation.checkIn").type(JsonFieldType.STRING).description("체크인 날짜"),
-                    fieldWithPath("data[].reservation.checkOut").type(JsonFieldType.STRING).description("체크아웃 날짜"),
+                    fieldWithPath("data[].reservation.checkIn").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("체크인 날짜"),
+                    fieldWithPath("data[].reservation.checkOut").type(JsonFieldType.STRING).attributes(getDateFormat())
+                        .description("체크아웃 날짜"),
                     fieldWithPath("data[].reservation.totalGuest").type(JsonFieldType.NUMBER).description("총 인원수"),
                     fieldWithPath("data[].reservation.totalPrice").type(JsonFieldType.NUMBER).description("총 가격"),
                     fieldWithPath("data[].reservation.reservationStatus").type(JsonFieldType.STRING)
@@ -208,12 +214,12 @@ class ReservationHostApiTest extends ApiTest {
                 )));
     }
 
-    private CreateReservationRequest createReservationRequest(int totalGuest, int totalPrice, Long roomId) {
+    private CreateReservationRequest createReservationRequest(Long roomId) {
         return CreateReservationRequest.builder()
             .checkIn(LocalDate.now())
             .checkOut(LocalDate.now().plusDays(3L))
-            .totalGuest(totalGuest)
-            .totalPrice(totalPrice)
+            .totalGuest(3)
+            .totalPrice(300000)
             .roomId(roomId)
             .build();
     }
