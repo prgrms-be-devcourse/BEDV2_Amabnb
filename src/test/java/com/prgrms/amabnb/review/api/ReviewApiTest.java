@@ -3,7 +3,11 @@ package com.prgrms.amabnb.review.api;
 import static com.prgrms.amabnb.config.util.Fixture.*;
 import static com.prgrms.amabnb.reservation.entity.ReservationStatus.*;
 import static org.assertj.core.api.Assertions.*;
+import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -20,6 +24,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
@@ -67,7 +73,7 @@ class ReviewApiTest extends ApiTest {
         CreateReviewRequest createReviewDto) throws Exception {
         return mockMvc.perform(post("/reservations/{reservationId}/reviews", reservationId)
             .header(HttpHeaders.AUTHORIZATION, userAccessToken)
-            .contentType(MediaType.APPLICATION_JSON)
+            .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
             .content(toJson(createReviewDto)));
     }
 
@@ -89,19 +95,34 @@ class ReviewApiTest extends ApiTest {
 
         @Test
         @DisplayName("리뷰를 작성할 수 있다")
-        void postReview() throws Exception {
+        void createReview() throws Exception {
             예약_상태_변경(givenReservationId, COMPLETED);
             var reserv = reservationRepository.findById(givenReservationId).get();
             리뷰_작성(reserv.getId(), givenGuestAccessToken, givenReviewRequest)
                 .andExpect(status().isCreated())
                 .andExpect(redirectedUrlPattern("/reviews/*"))
-                .andDo(print());
+                .andDo(createReviewDoc());
+        }
+
+        private RestDocumentationResultHandler createReviewDoc() {
+            return document.document(
+                pathParameters(
+                    parameterWithName("reservationId").description("예약 아이디")
+                ),
+                requestFields(
+                    fieldWithPath("score").type(JsonFieldType.NUMBER).description("리뷰 점수"),
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용 본문")
+                ),
+                responseHeaders(
+                    headerWithName("Location").description("생성된 리뷰 URI")
+                )
+            );
         }
 
         @ParameterizedTest
         @DisplayName("숙소를 방문을 완료(COMPLETED)한 후에 리뷰를 작성할 수 있다")
         @EnumSource(value = ReservationStatus.class, names = {"PENDING", "APPROVED", "GUEST_CANCELED", "HOST_CANCELED"})
-        void exception1(ReservationStatus status) throws Exception {
+        void create_review_exception1(ReservationStatus status) throws Exception {
             var errorMessage = "숙소 방문 완료 후 리뷰를 작성할 수 있습니다.";
             예약_상태_변경(givenReservationId, status);
 
@@ -113,7 +134,7 @@ class ReviewApiTest extends ApiTest {
 
         @Test
         @DisplayName("리뷰는 예약 한 건당 한 개만 작성할 수 있다")
-        void exception2() throws Exception {
+        void create_review_exception2() throws Exception {
             var errorMessage = "이미 작성한 예약 건 입니다.";
             예약_상태_변경(givenReservationId, COMPLETED);
 
@@ -128,7 +149,7 @@ class ReviewApiTest extends ApiTest {
 
         @Test
         @DisplayName("예약자 본인만 리뷰를 작성할 수 있다")
-        void exception3() throws Exception {
+        void create_review_exception3() throws Exception {
             var errorMessage = "리뷰에 대한 권한이 존재하지 않습니다.";
             예약_상태_변경(givenReservationId, COMPLETED);
 
@@ -157,7 +178,7 @@ class ReviewApiTest extends ApiTest {
 
             return mockMvc.perform(get("/reviews")
                 .header(HttpHeaders.AUTHORIZATION, guestUserAccessToken)
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                 .params(params));
         }
 
@@ -182,14 +203,32 @@ class ReviewApiTest extends ApiTest {
 
         @Test
         @DisplayName("조건에 맞는 리뷰를 전부 가져온다")
-        void findMyReviews() throws Exception {
+        void searchMyReviews() throws Exception {
             var givenSearchRequest = new SearchReviewRequest(1);
-            var givenPageReviewRequest = new PageReviewRequest(10, 10);
+            var givenPageReviewRequest = new PageReviewRequest(0, 10);
 
             본인_리뷰_조회(guestTokens.get(0), givenSearchRequest, givenPageReviewRequest)
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(searchMyReviewsDoc());
         }
+
+        private RestDocumentationResultHandler searchMyReviewsDoc() {
+            return document.document(
+                requestParameters(
+                    parameterWithName("score").description("리뷰 점수"),
+                    parameterWithName("size").description("페이지 사이즈"),
+                    parameterWithName("page").description("페이지 번호")
+                ),
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("JWT access 토큰")
+                ),
+                responseFields(
+                    fieldWithPath("data[].score").type(JsonFieldType.NUMBER).description("리뷰 점수"),
+                    fieldWithPath("data[].content").type(JsonFieldType.STRING).description("리뷰 내용 본문")
+                )
+            );
+        }
+
     }
 
     @Nested
@@ -209,7 +248,7 @@ class ReviewApiTest extends ApiTest {
 
             return mockMvc.perform(get("/rooms/{roomId}/reviews", roomId)
                 .header(HttpHeaders.AUTHORIZATION, givenUserAccessToken)
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                 .params(params));
         }
 
@@ -238,11 +277,31 @@ class ReviewApiTest extends ApiTest {
         @DisplayName("조건에 맞는 리뷰를 전부 가져온다")
         void searchRoomReviews() throws Exception {
             var givenSearchRequest = new SearchReviewRequest(5);
-            var givenPageReviewRequest = new PageReviewRequest(10, 10);
+            var givenPageReviewRequest = new PageReviewRequest(0, 10);
 
             숙소_리뷰_조회(givenRoom.getId(), givenSearchRequest, givenPageReviewRequest)
                 .andExpect(status().isOk())
-                .andDo(print());
+                .andDo(searchRoomReviewsDoc());
+        }
+
+        private RestDocumentationResultHandler searchRoomReviewsDoc() {
+            return document.document(
+                pathParameters(
+                    parameterWithName("roomId").description("숙소 아이디")
+                ),
+                requestParameters(
+                    parameterWithName("score").description("리뷰 점수"),
+                    parameterWithName("size").description("페이지 사이즈"),
+                    parameterWithName("page").description("페이지 번호")
+                ),
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("JWT access 토큰")
+                ),
+                responseFields(
+                    fieldWithPath("data[].score").type(JsonFieldType.NUMBER).description("리뷰 점수"),
+                    fieldWithPath("data[].content").type(JsonFieldType.STRING).description("리뷰 내용 본문")
+                )
+            );
         }
     }
 
@@ -256,7 +315,7 @@ class ReviewApiTest extends ApiTest {
             EditReviewRequest editReviewDto) throws Exception {
             return mockMvc.perform(post("/reviews/{reviewId}", reviewId)
                 .header(HttpHeaders.AUTHORIZATION, userAccessToken)
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
                 .content(toJson(editReviewDto)));
         }
 
@@ -268,12 +327,31 @@ class ReviewApiTest extends ApiTest {
 
         @Test
         @DisplayName("리뷰를 수정할 수 있다")
-        void postReview() throws Exception {
+        void editReview() throws Exception {
             리뷰_수정(givenGuestAccessToken, givenReview.getId(), givenEditDto)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.content").value(givenEditDto.getContent()))
                 .andExpect(jsonPath("$.data.score").value(givenEditDto.getScore()))
-                .andDo(print());
+                .andDo(editReviewDoc());
+        }
+
+        private RestDocumentationResultHandler editReviewDoc() {
+            return document.document(
+                pathParameters(
+                    parameterWithName("reviewId").description("리뷰 아이디")
+                ),
+                requestFields(
+                    fieldWithPath("score").type(JsonFieldType.NUMBER).description("리뷰 점수"),
+                    fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용 본문")
+                ),
+                requestHeaders(
+                    headerWithName(AUTHORIZATION).description("JWT access 토큰")
+                ),
+                responseFields(
+                    fieldWithPath("data.score").type(JsonFieldType.NUMBER).description("리뷰 점수"),
+                    fieldWithPath("data.content").type(JsonFieldType.STRING).description("리뷰 내용 본문")
+                )
+            );
         }
 
         @Test
@@ -312,9 +390,17 @@ class ReviewApiTest extends ApiTest {
 
             리뷰_삭제(givenGuestAccessToken, givenReview.getId())
                 .andExpect(status().isNoContent())
-                .andDo(print());
+                .andDo(deleteReviewDoc());
 
             assertThat(reviewRepository.count()).isZero();
+        }
+
+        private RestDocumentationResultHandler deleteReviewDoc() {
+            return document.document(
+                pathParameters(
+                    parameterWithName("reviewId").description("리뷰 아이디")
+                )
+            );
         }
 
         @Test
