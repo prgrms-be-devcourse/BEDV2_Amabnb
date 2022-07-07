@@ -1,0 +1,53 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:docinfo: shared-head
+
+
+== 숙소 API
+
+=== 공통
+
+모든 숙소 조회는 로그인 없이 가능하다.
+
+=== 숙소 필터 검색
+
+==== Request
+
+include::{snippets}/room-api-test/filter-search-rooms/request-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/room-api-test/filter-search-rooms/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/room-api-test/filter-search-rooms/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/room-api-test/filter-search-rooms/http-response.adoc[]
+
+=== 숙소 상세 조회
+
+==== Request
+
+include::{snippets}/room-api-test/get-room-detail/path-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/room-api-test/get-room-detail/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/room-api-test/get-room-detail/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/room-api-test/get-room-detail/http-response.adoc[]

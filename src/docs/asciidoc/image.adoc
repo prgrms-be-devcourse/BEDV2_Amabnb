@@ -1,0 +1,36 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:docinfo: shared-head
+
+
+== 이미지 업로드 API
+
+=== 공통
+
+이미지 업로드 시 S3 경로 배열을 반환한다.
+
+=== 이미지 업로드
+
+==== Request
+
+include::{snippets}/image_upload/success/request-parts.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/image_upload/success/curl-request.adoc[]
+
+==== Response
+
+include::{snippets}/image_upload/success/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/image_upload/success/response-body.adoc[]
+
