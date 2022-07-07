@@ -17,6 +17,7 @@ import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.dto.response.RoomSearchResponse;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.user.entity.User;
@@ -30,6 +31,9 @@ class RoomRepositoryTest extends RepositoryTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    RoomImageRepository roomImageRepository;
 
     @Test
     @DisplayName("숙소정보를 db에 저장할 수 있다")
@@ -132,6 +136,19 @@ class RoomRepositoryTest extends RepositoryTest {
         assertThat(foundRoom).usingRecursiveComparison().ignoringFieldsOfTypes(LocalDateTime.class)
             .isEqualTo(room);
 
+    }
+
+    @Test
+    @DisplayName("호스트는 숙소를 삭제할 수 있다.")
+    void deleteHostRoom() {
+        //given
+        User host = userRepository.save(createUser("fads"));
+        Room room = roomRepository.save(createRoom(host));
+        //when
+        roomRepository.deleteById(room.getId());
+        //then
+        assertThat(roomRepository.findById(room.getId()).orElse(null)).isNull();
+        assertThat(roomImageRepository.findRoomImagesByRoom(room).size()).isEqualTo(0);
     }
 
     private SearchRoomFilterCondition createFullFilter() {
