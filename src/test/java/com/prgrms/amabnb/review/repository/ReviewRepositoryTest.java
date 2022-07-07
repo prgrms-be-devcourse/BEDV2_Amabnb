@@ -36,7 +36,7 @@ class ReviewRepositoryTest extends RepositoryTest {
     @DisplayName("게스트는 본인이 작성한 리뷰 목록을 조회할 수 있다 #70")
     class FindMyReviewByCondition {
         int givenReviewScore = 2;
-        PageReviewRequest pageable = new PageReviewRequest(10, 10);
+        PageReviewRequest pageable = new PageReviewRequest(0, 10);
         SearchReviewRequest givenSearchRequest = new SearchReviewRequest(givenReviewScore);
 
         @Test
@@ -69,7 +69,7 @@ class ReviewRepositoryTest extends RepositoryTest {
     @DisplayName("게스트는 숙소의 리뷰를 조회할 수 있다 #67")
     class FindRoomReviewByCondition {
         int givenReviewScore = 2;
-        PageReviewRequest pageable = new PageReviewRequest(10, 10);
+        PageReviewRequest pageable = new PageReviewRequest(0, 10);
         SearchReviewRequest condition = new SearchReviewRequest(givenReviewScore);
 
         @Test
