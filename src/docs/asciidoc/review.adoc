@@ -1,0 +1,103 @@
+ifndef::snippets[]
+:snippets: ../../../build/generated-snippets
+endif::[]
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 3
+:sectlinks:
+:docinfo: shared-head
+
+== 리뷰 API
+
+=== 리뷰 생성
+
+==== Request
+
+include::{snippets}/create-review/create-review/request-fields.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/create-review/create-review/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/create-review/create-review/response-headers.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/create-review/create-review/http-response.adoc[]
+
+=== 리뷰 수정
+
+==== Request
+
+include::{snippets}/edit-review/edit-review/request-fields.adoc[]
+include::{snippets}/edit-review/edit-review/request-headers.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/edit-review/edit-review/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/edit-review/edit-review/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/edit-review/edit-review/http-response.adoc[]
+
+=== 리뷰 삭제
+
+include::{snippets}/delete-review/delete-review/path-parameters.adoc[]
+
+==== Request
+
+===== Request HTTP Example
+
+include::{snippets}/delete-review/delete-review/http-request.adoc[]
+
+==== Response
+
+===== Response HTTP Example
+
+include::{snippets}/delete-review/delete-review/http-response.adoc[]
+
+=== 본인 리뷰 조회
+
+==== Request
+
+include::{snippets}/search-my-reviews/search-my-reviews/request-headers.adoc[]
+include::{snippets}/search-my-reviews/search-my-reviews/request-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/search-my-reviews/search-my-reviews/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/search-my-reviews/search-my-reviews/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/search-my-reviews/search-my-reviews/http-response.adoc[]
+
+=== 숙소 리뷰 조회
+
+==== Request
+
+include::{snippets}/search-room-reviews/search-room-reviews/request-headers.adoc[]
+include::{snippets}/search-room-reviews/search-room-reviews/request-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/search-room-reviews/search-room-reviews/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/search-room-reviews/search-room-reviews/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/search-room-reviews/search-room-reviews/http-response.adoc[]
