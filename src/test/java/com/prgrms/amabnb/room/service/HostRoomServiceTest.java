@@ -143,16 +143,4 @@ class HostRoomServiceTest {
             .build();
     }
 
-    private User createUserWithId(String name) {
-        return User.builder()
-            .id(1L)
-            .oauthId(name)
-            .provider("kakao")
-            .name(name)
-            .email(new Email(name + "@gmail.com"))
-            .userRole(GUEST)
-            .profileImgUrl("url")
-            .build();
-    }
-
 }
