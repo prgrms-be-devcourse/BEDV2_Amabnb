@@ -10,8 +10,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL5Dialect
+        format_sql: true
     hibernate:
       ddl-auto: validate
+
 
 cloud:
   aws:
@@ -25,3 +27,12 @@ cloud:
       auto: false
     stack:
       auto: false
+
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type: trace
+        descriptor:
+          sql: trace
