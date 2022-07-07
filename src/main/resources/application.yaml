@@ -1,23 +1,4 @@
 spring:
-  h2:
-    console:
-      enabled: true
-  datasource:
-    username: sa
-    password:
-    url: jdbc:h2:mem:amabnb
-    driver-class-name: org.h2.Driver
-
-  jpa:
-    database: H2
-    open-in-view: false
-    show-sql: true
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.H2Dialect
-        format_sql: true
-    hibernate:
-      ddl-auto: create
-
   profiles:
-    include: security, cloud
+    active: local
+    include: security

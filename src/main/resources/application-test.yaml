@@ -17,7 +17,11 @@ spring:
         dialect: org.hibernate.dialect.MySQL5Dialect
         format_sql: true
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: none
+
+  sql:
+    init:
+      platform: test
 
   security:
     oauth2:

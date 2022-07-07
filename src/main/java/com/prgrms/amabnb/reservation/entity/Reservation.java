@@ -49,6 +49,7 @@ public class Reservation extends BaseEntity {
     private Money totalPrice;
 
     @Enumerated(value = EnumType.STRING)
+    @Column(name = "status", nullable = false)
     private ReservationStatus reservationStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -56,7 +57,7 @@ public class Reservation extends BaseEntity {
     private Room room;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "users_id")
+    @JoinColumn(name = "user_id")
     private User guest;
 
     @Builder
