@@ -2,7 +2,6 @@ package com.prgrms.amabnb.image;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.DisplayName;
@@ -49,7 +48,6 @@ public class ImageUploadToS3Test extends ApiTest {
                 // then
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("data").value("https://s3.amand.com/0"))
-                .andDo(print())
 
                 // docs
                 .andDo(document.document(
