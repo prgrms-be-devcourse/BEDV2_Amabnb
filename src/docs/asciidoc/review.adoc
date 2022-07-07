@@ -11,10 +11,17 @@ endif::[]
 
 == 리뷰 API
 
+=== 공통
+
+모든 요청은 JWT access token 이 필요합니다.
+
+include::{snippets}/search-room-reviews/search-room-reviews/request-headers.adoc[]
+
 === 리뷰 생성
 
 ==== Request
 
+include::{snippets}/create-review/create-review/path-parameters.adoc[]
 include::{snippets}/create-review/create-review/request-fields.adoc[]
 
 ===== Request HTTP Example
@@ -29,46 +36,14 @@ include::{snippets}/create-review/create-review/response-headers.adoc[]
 
 include::{snippets}/create-review/create-review/http-response.adoc[]
 
-=== 리뷰 수정
-
-==== Request
-
-include::{snippets}/edit-review/edit-review/request-fields.adoc[]
-include::{snippets}/edit-review/edit-review/request-headers.adoc[]
-
-===== Request HTTP Example
-
-include::{snippets}/edit-review/edit-review/http-request.adoc[]
-
-==== Response
-
-include::{snippets}/edit-review/edit-review/response-fields.adoc[]
-
-===== Response HTTP Example
-
-include::{snippets}/edit-review/edit-review/http-response.adoc[]
-
-=== 리뷰 삭제
-
-include::{snippets}/delete-review/delete-review/path-parameters.adoc[]
-
-==== Request
-
-===== Request HTTP Example
-
-include::{snippets}/delete-review/delete-review/http-request.adoc[]
-
-==== Response
-
-===== Response HTTP Example
-
-include::{snippets}/delete-review/delete-review/http-response.adoc[]
-
 === 본인 리뷰 조회
 
 ==== Request
 
-include::{snippets}/search-my-reviews/search-my-reviews/request-headers.adoc[]
+===== End Point
+
+/reviews
+
 include::{snippets}/search-my-reviews/search-my-reviews/request-parameters.adoc[]
 
 ===== Request HTTP Example
@@ -87,7 +62,7 @@ include::{snippets}/search-my-reviews/search-my-reviews/http-response.adoc[]
 
 ==== Request
 
-include::{snippets}/search-room-reviews/search-room-reviews/request-headers.adoc[]
+include::{snippets}/search-room-reviews/search-room-reviews/path-parameters.adoc[]
 include::{snippets}/search-room-reviews/search-room-reviews/request-parameters.adoc[]
 
 ===== Request HTTP Example
@@ -101,3 +76,38 @@ include::{snippets}/search-room-reviews/search-room-reviews/response-fields.adoc
 ===== Response HTTP Example
 
 include::{snippets}/search-room-reviews/search-room-reviews/http-response.adoc[]
+
+=== 리뷰 수정
+
+==== Request
+
+include::{snippets}/edit-review/edit-review/path-parameters.adoc[]
+include::{snippets}/edit-review/edit-review/request-fields.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/edit-review/edit-review/http-request.adoc[]
+
+==== Response
+
+include::{snippets}/edit-review/edit-review/response-fields.adoc[]
+
+===== Response HTTP Example
+
+include::{snippets}/edit-review/edit-review/http-response.adoc[]
+
+=== 리뷰 삭제
+
+==== Request
+
+include::{snippets}/delete-review/delete-review/path-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/delete-review/delete-review/http-request.adoc[]
+
+==== Response
+
+===== Response HTTP Example
+
+include::{snippets}/delete-review/delete-review/http-response.adoc[]

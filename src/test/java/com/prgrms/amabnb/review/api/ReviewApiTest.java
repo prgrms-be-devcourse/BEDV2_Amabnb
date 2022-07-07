@@ -106,6 +106,9 @@ class ReviewApiTest extends ApiTest {
 
         private RestDocumentationResultHandler createReviewDoc() {
             return document.document(
+                pathParameters(
+                    parameterWithName("reservationId").description("예약 아이디")
+                ),
                 requestFields(
                     fieldWithPath("score").type(JsonFieldType.NUMBER).description("리뷰 점수"),
                     fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용 본문")
@@ -283,6 +286,9 @@ class ReviewApiTest extends ApiTest {
 
         private RestDocumentationResultHandler searchRoomReviewsDoc() {
             return document.document(
+                pathParameters(
+                    parameterWithName("roomId").description("숙소 아이디")
+                ),
                 requestParameters(
                     parameterWithName("score").description("리뷰 점수"),
                     parameterWithName("size").description("페이지 사이즈"),
@@ -331,6 +337,9 @@ class ReviewApiTest extends ApiTest {
 
         private RestDocumentationResultHandler editReviewDoc() {
             return document.document(
+                pathParameters(
+                    parameterWithName("reviewId").description("리뷰 아이디")
+                ),
                 requestFields(
                     fieldWithPath("score").type(JsonFieldType.NUMBER).description("리뷰 점수"),
                     fieldWithPath("content").type(JsonFieldType.STRING).description("리뷰 내용 본문")
