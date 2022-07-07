@@ -274,7 +274,7 @@ class ReviewApiTest extends ApiTest {
         @DisplayName("조건에 맞는 리뷰를 전부 가져온다")
         void searchRoomReviews() throws Exception {
             var givenSearchRequest = new SearchReviewRequest(5);
-            var givenPageReviewRequest = new PageReviewRequest(10, 10);
+            var givenPageReviewRequest = new PageReviewRequest(0, 10);
 
             숙소_리뷰_조회(givenRoom.getId(), givenSearchRequest, givenPageReviewRequest)
                 .andExpect(status().isOk())
