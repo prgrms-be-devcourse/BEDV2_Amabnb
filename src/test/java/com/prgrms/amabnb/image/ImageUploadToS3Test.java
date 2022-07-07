@@ -1,6 +1,7 @@
 package com.prgrms.amabnb.image;
 
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -28,11 +29,11 @@ public class ImageUploadToS3Test extends ApiTest {
         @Test
         @WithMockUser
         @DisplayName("파일이 정상적으로 업로드 됐을때")
-        void 성공() throws Exception {
+        void success() throws Exception {
             // given
             var fileResource = new ClassPathResource("imagefile.jpeg");
             MockMultipartFile firstFile = new MockMultipartFile(
-                "file",
+                "images",
                 fileResource.getFilename(),
                 MediaType.MULTIPART_FORM_DATA_VALUE,
                 fileResource.getInputStream());
@@ -40,7 +41,7 @@ public class ImageUploadToS3Test extends ApiTest {
             // when
             mockMvc.perform(MockMvcRequestBuilders
                     .multipart("/room-images")
-                    .file("images", firstFile.getBytes())
+                    .file(firstFile)
                     .contentType(MediaType.MULTIPART_FORM_DATA)
                     .characterEncoding("UTF-8")
                 )
@@ -52,7 +53,9 @@ public class ImageUploadToS3Test extends ApiTest {
 
                 // docs
                 .andDo(document.document(
-                    requestPartBody("images"),
+                    requestParts(
+                        partWithName("images").description("이미지 파일 배열")
+                    ),
                     responseFields(
                         fieldWithPath("data").type(JsonFieldType.ARRAY).description("s3 이미지 경로 배열")
                     )));
