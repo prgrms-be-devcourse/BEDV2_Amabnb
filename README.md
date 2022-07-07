@@ -1,11 +1,11 @@
 # ✈️ 아마비앤비
 
-### 📔 [Amabnb Notion Page](https://www.notion.so/backend-devcourse/687c68a23cbd49fa8c825beb2b47dda7)  
+### 📔 [Amabnb Notion Page](https://www.notion.so/backend-devcourse/687c68a23cbd49fa8c825beb2b47dda7)
 <br/>
 
 ## 🔹 프로젝트의 기획 및 설명
 > 에어비앤비 API 클론코딩
-## 🔹 팀 구성   
+## 🔹 팀 구성
 <table>
   <tr>
     <td align="center"><b>Product Owner</b></td>
@@ -16,27 +16,27 @@
   </tr>
   <tr>
     <td>
-        <a href="https://github.com/midasWorld">
+        <a href="https://github.com/78planet">
             <img src="https://user-images.githubusercontent.com/41179265/177427660-243afcba-a7cf-4810-9906-d9f7d22b4f07.png" width="100px" />
         </a>
     </td>
     <td>
-        <a href="https://github.com/HyoungUkJJang">
+        <a href="https://github.com/kimziou77">
             <img src="https://avatars.githubusercontent.com/u/41179265?s=96&v=4" width="100px" />
         </a>
     </td>
     <td>
-        <a href="https://github.com/whyWhale">
+        <a href="https://github.com/yuminhwan">
             <img src="https://avatars.githubusercontent.com/u/65746780?v=4" width="100px" />
         </a>
     </td>
     <td>
-        <a href="https://github.com/pjh612">
+        <a href="https://github.com/yongsu-kang">
             <img src="https://avatars.githubusercontent.com/u/97223877?v=4" width="100px" />
         </a>
     </td>
     <td>
-        <a href="https://github.com/HYEBPARK">
+        <a href="https://github.com/bosuksh">
             <img src="https://user-images.githubusercontent.com/41179265/177427610-6be14972-f4a8-49f9-ad80-62ae57c6c8f9.png" width="100px" />
         </a>
     </td>
@@ -58,19 +58,19 @@
 ![notion](https://img.shields.io/badge/notion-eeeeee?style=flat-square&logo=notion&logoColor=black)
 
 ## 🔹 기술 스택
-* java 17  
-* Spring Boot 2.7.0  
-* Gradle 7.4.1  
+* java 17
+* Spring Boot 2.7.0
+* Gradle 7.4.1
 * data Jpa
-* QueryDSL  
+* QueryDSL
 * Amazon Aurora MySQL
-* Rest-Docs  
-* Junit 5  
-* Jwt  
-* Oauth2  
-* SpringSecurity  
-* AWS S3  
-* Jenkins  
+* Rest-Docs
+* Junit 5
+* Jwt
+* Oauth2
+* SpringSecurity
+* AWS S3
+* Jenkins
 
 <br/>
 
@@ -91,9 +91,11 @@
 ![image](https://user-images.githubusercontent.com/41179265/177434430-89724cd3-f14f-424e-8a20-0587bba01203.png)
 
 ## 🔹 자동화 API 문서
-- [API 문서](https://github.com/prgrms-be-devcourse/BEDV2_Amabnb/wiki/%F0%9F%9B%A9%EF%B8%8F-03_API-%EB%AC%B8%EC%84%9C)
+- [API 문서](https://kimziou77.github.io/BEDV2_Amabnb/)
 
 ## 🔹 프로젝트 주요 관심사
 - [기술적 선택 이유](https://github.com/prgrms-be-devcourse/BEDV2_Amabnb/wiki/%F0%9F%9B%A9%EF%B8%8F-02_%EA%B8%B0%EC%88%A0%EC%A0%81-%EC%84%A0%ED%83%9D-%EC%9D%B4%EC%9C%A0)
-- [협업방식 with 애자일](https://github.com/prgrms-be-devcourse/BEDV2_Amabnb/wiki/%F0%9F%9B%A9%EF%B8%8F-01_%ED%98%91%EC%97%85%EB%B0%A9%EC%8B%9D) 
-- 객체지향과 클린코드
+- [협업방식 with 애자일](https://github.com/prgrms-be-devcourse/BEDV2_Amabnb/wiki/%F0%9F%9B%A9%EF%B8%8F-01_%ED%98%91%EC%97%85%EB%B0%A9%EC%8B%9D)
+
+## 🔹 회고
+- [회고링크](https://www.notion.so/backend-devcourse/3a7dd41f01a14fcda608f8745aac18c3?v=f96c56dedcf14358aec82ea14dc89e31)
