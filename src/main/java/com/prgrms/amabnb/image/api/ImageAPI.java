@@ -21,8 +21,9 @@ public class ImageAPI {
     private final ImageUploader imageUploader;
 
     @PostMapping("/room-images")
-    public ResponseEntity<ApiResponse<List<String>>> upload(@RequestBody List<MultipartFile> images) throws
-        IOException {
+    public ResponseEntity<ApiResponse<List<String>>> upload(
+        @RequestBody List<MultipartFile> images
+    ) throws IOException {
         return ResponseEntity.ok(new ApiResponse<>(imageUploader.uploadImage(images)));
     }
 }
