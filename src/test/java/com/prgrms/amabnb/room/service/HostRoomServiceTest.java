@@ -1,6 +1,7 @@
 package com.prgrms.amabnb.room.service;
 
 import static com.prgrms.amabnb.config.util.Fixture.*;
+import static com.prgrms.amabnb.user.entity.UserRole.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
@@ -15,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.prgrms.amabnb.common.exception.EntityNotFoundException;
+import com.prgrms.amabnb.common.vo.Email;
 import com.prgrms.amabnb.room.dto.request.CreateRoomRequest;
 import com.prgrms.amabnb.room.dto.request.ModifyRoomRequest;
 import com.prgrms.amabnb.room.entity.Room;
@@ -69,21 +71,26 @@ class HostRoomServiceTest {
     @DisplayName("호스트는 자신이 등록한 방을 수정할 수 있다.")
     void modifyRoomTest() {
         //given
-        Room room = createRoom(createUser("fdas"));
-        given(roomRepository.findRoomByIdAndHostId(anyLong(), anyLong())).willReturn(Optional.of(room));
+        User host = createUserWithId("fdas");
+        Room room = createRoom(host);
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(host));
+        given(roomRepository.findById(anyLong())).willReturn(Optional.of(room));
         //when
-        hostRoomService.modifyRoom(1L, 1L, createModifyRoomRequest());
+        hostRoomService.modifyRoom(host.getId(), anyLong(), createModifyRoomRequest());
         //then
-        then(roomRepository).should(times(1)).findRoomByIdAndHostId(anyLong(), anyLong());
+        then(userRepository).should(times(1)).findById(anyLong());
+        then(roomRepository).should(times(1)).findById(anyLong());
     }
 
     @Test
     @DisplayName("등록된 방이 아니면 수정할 수 없다.")
     void modifyFailTest() {
         //given
-        given(roomRepository.findRoomByIdAndHostId(anyLong(), anyLong())).willThrow(RoomNotFoundException.class);
+        User host = createUserWithId("gfadgs");
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(host));
+        given(roomRepository.findById(anyLong())).willThrow(RoomNotFoundException.class);
         //when, then
-        assertThatThrownBy(() -> hostRoomService.modifyRoom(anyLong(), anyLong(), createModifyRoomRequest()))
+        assertThatThrownBy(() -> hostRoomService.modifyRoom(host.getId(), anyLong(), createModifyRoomRequest()))
             .isInstanceOf(RoomNotFoundException.class);
     }
 
@@ -102,12 +109,26 @@ class HostRoomServiceTest {
 
     @Test
     @DisplayName("유저가 존재하지 않으면 방정보를 가져올 수 없다.")
-    void name() {
+    void noUser() {
         //given
         given(userRepository.existsById(anyLong())).willReturn(false);
         //when
         assertThatThrownBy(() -> hostRoomService.searchRoomsForHost(1L)).isInstanceOf(UserNotFoundException.class);
 
+    }
+
+    @Test
+    @DisplayName("호스트는 숙소를 삭제할 수 있다.")
+    void deleteHostRoom() {
+        //given
+        User host = createUserWithId("ada");
+        given(userRepository.findById(host.getId())).willReturn(Optional.of(host));
+        given(roomRepository.findById(anyLong())).willReturn(Optional.of(createRoom(host)));
+        //when
+        hostRoomService.deleteRoom(host.getId(), 1L);
+        //then
+        then(userRepository).should(times(1)).findById(anyLong());
+        then(roomRepository).should(times(1)).findById(anyLong());
     }
 
     private ModifyRoomRequest createModifyRoomRequest() {
@@ -119,6 +140,18 @@ class HostRoomServiceTest {
             .bedCnt(22)
             .bedRoomCnt(11)
             .bathRoomCnt(11)
+            .build();
+    }
+
+    private User createUserWithId(String name) {
+        return User.builder()
+            .id(1L)
+            .oauthId(name)
+            .provider("kakao")
+            .name(name)
+            .email(new Email(name + "@gmail.com"))
+            .userRole(GUEST)
+            .profileImgUrl("url")
             .build();
     }
 
