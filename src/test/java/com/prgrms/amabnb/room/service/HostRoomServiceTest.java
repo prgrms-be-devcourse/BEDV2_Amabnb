@@ -76,7 +76,7 @@ class HostRoomServiceTest {
         given(userRepository.findById(anyLong())).willReturn(Optional.of(host));
         given(roomRepository.findById(anyLong())).willReturn(Optional.of(room));
         //when
-        hostRoomService.modifyRoom(host.getId(), anyLong(), createModifyRoomRequest());
+        hostRoomService.modifyRoom(host.getId(), 1L, createModifyRoomRequest());
         //then
         then(userRepository).should(times(1)).findById(anyLong());
         then(roomRepository).should(times(1)).findById(anyLong());
