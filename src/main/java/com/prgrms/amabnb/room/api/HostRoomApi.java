@@ -1,10 +1,13 @@
 package com.prgrms.amabnb.room.api;
 
+import static org.springframework.http.HttpStatus.*;
+
 import java.net.URI;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -65,6 +68,6 @@ public class HostRoomApi {
         @AuthenticationPrincipal JwtAuthentication host
     ) {
         hostRoomService.deleteRoom(host.id(), roomId);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(NO_CONTENT).build();
     }
 }
