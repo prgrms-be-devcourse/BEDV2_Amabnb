@@ -123,6 +123,26 @@ class HostRoomApiTest extends ApiTest {
     }
 
     @Test
+    @DisplayName("호스트는 등록한 숙소를 삭제할 수 있다.")
+    void deleteRoom() throws Exception{
+        //given
+        String accessToken = 로그인_요청("host");
+        Long roomId = saveRoom(accessToken);
+        //when
+        mockMvc.perform(delete("/host/rooms/{roomId}", roomId)
+                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .contentType(MediaType.APPLICATION_JSON))
+            //then
+            .andExpect(status().isNoContent())
+            .andDo(document.document(
+                tokenRequestHeader(),
+                pathParameters(
+                    parameterWithName("roomId").description("숙소 아이디")
+                )
+            ));
+    }
+
+    @Test
     @DisplayName("숙소는 userId가 없으면 등록되지 않는다.")
     void nullUserIdTest() throws Exception {
         //given

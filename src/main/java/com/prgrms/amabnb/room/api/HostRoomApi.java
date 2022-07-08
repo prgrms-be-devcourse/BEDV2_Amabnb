@@ -1,12 +1,16 @@
 package com.prgrms.amabnb.room.api;
 
+import static org.springframework.http.HttpStatus.*;
+
 import java.net.URI;
 import java.util.List;
 
 import javax.validation.Valid;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -40,6 +44,14 @@ public class HostRoomApi {
         return ResponseEntity.created(URI.create("/rooms/" + savedRoomId)).build();
     }
 
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<RoomResponse>>> getRoomsForHost(
+        @AuthenticationPrincipal JwtAuthentication host
+    ) {
+        List<RoomResponse> roomResponseList = hostRoomService.searchRoomsForHost(host.id());
+        return ResponseEntity.ok(new ApiResponse<>(roomResponseList));
+    }
+
     @PutMapping("/{roomId}")
     public ResponseEntity<Void> modifyRoom(
         @PathVariable Long roomId,
@@ -50,11 +62,12 @@ public class HostRoomApi {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<RoomResponse>>> getRoomsForHost(
+    @DeleteMapping("/{roomId}")
+    public ResponseEntity<Void> deleteRoom(
+        @PathVariable Long roomId,
         @AuthenticationPrincipal JwtAuthentication host
     ) {
-        List<RoomResponse> roomResponseList = hostRoomService.searchRoomsForHost(host.id());
-        return ResponseEntity.ok(new ApiResponse<>(roomResponseList));
+        hostRoomService.deleteRoom(host.id(), roomId);
+        return ResponseEntity.status(NO_CONTENT).build();
     }
 }

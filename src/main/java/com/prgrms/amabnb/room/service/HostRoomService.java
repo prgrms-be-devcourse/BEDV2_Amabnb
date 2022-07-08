@@ -12,6 +12,7 @@ import com.prgrms.amabnb.room.dto.response.RoomResponse;
 import com.prgrms.amabnb.room.entity.Room;
 import com.prgrms.amabnb.room.entity.vo.RoomOption;
 import com.prgrms.amabnb.room.exception.RoomNotFoundException;
+import com.prgrms.amabnb.room.exception.RoomNotHavePermissionException;
 import com.prgrms.amabnb.room.repository.RoomRepository;
 import com.prgrms.amabnb.user.entity.User;
 import com.prgrms.amabnb.user.exception.UserNotFoundException;
@@ -34,12 +35,6 @@ public class HostRoomService {
         return roomRepository.save(room).getId();
     }
 
-    @Transactional
-    public void modifyRoom(Long hostId, Long roomId, ModifyRoomRequest modifyRoomRequest) {
-        Room room = roomRepository.findRoomByIdAndHostId(roomId, hostId).orElseThrow(RoomNotFoundException::new);
-        changeRoomData(modifyRoomRequest, room);
-    }
-
     public List<RoomResponse> searchRoomsForHost(Long hostId) {
         isExistUser(hostId);
 
@@ -47,6 +42,28 @@ public class HostRoomService {
             .stream()
             .map(RoomResponse::from)
             .toList();
+    }
+
+    @Transactional
+    public void modifyRoom(Long hostId, Long roomId, ModifyRoomRequest modifyRoomRequest) {
+        User host = userRepository.findById(hostId).orElseThrow(UserNotFoundException::new);
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+        validateRoomHost(room, host);
+        changeRoomData(modifyRoomRequest, room);
+    }
+
+    @Transactional
+    public void deleteRoom(Long hostId, Long roomId) {
+        User host = userRepository.findById(hostId).orElseThrow(UserNotFoundException::new);
+        Room room = roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
+        validateRoomHost(room, host);
+        roomRepository.deleteById(roomId);
+    }
+
+    private void validateRoomHost(Room room, User host) {
+        if (!room.isHost(host)) {
+            throw new RoomNotHavePermissionException("해당 숙소의 호스트가 아닙니다.");
+        }
     }
 
     private void changeRoomData(ModifyRoomRequest modifyRoomRequest, Room room) {
