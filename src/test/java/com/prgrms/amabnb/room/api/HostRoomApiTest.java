@@ -133,7 +133,7 @@ class HostRoomApiTest extends ApiTest {
                 .header(HttpHeaders.AUTHORIZATION, accessToken)
                 .contentType(MediaType.APPLICATION_JSON))
             //then
-            .andExpect(status().isOk())
+            .andExpect(status().isNoContent())
             .andDo(document.document(
                 tokenRequestHeader(),
                 pathParameters(
