@@ -37,13 +37,6 @@ class RoomRepositoryTest extends RepositoryTest {
     @Autowired
     RoomImageRepository roomImageRepository;
 
-    @AfterEach
-    void cleanUp(){
-        roomRepository.deleteAll();
-        userRepository.deleteAll();
-        roomImageRepository.deleteAll();
-    }
-
     @Test
     @DisplayName("숙소정보를 db에 저장할 수 있다")
     void roomJpaSave() {
@@ -78,12 +71,12 @@ class RoomRepositoryTest extends RepositoryTest {
         roomRepository.save(room2);
 
         List<Room> all = roomRepository.findAll();
-        assertThat(all.size()).isEqualTo(31);
+        assertThat(all).hasSize(31);
         //when
         List<RoomSearchResponse> rooms = roomRepository.findRoomsByFilterCondition(filter, PageRequest.of(0, 10));
 
         //then
-        assertThat(rooms.size()).isEqualTo(10);
+        assertThat(rooms).hasSize(10);
     }
 
     @Test
@@ -102,7 +95,7 @@ class RoomRepositoryTest extends RepositoryTest {
         List<RoomSearchResponse> rooms = roomRepository.findRoomsByFilterCondition(nullFilter, PageRequest.of(0, 10));
 
         //then
-        assertThat(rooms.size()).isEqualTo(3);
+        assertThat(rooms).hasSize(3);
 
     }
 
@@ -132,7 +125,7 @@ class RoomRepositoryTest extends RepositoryTest {
         //when
         List<Room> rooms = roomRepository.findRoomsByHostId(hostId);
         //then
-        assertThat(rooms.size()).isEqualTo(2);
+        assertThat(rooms).hasSize(2);
     }
 
     @Test
