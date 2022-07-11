@@ -52,7 +52,7 @@ CREATE TABLE room
 
 alter table room
     add constraint fk_room_to_user
-        foreign key (host_id) references users (id);
+        foreign key (host_id) references users (id) on DELETE cascade;
 
 
 CREATE TABLE reservation
@@ -73,11 +73,11 @@ CREATE TABLE reservation
 
 alter table reservation
     add constraint fk_reservation_to_reservation
-        foreign key (room_id) references room (id);
+        foreign key (room_id) references room (id) on DELETE cascade;
 
 alter table reservation
     add constraint fk_reservation_to_user
-        foreign key (user_id) references users (id);
+        foreign key (user_id) references users (id) on DELETE cascade;
 
 
 CREATE TABLE `review`
@@ -94,7 +94,7 @@ CREATE TABLE `review`
 
 alter table review
     add constraint fk_review_to_reservation
-        foreign key (reservation_id) references reservation (id);
+        foreign key (reservation_id) references reservation (id) on DELETE cascade;;
 
 CREATE TABLE room_image
 (
@@ -109,7 +109,7 @@ CREATE TABLE room_image
 
 alter table room_image
     add constraint fk_room_images_to_room
-        foreign key (room_id) references room (id);
+        foreign key (room_id) references room (id) on DELETE cascade;
 
 CREATE TABLE token
 (
