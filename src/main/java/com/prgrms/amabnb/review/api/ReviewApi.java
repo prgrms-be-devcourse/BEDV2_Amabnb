@@ -4,8 +4,10 @@ import java.net.URI;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Null;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,9 +47,10 @@ public class ReviewApi {
     @GetMapping("/rooms/{roomId}/reviews")
     public ResponseEntity<ApiResponse<List<SearchReviewResponse>>> searchRoomReviews(
         @PathVariable Long roomId,
-        @Valid SearchReviewRequest searchDto,
-        PageReviewRequest pageReviewRequest
+        @Nullable @Valid SearchReviewRequest searchDto,
+        @Nullable PageReviewRequest pageReviewRequest
     ) {
+
         return ResponseEntity.ok(
             new ApiResponse<>(reviewService.searchRoomReviews(roomId, searchDto, pageReviewRequest.of())));
     }
@@ -55,8 +58,8 @@ public class ReviewApi {
     @GetMapping("/reviews")
     public ResponseEntity<ApiResponse<List<SearchReviewResponse>>> searchMyReviews(
         @AuthenticationPrincipal JwtAuthentication user,
-        @Valid SearchReviewRequest searchReviewDto,
-        PageReviewRequest pageReviewRequest
+        @Nullable @Valid SearchReviewRequest searchReviewDto,
+        @Nullable PageReviewRequest pageReviewRequest
     ) {
         return ResponseEntity.ok(
             new ApiResponse<>(reviewService.searchMyReviews(user.id(), searchReviewDto, pageReviewRequest.of())));

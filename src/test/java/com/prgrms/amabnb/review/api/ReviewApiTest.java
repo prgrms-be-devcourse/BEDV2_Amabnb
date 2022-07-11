@@ -234,23 +234,17 @@ class ReviewApiTest extends ApiTest {
     @Nested
     @DisplayName("게스트는 숙소의 리뷰를 조회할 수 있다 #67")
     class SearchRoomReviews {
-
         Room givenRoom;
         String givenUserAccessToken;
 
-        ResultActions 숙소_리뷰_조회(
-            Long roomId, SearchReviewRequest request, PageReviewRequest page) throws Exception {
-
-            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-            params.add("score", String.valueOf(request.getScore()));
-            params.add("size", String.valueOf(page.getSize()));
-            params.add("page", String.valueOf(page.getPage()));
-
+        ResultActions 숙소_리뷰_조회(Long roomId, MultiValueMap<String, String> params) throws Exception {
             return mockMvc.perform(get("/rooms/{roomId}/reviews", roomId)
                 .header(HttpHeaders.AUTHORIZATION, givenUserAccessToken)
                 .contentType(MediaType.APPLICATION_JSON).characterEncoding("utf-8")
-                .params(params));
+                .params(params)
+            );
         }
+
 
         @BeforeEach
         void setAdditionalGiven() throws Exception {
@@ -274,16 +268,49 @@ class ReviewApiTest extends ApiTest {
         }
 
         @Test
-        @DisplayName("조건에 맞는 리뷰를 전부 가져온다")
+        @DisplayName("조건에 맞는 (paging & score) 리뷰를 전부 가져온다")
         void searchRoomReviews() throws Exception {
             var givenSearchRequest = new SearchReviewRequest(5);
             var givenPageReviewRequest = new PageReviewRequest(0, 10);
 
-            숙소_리뷰_조회(givenRoom.getId(), givenSearchRequest, givenPageReviewRequest)
+            숙소_리뷰_조회(givenRoom.getId(), makeParamMap(givenSearchRequest, givenPageReviewRequest))
                 .andExpect(status().isOk())
                 .andDo(searchRoomReviewsDoc());
         }
-
+        @Test
+        @DisplayName("일부 조건에 (no paging) 맞는 리뷰를 전부 가져온다")
+        void searchRoomReviews2() throws Exception {
+            var givenSearchRequest = new SearchReviewRequest(5);
+            숙소_리뷰_조회(givenRoom.getId(), noPagingParam(givenSearchRequest))
+                .andExpect(status().isOk())
+                .andDo(print());
+        }
+        @Test
+        @DisplayName("일부 조건에 (no score) 맞는 리뷰를 전부 가져온다")
+        void searchRoomReviews3() throws Exception {
+            var givenPageReviewRequest = new PageReviewRequest(0, 10);
+            숙소_리뷰_조회(givenRoom.getId(), noScoreParam(givenPageReviewRequest))
+                .andExpect(status().isOk())
+                .andDo(print());
+        }
+        MultiValueMap<String, String> makeParamMap(SearchReviewRequest request, PageReviewRequest page){
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("score", String.valueOf(request.getScore()));
+            params.add("size", String.valueOf(page.getSize()));
+            params.add("page", String.valueOf(page.getPage()));
+            return params;
+        }
+        MultiValueMap<String, String> noPagingParam(SearchReviewRequest request){
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("score", String.valueOf(request.getScore()));
+            return params;
+        }
+        MultiValueMap<String, String> noScoreParam(PageReviewRequest page){
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("size", String.valueOf(page.getSize()));
+            params.add("page", String.valueOf(page.getPage()));
+            return params;
+        }
         private RestDocumentationResultHandler searchRoomReviewsDoc() {
             return document.document(
                 pathParameters(
