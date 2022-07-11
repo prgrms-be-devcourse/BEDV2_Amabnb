@@ -69,3 +69,19 @@ include::{snippets}/host-room-api-test/modify-room/http-request.adoc[]
 ===== Response HTTP Example
 
 include::{snippets}/host-room-api-test/modify-room/http-response.adoc[]
+
+=== 숙소 삭제
+
+==== Request
+
+include::{snippets}/host-room-api-test/delete-room/path-parameters.adoc[]
+
+===== Request HTTP Example
+
+include::{snippets}/host-room-api-test/delete-room/http-request.adoc[]
+
+==== Response
+
+===== Response HTTP Example
+
+include::{snippets}/host-room-api-test/delete-room/http-response.adoc[]

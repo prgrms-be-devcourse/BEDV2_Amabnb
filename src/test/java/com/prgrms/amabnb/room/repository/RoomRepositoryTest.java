@@ -4,8 +4,10 @@ import static com.prgrms.amabnb.config.util.Fixture.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import com.prgrms.amabnb.config.RepositoryTest;
 import com.prgrms.amabnb.room.dto.request.SearchRoomFilterCondition;
 import com.prgrms.amabnb.room.dto.response.RoomSearchResponse;
 import com.prgrms.amabnb.room.entity.Room;
+import com.prgrms.amabnb.room.entity.RoomImage;
 import com.prgrms.amabnb.room.entity.RoomScope;
 import com.prgrms.amabnb.room.entity.RoomType;
 import com.prgrms.amabnb.user.entity.User;
@@ -30,6 +33,9 @@ class RoomRepositoryTest extends RepositoryTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    RoomImageRepository roomImageRepository;
 
     @Test
     @DisplayName("숙소정보를 db에 저장할 수 있다")
@@ -53,17 +59,24 @@ class RoomRepositoryTest extends RepositoryTest {
         User host = userRepository.save(createUser("fdsa"));
         SearchRoomFilterCondition filter = createFullFilter();
 
+        List<Room> createRooms = new ArrayList<>();
+        for (int i = 0; i < 30; i++) {
+            createRooms.add(createRoom(host));
+        }
+
+        roomRepository.saveAll(createRooms);
+
         Room room2 = createRoom(host);
+        room2.changePrice(new Money(50000));
         roomRepository.save(room2);
 
-        Room room3 = createRoom(host);
-        room3.changePrice(new Money(50000));
-        roomRepository.save(room3);
+        List<Room> all = roomRepository.findAll();
+        assertThat(all).hasSize(31);
         //when
         List<RoomSearchResponse> rooms = roomRepository.findRoomsByFilterCondition(filter, PageRequest.of(0, 10));
 
         //then
-        assertThat(rooms.size()).isEqualTo(1);
+        assertThat(rooms).hasSize(10);
     }
 
     @Test
@@ -82,7 +95,7 @@ class RoomRepositoryTest extends RepositoryTest {
         List<RoomSearchResponse> rooms = roomRepository.findRoomsByFilterCondition(nullFilter, PageRequest.of(0, 10));
 
         //then
-        assertThat(rooms.size()).isEqualTo(3);
+        assertThat(rooms).hasSize(3);
 
     }
 
@@ -112,7 +125,7 @@ class RoomRepositoryTest extends RepositoryTest {
         //when
         List<Room> rooms = roomRepository.findRoomsByHostId(hostId);
         //then
-        assertThat(rooms.size()).isEqualTo(2);
+        assertThat(rooms).hasSize(2);
     }
 
     @Test
@@ -132,6 +145,19 @@ class RoomRepositoryTest extends RepositoryTest {
         assertThat(foundRoom).usingRecursiveComparison().ignoringFieldsOfTypes(LocalDateTime.class)
             .isEqualTo(room);
 
+    }
+
+    @Test
+    @DisplayName("호스트는 숙소를 삭제할 수 있다.")
+    void deleteHostRoom() {
+        //given
+        User host = userRepository.save(createUser("fads"));
+        Room room = roomRepository.save(createRoom(host));
+        //when
+        roomRepository.deleteById(room.getId());
+        //then
+        assertThat(roomRepository.findById(room.getId()).orElse(null)).isNull();
+        assertThat(roomImageRepository.findRoomImagesByRoom(room).size()).isEqualTo(0);
     }
 
     private SearchRoomFilterCondition createFullFilter() {
